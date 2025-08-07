@@ -72,12 +72,12 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: "img/docusaurus-social-card.jpg",
+    image: "img/supervaize-black-green.png",
     navbar: {
-      title: "Supervaize",
+      title: "supervaize",
       logo: {
         alt: "Supervaize Logo",
-        src: "https://cdn.do.supervaize.com/brand/logos/pill-black-green-orange.svg",
+        src: "img/logo.svg",
       },
       items: [
         {

@@ -4,6 +4,9 @@
  * work well for content-centric websites.
  */
 
+/* Import Conformaa font */
+@import url("https://fonts.googleapis.com/css2?family=Conformaa:wght@300;400;500;600;700&display=swap");
+
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #32455f;
@@ -20,6 +23,36 @@
   --ifm-color-danger: #e92825;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* Apply Conformaa font to heading titles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Comfortaa", sans-serif;
+  font-weight: 600;
+}
+
+/* Apply Comfortaa font to navbar title */
+.navbar__title {
+  font-family: "Comfortaa", sans-serif;
+  font-weight: 600;
+  color: #32455f !important;
+  font-size: 1.8rem;
+}
+
+.navbar__item {
+  font-family: "Comfortaa", sans-serif;
+  font-weight: 600;
+  color: #32455f;
+}
+
+.navbar__logo {
+  width: 40px;
+  height: 40px;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
