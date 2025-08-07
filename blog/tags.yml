@@ -1,19 +1,24 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+supervaize:
+  label: Supervaize
+  permalink: /supervaize
+  description: Supervaize Company
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+supervaize-fleet:
+  label: Supervaize Fleet
+  permalink: /supervaize-fleet
+  description: Supervaize Fleet
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+supervaize-studio:
+  label: Supervaize Studio
+  permalink: /supervaize-studio
+  description: Supervaize Studio
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+supervaize-controller:
+  label: Supervaize Controller
+  permalink: /supervaize-controller
+  description: Supervaize Controller
+
+agentic:
+  label: Agentic
+  permalink: /agentic
+  description: Agentic AI
