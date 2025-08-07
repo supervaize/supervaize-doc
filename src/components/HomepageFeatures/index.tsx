@@ -1,50 +1,58 @@
-import type {ReactNode} from 'react';
-import clsx from 'clsx';
-import Heading from '@theme/Heading';
-import styles from './styles.module.css';
+import type { ReactNode } from "react";
+import clsx from "clsx";
+import Heading from "@theme/Heading";
+import styles from "./styles.module.css";
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
+  Svg: React.ComponentType<React.ComponentProps<"svg">>;
   description: ReactNode;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: "Supervaizer Controller",
+    Svg: require("@site/static/img/undraw_controller.svg").default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        The Supervaizer Controller is a powerful Python-based runtime that lets
+        you register, describe, and expose your AI agents to any A2A- or
+        ACP-compatible client. It handles lifecycle management, job execution,
+        agent cards, health checks, and telemetry—so developers can focus on the
+        logic while operations teams gain observability and control.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: "Supervaize Fleet Management",
+    Svg: require("@site/static/img/undraw_ai_fleet.svg").default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Supervaize is the first platform to enable non-technical teams to
+        monitor, control, and support their mission-critical AI agents in real
+        time. Think of it as your co-pilot for managing AI-powered operations.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: "Supervaize Studio",
+    Svg: require("@site/static/img/undraw_studio_dashboard.svg").default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Supervaize Studio is a no-code control center that empowers business
+        teams to onboard, monitor, and operate AI agents across their
+        organization. With built-in dashboards, workflow orchestration,
+        human-in-the-loop controls, and compliance-ready audit trails, Studio
+        makes it easy to scale and supervise your AI fleet—without writing a
+        single line of code.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({ title, Svg, description }: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={clsx("col col--4")}>
       <div className="text--center">
         <Svg className={styles.featureSvg} role="img" />
       </div>
