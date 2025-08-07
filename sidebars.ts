@@ -22,6 +22,7 @@ const sidebars: SidebarsConfig = {
       type: "category",
       label: "Supervaizer Controller",
       items: [
+        "Supervaizer Controller/intro",
         "Supervaizer Controller/API_REFERENCE",
         "Supervaizer Controller/REST_API",
         "Supervaizer Controller/CLI",
@@ -34,37 +35,19 @@ const sidebars: SidebarsConfig = {
     // Supervaize SaaS Documentation
     {
       type: "category",
-      label: "Supervaize SaaS",
+      label: "Supervaize Fleet Management",
       items: [
-        "Supervaize SaaS/intro",
+        "Supervaize Fleet/intro",
         // Add more items here when Supervaize SaaS docs are created
       ],
     },
+    // Supervaize SaaS Documentation
     {
       type: "category",
-      label: "Internal",
+      label: "Supervaize Studio",
       items: [
-        "Internal/intro",
-        {
-          type: "category",
-          label: "Tutorial Basics",
-          items: [
-            "Internal/tutorial-basics/create-a-document",
-            "Internal/tutorial-basics/create-a-page",
-            "Internal/tutorial-basics/create-a-blog-post",
-            "Internal/tutorial-basics/markdown-features",
-            "Internal/tutorial-basics/deploy-your-site",
-            "Internal/tutorial-basics/congratulations",
-          ],
-        },
-        {
-          type: "category",
-          label: "Tutorial Extras",
-          items: [
-            "Internal/tutorial-extras/manage-docs-versions",
-            "Internal/tutorial-extras/translate-your-site",
-          ],
-        },
+        "Supervaize Studio/intro",
+        // Add more items here when Supervaize SaaS docs are created
       ],
     },
   ],

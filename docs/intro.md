@@ -22,7 +22,6 @@ Choose a section from the sidebar to get started:
 
 ## Quick Links
 
-- [Supervaize SaaS](/docs/Supervaize%20SaaS/intro)
-- [Supervaizer Controller](/docs/Supervaizer%20Controller/API_REFERENCE)
+- [Supervaizer Controller](/docs/Supervaizer%20Controller/intro)
 - [GitHub Repository](https://github.com/supervaize)
 - [Community Slack](https://join.slack.com/t/supervaize/shared_invite/zt-3ay81n5ap-~gggl0BGbzREcyCdLUf9Kw)
