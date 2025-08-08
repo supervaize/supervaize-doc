@@ -23,6 +23,7 @@ const sidebars: SidebarsConfig = {
       label: "Supervaizer Controller",
       items: [
         "Supervaizer Controller/intro",
+        "Supervaizer Controller/model_reference",
         "Supervaizer Controller/API_REFERENCE",
         "Supervaizer Controller/REST_API",
         "Supervaizer Controller/CLI",
