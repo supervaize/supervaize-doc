@@ -124,6 +124,16 @@ const config: Config = {
           ],
         },
         {
+          title: "Supervaize",
+          items: [
+            {
+              label: "Supervaize",
+              href: "https://supervaize.com",
+            },
+          ],
+        },
+
+        {
           title: "More",
           items: [
             {
