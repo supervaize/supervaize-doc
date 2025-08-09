@@ -21,15 +21,56 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Supervaizer Controller",
+      link: {
+        type: "generated-index",
+        slug: "supervaizer-controller",
+      },
       items: [
-        "Supervaizer Controller/intro",
-        "Supervaizer Controller/model_reference",
-        "Supervaizer Controller/API_REFERENCE",
-        "Supervaizer Controller/REST_API",
-        "Supervaizer Controller/CLI",
-        "Supervaizer Controller/PROTOCOLS",
-        "Supervaizer Controller/PERSISTENCE",
-        "Supervaizer Controller/CHANGELOG",
+        {
+          type: "doc",
+          id: "supervaizer-controller/intro",
+          label: "Introduction",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/model_reference/model_core",
+          label: "Core Model Reference",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/model_reference/model_extra",
+          label: "Extended Model Reference",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/API_REFERENCE",
+          label: "API Reference",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/REST_API",
+          label: "REST API",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/CLI",
+          label: "Command Line Interface",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/PROTOCOLS",
+          label: "Protocols",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/PERSISTENCE",
+          label: "Persistence",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/CHANGELOG",
+          label: "Changelog",
+        },
       ],
     },
 
