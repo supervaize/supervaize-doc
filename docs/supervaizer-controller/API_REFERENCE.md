@@ -1,3 +1,7 @@
+---
+displayed_sidebar: supervaizerControllerSidebar
+---
+
 # SUPERVAIZER API Reference
 
 This document provides details about the core components and APIs of SUPERVAIZER.

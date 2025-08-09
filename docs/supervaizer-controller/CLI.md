@@ -1,3 +1,7 @@
+---
+displayed_sidebar: supervaizerControllerSidebar
+---
+
 # SUPERVAIZER CLI
 
 SUPERVAIZER includes a command-line interface to simplify setup and operation:

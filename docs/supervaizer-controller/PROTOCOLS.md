@@ -1,3 +1,7 @@
+---
+displayed_sidebar: supervaizerControllerSidebar
+---
+
 # Protocol Support
 
 SUPERVAIZER provides comprehensive support for multiple agent communication protocols, enabling seamless interoperability between different AI agent systems.

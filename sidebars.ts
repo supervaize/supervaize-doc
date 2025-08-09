@@ -1,35 +1,23 @@
 import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
-
-/**
- * Creating a sidebar enables you to:
- - create an ordered group of docs
- - render a sidebar for each doc of that group
- - provide next/previous navigation
-
- The sidebars can be generated from the filesystem, or explicitly defined here.
-
- Create as many sidebars as you want.
- */
 const sidebars: SidebarsConfig = {
-  // Manual sidebar configuration
-  docs: [
-    // Internal Documentation
-
-    // Supervaizer Controller Documentation
+  // Supervaizer Controller sidebar
+  supervaizerControllerSidebar: [
     {
       type: "category",
       label: "Supervaizer Controller",
+      collapsible: true,
+      collapsed: false,
       link: {
         type: "generated-index",
-        slug: "supervaizer-controller",
+        title: "Supervaizer Controller Documentation",
+        description: "Documentation for the Supervaizer Controller",
       },
       items: [
         {
           type: "doc",
-          id: "supervaizer-controller/intro",
-          label: "Introduction",
+          id: "supervaizer-controller/quickstart",
+          label: "Quick Start",
         },
         {
           type: "doc",
@@ -73,23 +61,44 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
+  ],
 
-    // Supervaize SaaS Documentation
+  // Supervaize Fleet sidebar
+  supervaizeFleetSidebar: [
     {
       type: "category",
-      label: "Supervaize Fleet Management",
+      label: "Supervaize Fleet",
+      link: {
+        type: "generated-index",
+        title: "Supervaize Fleet Documentation",
+        description: "Documentation for Supervaize Fleet Management",
+      },
       items: [
-        "Supervaize Fleet/intro",
-        // Add more items here when Supervaize SaaS docs are created
+        {
+          type: "doc",
+          id: "supervaize-fleet/intro",
+          label: "Introduction",
+        },
       ],
     },
-    // Supervaize SaaS Documentation
+  ],
+
+  // Supervaize Studio sidebar
+  supervaizeStudioSidebar: [
     {
       type: "category",
       label: "Supervaize Studio",
+      link: {
+        type: "generated-index",
+        title: "Supervaize Studio Documentation",
+        description: "Documentation for Supervaize Studio",
+      },
       items: [
-        "Supervaize Studio/intro",
-        // Add more items here when Supervaize SaaS docs are created
+        {
+          type: "doc",
+          id: "supervaize-studio/intro",
+          label: "Introduction",
+        },
       ],
     },
   ],

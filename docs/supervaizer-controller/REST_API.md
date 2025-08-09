@@ -1,3 +1,7 @@
+---
+displayed_sidebar: supervaizerControllerSidebar
+---
+
 # REST API Documentation
 
 SUPERVAIZER provides multiple ways to interact with and explore the API:

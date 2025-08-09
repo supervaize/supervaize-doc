@@ -43,8 +43,6 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/supervaize/supervaize-doc/blob/main/",
         },
         blog: {
@@ -81,9 +79,24 @@ const config: Config = {
       items: [
         {
           type: "docSidebar",
-          sidebarId: "docs",
+          sidebarId: "supervaizerControllerSidebar",
           position: "left",
-          label: "Documentation",
+          label: "Supervaizer Controller",
+          activeBasePath: "/supervaizer-controller",
+        },
+        {
+          type: "docSidebar",
+          sidebarId: "supervaizeFleetSidebar",
+          position: "left",
+          label: "Supervaize Fleet",
+          activeBasePath: "/supervaize-fleet",
+        },
+        {
+          type: "docSidebar",
+          sidebarId: "supervaizeStudioSidebar",
+          position: "left",
+          label: "Supervaize Studio",
+          activeBasePath: "/supervaize-studio",
         },
         { to: "/blog", label: "Blog", position: "left" },
         {
