@@ -12,8 +12,8 @@
   --ifm-color-primary: #32455f;
   --ifm-color-primary-dark: #2d3e55;
   --ifm-color-primary-darker: #2a3a50;
-  --ifm-color-primary-darkest: #222f41;
-  --ifm-color-primary-light: #374c69;
+  --ifm-color-primary-darkest: #413622;
+  --ifm-color-primary-light: #16263c;
   --ifm-color-primary-lighter: #3a4f6e;
   --ifm-color-primary-lightest: #425a7a;
   --ifm-color-secondary: #b5e925;
@@ -23,6 +23,7 @@
   --ifm-color-danger: #e92825;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --navbar-link-color: #32455f;
 }
 
 /* Apply Conformaa font to heading titles */
@@ -34,20 +35,40 @@ h5,
 h6 {
   font-family: "Comfortaa", sans-serif;
   font-weight: 600;
+  color: var(--ifm-color-primary-darkest);
+}
+/* Add trailing line after h1 headings */
+h2::before {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 3px;
+  background-color: var(--ifm-color-secondary);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: 1.8rem;
+}
+
+/* Increase h4 heading size */
+h4 {
+  font-size: 1.4rem;
 }
 
 /* Apply Comfortaa font to navbar title */
 .navbar__title {
   font-family: "Comfortaa", sans-serif;
   font-weight: 600;
-  color: #32455f !important;
+  color: var(--navbar-link-color) !important;
   font-size: 1.8rem;
 }
 
 .navbar__item {
   font-family: "Comfortaa", sans-serif;
   font-weight: 600;
-  color: #32455f;
+  color: var(--navbar-link-color);
 }
 
 .navbar__logo {
@@ -57,7 +78,7 @@ h6 {
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme="dark"] {
-  --ifm-color-primary: #596cff;
+  --ifm-color-primary: #e9e9f0;
   --ifm-color-primary-dark: #4f61e6;
   --ifm-color-primary-darker: #4a5ce0;
   --ifm-color-primary-darkest: #3d4cb8;
@@ -70,4 +91,5 @@ h6 {
   --ifm-color-warning: #ff6600;
   --ifm-color-danger: #e92825;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --navbar-link-color: #b5e925;
 }

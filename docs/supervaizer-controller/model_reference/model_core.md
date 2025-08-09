@@ -2,13 +2,231 @@
 
 **Version:** 0.9.4
 
-### `parameter.Parameter`
+### `agent.Agent`
 
-**Inherits from:** [`parameter.ParameterModel`](#parameter-parametermodel)
+**Inherits from:** [`agent.AgentAbstract`](#agent-agentabstract)
 
 _No additional fields beyond parent class._
 
-### `parameter.ParameterModel`
+### `agent.AgentAbstract`
+
+**Inherits from:** [`common.SvBaseModel`](../model_extra.md#common-svbasemodel)
+
+Agent model for the Supervaize Control API.
+
+This represents an agent that can be registered with the Supervaize Control API.
+It contains metadata about the agent like name, version, description etc. as well as
+the methods it supports and any parameter configurations.
+
+The agent ID is automatically generated from the name and must match.
+
+#### Model Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `name` | `str` | **required** | Display name of the agent |
+| `id` | `str` | **required** | Unique ID generated from name |
+| `author` | `str` | `None` | Author of the agent |
+| `developer` | `str` | `None` | Developer of the controller integration |
+| `maintainer` | `str` | `None` | Maintainer of the integration |
+| `editor` | `str` | `None` | Editor (usually a company) |
+| `version` | `str` | '' | Version string |
+| `description` | `str` | '' | Description of what the agent does |
+| `tags` | `list[str]` | `None` | Tags for categorizing the agent |
+| `methods` | `AgentMethods` | `None` | Methods supported by this agent |
+| `parameters_setup` | `ParametersSetup` | `None` | Parameter configuration |
+| `server_agent_id` | `str` | `None` | ID assigned by server - Do not set this manually |
+| `server_agent_status` | `str` | `None` | Current status on server - Do not set this manually |
+| `server_agent_onboarding_status` | `str` | `None` | Onboarding status - Do not set this manually |
+| `server_encrypted_parameters` | `str` | `None` | Encrypted parameters from server - Do not set this manually |
+| `max_execution_time` | `int` | 3600 | Maximum execution time in seconds, defaults to 1 hour |
+
+#### Example
+
+```json
+
+{
+  "name": "Competitor Research Agent",
+  "id": "comp_research_123",
+  "author": "John Doe",
+  "developer": "Jane Smith",
+  "maintainer": "AI Team",
+  "editor": "Product Team",
+  "version": "1.0.0",
+  "description": "Agent for researching competitor information and generating summaries",
+  "tags": [
+    "research",
+    "competitor",
+    "analysis"
+  ],
+  "max_execution_time": 3600
+}
+
+```
+
+### `agent.AgentMethod`
+
+**Inherits from:** [`agent.AgentMethodAbstract`](#agent-agentmethodabstract)
+
+_No additional fields beyond parent class._
+
+### `agent.AgentMethodAbstract`
+
+Represents a method that can be called on an agent.
+
+Attributes:
+    name: Display name of the method
+    method: Name of the actual method in the project's codebase that will be called with the provided parameters
+    params: see below
+    fields: see below
+    description: Optional description of what the method does
+
+
+1. params : Dictionary format
+   A simple key-value dictionary of parameters what will be passed to the
+   AgentMethod.method as kwargs.
+   Example:
+
+```json
+{
+  "verbose": true,
+  "timeout": 60,
+  "max_retries": 3
+}
+```
+
+
+2. fields : Form fields format
+   These are the values that will be requested from the user in the Supervaize UI
+   and also passed as kwargs to the AgentMethod.method.
+   A list of field specifications for generating forms/UI, following the
+   django.forms.fields definition
+   see : https://docs.djangoproject.com/en/5.1/ref/forms/fields/
+   Each field is a dictionary with properties like:
+   - name: Field identifier
+   - type: Python type of the field for pydantic validation - note , ChoiceField and MultipleChoiceField are a list[str]
+   - field_type: Field type (one of: CharField, IntegerField, BooleanField, ChoiceField, MultipleChoiceField)
+   - choices: For choice fields, list of [value, label] pairs
+   - default: (optional) Default value for the field
+   - widget: UI widget to use (e.g. RadioSelect, TextInput)
+   - required: Whether field is required
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `name` | `str` | **required** | The name of the method |
+| `method` | `str` | **required** | The name of the method in the project's codebase that will be called with the provided parameters |
+| `params` | `typing.Dict[str, typing.Any]` | `None` | A simple key-value dictionary of parameters what will be passed to the AgentMethod.method as kwargs |
+| `fields` | `typing.List[supervaizer.agent.AgentMethodField]` | `None` | A list of field specifications for generating forms/UI, following the django.forms.fields definition |
+| `description` | `str` | `None` | Optional description of what the method does |
+| `is_async` | `bool` | False | Whether the method is asynchronous |
+
+#### Example
+
+```json
+
+{
+  "name": "start",
+  "method": "example_agent.example_synchronous_job_start",
+  "params": {
+    "action": "start"
+  },
+  "fields": [
+    {
+      "name": "Company to research",
+      "type": "str",
+      "field_type": "CharField",
+      "max_length": 100,
+      "required": true
+    }
+  ],
+  "description": "Start the collection of new competitor summary"
+}
+
+```
+
+### `agent.AgentMethodField`
+
+Represents a field specification for generating forms/UI in the Supervaize platform.
+
+Fields are used to define user input parameters that will be collected through
+the UI and passed as kwargs to the AgentMethod.method. They follow Django forms
+field definitions for consistency.
+
+
+- [Django Widgets](https://docs.djangoproject.com/en/5.2/ref/forms/widgets/)
+
+
+** field_type  - available field types ** [Django Field classes](https://docs.djangoproject.com/en/5.2/ref/forms/fields/#built-in-field-classes)
+
+    - `CharField` - Text input
+    - `IntegerField` - Number input
+    - `BooleanField` - Checkbox
+    - `ChoiceField` - Dropdown with options
+    - `MultipleChoiceField` - Multi-select
+    - `JSONField` - JSON data input
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `name` | `str` | **required** | The name of the field - displayed in the UI |
+| `type` | `Any` | **required** | Python type of the field for pydantic validation - note , ChoiceField and MultipleChoiceField are a list[str] |
+| `field_type` | `FieldTypeEnum` | `CharField` | Field type for persistence |
+| `description` | `str` | `None` | Description of the field - displayed in the UI |
+| `choices` | `list[list[str, str]]` | `None` | For choice fields, list of [value, label] pairs |
+| `default` | `Any` | `None` | Default value for the field - displayed in the UI |
+| `widget` | `str` | `None` | UI widget to use (e.g. RadioSelect, TextInput) - as a django widget name |
+| `required` | `bool` | False | Whether field is required for form submission |
+
+#### Examples
+
+**Example 1:**
+
+```json
+
+{
+  "name": "color",
+  "type": "list[str]",
+  "field_type": "MultipleChoiceField",
+  "choices": [
+    [
+      "B",
+      "Blue"
+    ],
+    [
+      "R",
+      "Red"
+    ],
+    [
+      "G",
+      "Green"
+    ]
+  ],
+  "widget": "RadioSelect",
+  "required": true
+}
+
+```
+
+**Example 2:**
+
+```json
+
+{
+  "name": "age",
+  "type": "int",
+  "field_type": "IntegerField",
+  "widget": "NumberInput",
+  "required": false
+}
+
+```
+
+### `parameter.Parameter`
+
+**Inherits from:** [`parameter.ParameterAbstract`](#parameter-parameterabstract)
+
+_No additional fields beyond parent class._
+
+### `parameter.ParameterAbstract`
 
 **Inherits from:** [`common.SvBaseModel`](../model_extra.md#common-svbasemodel)
 
@@ -23,9 +241,9 @@ model to manage parameter definitions and values.
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `name` | `str` | **required** | The name of the parameter, as used in the agent code |
-| `description` | `str` | `None` | — | The description of the parameter, used in the Supervaize UI |
+| `description` | `str` | `None` | The description of the parameter, used in the Supervaize UI |
 | `is_environment` | `bool` | False | Whether the parameter is set as an environment variable |
-| `value` | `str` | `None` | — | The value of the parameter - provided by the Supervaize platform |
+| `value` | `str` | `None` | The value of the parameter - provided by the Supervaize platform |
 | `is_secret` | `bool` | False | Whether the parameter is a secret - hidden from the user in the Supervaize UI |
 | `is_required` | `bool` | False | Whether the parameter is required, used in the Supervaize UI |
 
@@ -42,3 +260,75 @@ model to manage parameter definitions and values.
 }
 
 ```
+
+### `server.Server`
+
+**Inherits from:** [`server.ServerAbstract`](#server-serverabstract)
+
+_No additional fields beyond parent class._
+
+### `server.ServerAbstract`
+
+**Inherits from:** [`common.SvBaseModel`](../model_extra.md#common-svbasemodel)
+
+API Server for the Supervaize Controller.
+
+This represents the main server instance that manages agents and provides
+the API endpoints for the Supervaize Control API. It handles agent registration,
+job execution, and communication with the Supervaize platform.
+
+The server can be configured with various endpoints (A2A, ACP, admin interface)
+and supports encryption/decryption of parameters using RSA keys.
+
+registration_host: Host to use for outbound connections and registration.
+            This is especially important in Docker environments where the binding
+            address (0.0.0.0) can't be used for outbound connections. Set to
+            'host.docker.internal' for Docker or the appropriate service name
+            in container environments.
+            Examples:
+            - In Docker, set to 'host.docker.internal' to reach the host machine
+            - In Kubernetes, might be set to the service name or external DNS
+            If not provided, falls back to using the listening host.
+
+#### Model Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `scheme` | `str` | **required** | URL scheme (http or https) |
+| `host` | `str` | **required** | Host to bind the server to (e.g., 0.0.0.0 for all interfaces) |
+| `port` | `int` | **required** | Port to bind the server to |
+| `environment` | `str` | **required** | Environment name (e.g., dev, staging, prod) |
+| `mac_addr` | `str` | **required** | MAC address to use for server identification |
+| `debug` | `bool` | **required** | Whether to enable debug mode |
+| `agents` | `List` | **required** | List of agents to register with the server |
+| `app` | `FastAPI` | **required** | FastAPI application instance |
+| `reload` | `bool` | **required** | Whether to enable auto-reload |
+| `supervisor_account` | `Account` | `None` | Account of the supervisor |
+| `a2a_endpoints` | `bool` | True | Whether to enable A2A endpoints |
+| `acp_endpoints` | `bool` | True | Whether to enable ACP endpoints |
+| `private_key` | `RSAPrivateKey` | **required** | RSA private key for encryption |
+| `public_key` | `RSAPublicKey` | **required** | RSA public key for encryption |
+| `registration_host` | `str` | `None` | Host to use for outbound connections and registration |
+| `api_key` | `str` | `None` | API key for securing endpoints |
+| `api_key_header` | `APIKeyHeader` | `None` | API key header for authentication |
+
+#### Example
+
+```json
+
+{
+  "scheme": "http",
+  "host": "0.0.0.0",
+  "port": 8000,
+  "environment": "dev",
+  "mac_addr": "00-11-22-33-44-55",
+  "debug": false,
+  "reload": false,
+  "a2a_endpoints": true,
+  "acp_endpoints": true
+}
+
+```
+
+
+*Updated on 2025-08-09 20:18:47*

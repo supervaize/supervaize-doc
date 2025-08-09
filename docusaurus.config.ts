@@ -36,7 +36,7 @@ const config: Config = {
     defaultLocale: "en",
     locales: ["en"],
   },
-
+  themes: ["@saucelabs/theme-github-codeblock"],
   presets: [
     [
       "classic",
@@ -75,6 +75,7 @@ const config: Config = {
       logo: {
         alt: "Supervaize Logo",
         src: "img/logo.svg",
+        srcDark: "img/logo-dark.svg",
       },
       items: [
         {
