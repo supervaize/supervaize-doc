@@ -26,6 +26,15 @@
   --navbar-link-color: #32455f;
 }
 
+a {
+  font-weight: 500;
+  text-decoration: underline var(--ifm-color-primary-lightest) dotted;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 /* Apply Conformaa font to heading titles */
 h1,
 h2,
@@ -38,17 +47,11 @@ h6 {
   color: var(--ifm-color-primary-dark);
   text-decoration: none !important;
 }
-h1.title {
-  position: relative;
-  padding-inline-start: 1rem;
+h1 {
+  font-size: 2.7rem;
 }
-h1.title::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0; /* pin to the start edge */
-  width: 4px;
-  background: linear-gradient(180deg, var(--bs-primary), var(--bs-secondary));
-  border-radius: 2px;
+h2 {
+  font-size: 2.2rem;
 }
 
 /* Add trailing line after h1 headings */
@@ -66,18 +69,18 @@ h3 {
   font-size: 1.8rem;
 }
 
-a {
-  font-weight: 600;
-  text-decoration: underline var(--ifm-color-primary-lightest) dotted;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
 /* Increase h4 heading size */
 h4 {
   font-size: 1.4rem;
+}
+.menu__link {
+  text-decoration: none !important;
+}
+.navbar__brand {
+  text-decoration: none !important;
+}
+.navbar__link {
+  text-decoration: none !important;
 }
 
 /* Apply Comfortaa font to navbar title */
@@ -86,20 +89,17 @@ h4 {
   font-weight: 600;
   color: var(--navbar-link-color) !important;
   font-size: 1.8rem;
-  text-decoration: none !important;
 }
 
 .navbar__item {
   font-family: "Comfortaa", sans-serif;
   font-weight: 600;
   color: var(--navbar-link-color);
-  text-decoration: none !important;
 }
 
 .navbar__logo {
   width: 40px;
   height: 40px;
-  text-decoration: none !important;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
