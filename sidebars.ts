@@ -82,6 +82,21 @@ const sidebars: SidebarsConfig = {
               id: "supervaizer-controller/ref/CHANGELOG",
               label: "Changelog",
             },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/README",
+              label: "README",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/LICENSE",
+              label: "License",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/CONTRIBUTING",
+              label: "Contributing",
+            },
           ],
         },
       ],
