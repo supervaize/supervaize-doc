@@ -137,22 +137,22 @@ python examples/a2a-controller.py
 
 ## Protocol Support
 
-SUPERVAIZER provides comprehensive support for multiple agent communication protocols. See [Protocol Documentation](docs/PROTOCOLS.md) for complete details.
+SUPERVAIZER provides comprehensive support for multiple agent communication protocols. See [Protocol Documentation](PROTOCOLS.md) for complete details.
 
 ## Using the CLI
 
-SUPERVAIZER includes a command-line interface to simplify setup and operation. See [CLI Documentation](docs/CLI.md) for complete details.
+SUPERVAIZER includes a command-line interface to simplify setup and operation. See [CLI Documentation](CLI.md) for complete details.
 
 Also, check the list of [Environment variables](CLI.md#environment-variables).
 
 ## API Documentation & User Interfaces
 
-SUPERVAIZER provides multiple ways to interact with and explore the API. See [REST API Documentation](docs/REST_API.md) for complete details.
+SUPERVAIZER provides multiple ways to interact with and explore the API. See [REST API Documentation](REST_API.md) for complete details.
 
 ### Admin Interface (`/admin`)
 
 A comprehensive web-based admin interface for managing your SUPERVAIZER instance
-See [Admin documentation](docs/ADMIN_README.md)
+See [Admin documentation](ADMIN_README.md)
 
 #### Quick Start
 
@@ -191,7 +191,7 @@ A list of costs is maintained here:
 
 Note: run `just generate_model_docs` to update the `docs/model_reference.md` file (this also updates this file in the doc.supervaize.com project)
 
-- [Persistence Layer](docs/PERSISTENCE.md) - TinyDB-based storage for Jobs, Cases, and workflow entities
+- [Persistence Layer](PERSISTENCE.md) - TinyDB-based storage for Jobs, Cases, and workflow entities
 
 - [API Reference](API_REFERENCE.md) - Complete documentation of classes and methods
 - [Contributing Guide](CONTRIBUTING.md) - How to set up your development environment and contribute
@@ -201,4 +201,4 @@ Note: run `just generate_model_docs` to update the `docs/model_reference.md` fil
 This project is licensed under the [Mozilla Public License 2.0](LICENSE.md) License.
 
 
-*Uploaded on 2025-08-10 13:14:06*
+*Uploaded on 2025-08-10 14:40:20*

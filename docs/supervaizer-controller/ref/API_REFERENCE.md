@@ -1,7 +1,3 @@
----
-displayed_sidebar: supervaizerControllerSidebar
----
-
 # SUPERVAIZER API Reference
 
 This document provides details about the core components and APIs of SUPERVAIZER.
@@ -171,3 +167,6 @@ agent = Agent(
     methods=methods
 )
 ```
+
+
+*Uploaded on 2025-08-10 14:40:20*

@@ -1,7 +1,3 @@
----
-displayed_sidebar: supervaizerControllerSidebar
----
-
 # REST API Documentation
 
 SUPERVAIZER provides multiple ways to interact with and explore the API:
@@ -55,3 +51,6 @@ Most endpoints support API key authentication:
 3. Click "Authorize" and enter your API key
 4. Browse available endpoints and test them directly
 5. View request/response schemas and examples
+
+
+*Uploaded on 2025-08-10 14:40:20*

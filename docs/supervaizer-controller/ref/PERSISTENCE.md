@@ -1,7 +1,3 @@
----
-displayed_sidebar: supervaizerControllerSidebar
----
-
 # TinyDB Persistence Layer
 
 The Supervaizer TinyDB persistence layer provides thread-safe, local storage for WorkflowEntity instances (Jobs, Cases, Missions) across sessions and processes.
@@ -412,3 +408,6 @@ If you need to migrate to a more robust database later:
 2. **Export data**: Use `get_objects()` to export all data for migration
 3. **Preserve relationships**: Foreign key structure translates well to relational databases
 4. **Maintain threading**: Keep thread-safety patterns for any database backend
+
+
+*Uploaded on 2025-08-10 14:40:20*

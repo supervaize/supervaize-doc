@@ -1,18 +1,25 @@
----
-displayed_sidebar: supervaizerControllerSidebar
----
-
 # Supervaizer Changelog
 
 All notable changes to this project will be documented in this file.
 
 > The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Setup : missing `py.typed` in pyproject
+
+### Added
+
+- `gen_model_docs.py`: tool for documentation generation - see disclaimer
+
 ## [0.9.4]
 
 ### Added
 
-- CICD : release, deploy,
+- CICD : release, deploy
+- `gen_model_docs.py` : to generate the documentation of the models.
 
 ### Changed
 
@@ -56,3 +63,6 @@ Test Coverage : [![Test Coverage](https://img.shields.io/badge/Coverage-81%25-br
 > | 🐛 Bug       | 🛣️ Infrastructure/CICD | 🔌 API        |
 > | 💼 Admin     | 📖 Documentation       | 📰 Events     |
 > | 🧪 Tests     | 🧑‍🎨 UI/Style            | 🎼 Controller |
+
+
+*Uploaded on 2025-08-10 14:40:20*

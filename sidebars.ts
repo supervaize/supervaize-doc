@@ -97,6 +97,11 @@ const sidebars: SidebarsConfig = {
               id: "supervaizer-controller/ref/CONTRIBUTING",
               label: "Contributing",
             },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/ADMIN_README",
+              label: "Admin Documentation",
+            },
           ],
         },
       ],

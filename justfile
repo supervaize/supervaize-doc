@@ -10,3 +10,7 @@ start_local:
 
 build:
     npm run build
+
+upgrade_packages:
+    npx npm-check-updates -u
+    npm install

@@ -1,7 +1,3 @@
----
-displayed_sidebar: supervaizerControllerSidebar
----
-
 # SUPERVAIZER CLI
 
 SUPERVAIZER includes a command-line interface to simplify setup and operation:
@@ -70,3 +66,6 @@ All CLI options can also be configured through environment variables:
 | SUPERVAIZER_SCRIPT_PATH   | Path to configuration script    | -                      |
 | SUPERVAIZER_OUTPUT_PATH   | Path for install command output | supervaizer_control.py |
 | SUPERVAIZER_FORCE_INSTALL | Force overwrite existing file   | false                  |
+
+
+*Uploaded on 2025-08-10 14:40:20*

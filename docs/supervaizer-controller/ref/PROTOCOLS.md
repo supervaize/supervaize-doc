@@ -1,7 +1,3 @@
----
-displayed_sidebar: supervaizerControllerSidebar
----
-
 # Protocol Support
 
 SUPERVAIZER provides comprehensive support for multiple agent communication protocols, enabling seamless interoperability between different AI agent systems.
@@ -88,3 +84,6 @@ server = Server(
     a2a_endpoints=True,  # Enable A2A protocol support
 )
 ```
+
+
+*Uploaded on 2025-08-10 14:40:20*
