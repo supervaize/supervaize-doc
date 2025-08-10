@@ -99,6 +99,11 @@ const sidebars: SidebarsConfig = {
           id: "supervaize-fleet/intro",
           label: "Introduction",
         },
+        {
+          type: "doc",
+          id: "supervaize-fleet/developer-account",
+          label: "Setup Development Environment",
+        },
       ],
     },
   ],

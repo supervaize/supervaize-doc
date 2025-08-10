@@ -2,24 +2,6 @@
 
 **Version:** 0.9.4
 
-### `account.Account`
-
-**Inherits from:** [`account.AccountModel`](#account-accountmodel)
-
-_No additional fields beyond parent class._
-
-### `account.AccountModel`
-
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
-
-#### Model Fields
-
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `workspace_id` | `str` | **required** |  |
-| `api_key` | `str` | **required** |  |
-| `api_url` | `str` | **required** |  |
-
 ### `common.SvBaseModel`
 
 Base model for all Supervaize models.
@@ -61,7 +43,7 @@ Base model for agent job context parameters
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `job_context` | `JobContext` | **required** |  |
-| `job_fields` | `Dict` | **required** |  |
+| `job_fields` | `Dict[str, Any]` | **required** |  |
 
 ### `agent.AgentMethodParams`
 
@@ -69,7 +51,7 @@ Method parameters for agent operations.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `params` | `Dict` | — | A simple key-value dictionary of parameters what will be passed to the AgentMethod.method as kwargs |
+| `params` | `Dict[str, Any]` | — | A simple key-value dictionary of parameters what will be passed to the AgentMethod.method as kwargs |
 
 ### `agent.AgentMethods`
 
@@ -158,7 +140,7 @@ _No additional fields beyond parent class._
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `job_id` | `str` | **required** |  |
-| `status` | `EntityStatus` | **required** |  |
+| `status` | `<enum 'EntityStatus'>` | **required** |  |
 | `message` | `str` | **required** |  |
 | `payload` | `dict[str, typing.Any]` | `None` |  |
 | `error_message` | `str` | `None` |  |
@@ -169,16 +151,6 @@ _No additional fields beyond parent class._
 **Inherits from:** [`event.Event`](#event-event)
 
 _No additional fields beyond parent class._
-
-### `parameter.ParametersSetup`
-
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
-
-#### Model Fields
-
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `definitions` | `Dict` | **required** |  |
 
 ### `case.Case`
 
@@ -199,8 +171,8 @@ _No additional fields beyond parent class._
 | `name` | `str` | **required** |  |
 | `account` | `ForwardRef('Account')` | **required** |  |
 | `description` | `str` | **required** |  |
-| `status` | `EntityStatus` | **required** |  |
-| `updates` | `List` | [] |  |
+| `status` | `<enum 'EntityStatus'>` | **required** |  |
+| `updates` | `List[case.CaseNodeUpdate]` | [] |  |
 | `total_cost` | `float` | 0.0 |  |
 | `final_delivery` | `typing.Dict[str, typing.Any]` | `None` |  |
 | `finished_at` | `datetime` | `None` |  |
@@ -215,7 +187,7 @@ _No additional fields beyond parent class._
 |---|---|---|---|
 | `name` | `str` | **required** |  |
 | `description` | `str` | **required** |  |
-| `type` | `CaseNoteType` | **required** |  |
+| `type` | `<enum 'CaseNoteType'>` | **required** |  |
 
 ### `case.CaseNodeUpdate`
 
@@ -246,11 +218,11 @@ Returns:
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `source` | `Dict` | **required** |  |
+| `source` | `Dict[str, Any]` | **required** |  |
 | `account` | `Any` | **required** |  |
-| `type` | `EventType` | **required** |  |
+| `type` | `<enum 'EventType'>` | **required** |  |
 | `object_type` | `str` | **required** |  |
-| `details` | `Dict` | **required** |  |
+| `details` | `Dict[str, Any]` | **required** |  |
 
 ### `event.AgentRegisterEvent`
 
@@ -316,16 +288,16 @@ _No additional fields beyond parent class._
 | `id` | `str` | **required** |  |
 | `name` | `str` | **required** |  |
 | `agent_name` | `str` | **required** |  |
-| `status` | `EntityStatus` | **required** |  |
+| `status` | `<enum 'EntityStatus'>` | **required** |  |
 | `job_context` | `JobContext` | **required** |  |
 | `payload` | `Any` | `None` |  |
 | `result` | `Any` | `None` |  |
 | `error` | `str` | `None` |  |
-| `responses` | `list` | [] |  |
+| `responses` | `list[job.JobResponse]` | [] |  |
 | `finished_at` | `datetime` | `None` |  |
 | `created_at` | `datetime` | `None` |  |
 | `agent_parameters` | `typing.List[dict[str, typing.Any]]` | `None` |  |
-| `case_ids` | `List` | [] |  |
+| `case_ids` | `List[str]` | [] |  |
 
 ### `job.JobInstructions`
 
@@ -352,7 +324,7 @@ Request model for updating a case with answer to a question.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `answer` | `Dict` | **required** |  |
+| `answer` | `Dict[str, Any]` | **required** |  |
 | `message` | `str` | `None` |  |
 
 ### `server_utils.ErrorResponse`
@@ -362,9 +334,9 @@ Standard error response model
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `error` | `str` | **required** |  |
-| `error_type` | `ErrorType` | **required** |  |
+| `error_type` | `<enum 'ErrorType'>` | **required** |  |
 | `detail` | `str` | `None` |  |
-| `timestamp` | `datetime` | datetime.datetime(2025, 8, 9, 20, 18, 47, 7286) |  |
+| `timestamp` | `datetime` | datetime.datetime(2025, 8, 10, 10, 28, 56, 376255) |  |
 | `status_code` | `int` | **required** |  |
 
 ### `server.ServerInfo`
@@ -378,7 +350,7 @@ Complete server information for storage.
 | `port` | `int` | **required** |  |
 | `api_version` | `str` | **required** |  |
 | `environment` | `str` | **required** |  |
-| `agents` | `List` | **required** |  |
+| `agents` | `List[Dict[str, str]]` | **required** |  |
 | `start_time` | `float` | **required** |  |
 | `created_at` | `str` | **required** |  |
 | `updated_at` | `str` | **required** |  |
@@ -390,10 +362,10 @@ A base class for creating Pydantic models.
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `agentId` | `str` | **required** |  |
-| `type` | `TelemetryType` | **required** |  |
-| `category` | `TelemetryCategory` | **required** |  |
-| `severity` | `TelemetrySeverity` | **required** |  |
-| `details` | `Dict` | **required** |  |
+| `type` | `<enum 'TelemetryType'>` | **required** |  |
+| `category` | `<enum 'TelemetryCategory'>` | **required** |  |
+| `severity` | `<enum 'TelemetrySeverity'>` | **required** |  |
+| `details` | `Dict[str, Any]` | **required** |  |
 
 
-*Updated on 2025-08-09 20:18:47*
+*Updated on 2025-08-10 10:28:56*

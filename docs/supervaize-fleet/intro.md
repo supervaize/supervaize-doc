@@ -2,4 +2,4 @@
 displayed_sidebar: supervaizeFleetSidebar
 ---
 
-# Supervaize Fleet Mamanagement Documentation
+# Supervaize Fleet Management Documentation

@@ -2,7 +2,7 @@
 id: controller-setup
 title: Controller Setup Guide
 displayed_sidebar: supervaizerControllerSidebar
-slug: /controller/setup
+slug: /supervaizer/setup
 ---
 
 import Link from "@docusaurus/Link";
@@ -12,12 +12,6 @@ This guide walks you through customizing your Supervaizer controller step by ste
 
 ## Overview
 
-After running `supervaizer scaffold`, you'll have a template file to customize. This guide shows you how to:
-
-- Define **agent parameters** (secrets, env, required inputs)
-- Define **agent methods** (start/stop/status, etc.)
-- Map those methods to **your agent's functions**
-
 :::info
 
 This step-by-step guide uses the [<i className="bi bi-github"></i> EmailAIAgent](https://github.com/parthshr370/Email-AI-Agent?tab=readme-ov-file) as an example.
@@ -25,16 +19,19 @@ This step-by-step guide uses the [<i className="bi bi-github"></i> EmailAIAgent]
 See the [Quickstart guide](quickstart) for installation instructions.
 :::
 
-### Steps
+After running `supervaizer scaffold`, you'll have a template file to customize. This guide shows you how to:
 
-[<i className="bi bi-1-circle-fill"></i> Define agent parameters](#1)
+[<i className="bi bi-1-circle-fill"></i> Define agent parameters: ParameterSetup()](#1)
 
-[<i className="bi bi-2-circle-fill"></i> Define agent
-methods](#2)
+[<i className="bi bi-2-circle-fill"></i> Define agent methods: AgentMethod()](#2)
 
-[<i className="bi bi-3-circle-fill"></i> Define the **fields** of the AgentMethods](#3)
+[<i className="bi bi-3-circle-fill"></i> Define the **fields** of the AgentMethods: AgentMethodField()](#3)
 
-[<i className="bi bi-4-circle-fill"></i> Declare the agent and define the server](#4)
+[<i className="bi bi-4-circle-fill"></i> Declare the agent: Agent()](#4)
+
+[<i className="bi bi-5-circle-fill"></i> Define the account: Account()](#5)
+
+[<i className="bi bi-6-circle-fill"></i> Setup the server: Server()](#6)
 
 :::note
 Open `supervaizer_control_example.py` and adapt the content to the EmailAIAgent.
@@ -48,9 +45,11 @@ Use **Parameter** / **ParametersSetup** to declare what the agent needs. These s
 https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L27-L83
 ```
 
-**📖 See the model reference**
+**📖 See the model references**
 
-[ParameterModel Documentation](/docs/supervaizer-controller/model_reference/model_core#parameterparameterabstract)
+[Parameter Documentation](/docs/supervaizer-controller/model_reference/model_core#parameterparameterabstract)
+
+[ParameterSetup Documentation](/docs/supervaizer-controller/model_reference/model_core#parameterparameterssetup)
 
 ## 2. Define agent methods {#2}
 
@@ -106,9 +105,7 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_ag
 
 [AgentMethodField Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentmethodfield)
 
-## 4. Declare the agent and server {#4}
-
-### Define the Agent
+## 4. Declare the agent {#4}
 
 The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
 
@@ -120,44 +117,49 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_ag
 
 [Agent Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentabstract)
 
-### Configure Environment Variables
-
-Before starting the server, ensure your agent has access to the required environment variables. Based on the [Quickstart guide](quickstart#4), create a `.env` file in your project root:
-
-```env title=".env"
-OPENAI_API_KEY=sk-...
-EMAIL_SENDER=ops@yourdomain.com
-```
-
-### Define the Supervaize Account
+## 5.Setup the Supervaize Account and configure your Environment variables {#5}
 
 :::info
 This step is not needed to run the supervaizer as an A2A / ACP server only. See [Protocol support](/docs/supervaizer-controller/PROTOCOLS)
 :::
 
-### Define the Server
+[Create your developer account](/docs/fleet/setup-developmen-environment#getting_started) on the Supervaize platform.
 
-The `Server` class wraps your agent and provides the HTTP API endpoints:
+Create your API Key and collect your environment variables.
 
-```python title="Server definition"
-sv_server = Server(
-    agents=[agent],
-    acp_endpoints=True,  # optional: ACP discovery
-    a2a_endpoints=True,  # optional: Google's A2A discovery
-    supervisor_account=None,
-)
+See the [Quickstart guide](quickstart#4) to setup the environment variables
 
-if __name__ == "__main__":
-    sv_server.launch(log_level="DEBUG")  # starts FastAPI/uvicorn on :8000
+```js reference title="Account definition"
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L167-L172
 ```
 
-:::tip Verify endpoints
-Once the server is running, you'll have:
+**📖 See the model reference**
 
-- **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`
-- **A2A discovery**: `/.well-known/agents.json`
-- **ACP discovery**: `/agents`
-  :::
+[Account Documentation](/docs/supervaizer-controller/model_reference/model_core#accountaccountabstract)
+
+## 6. Setup the Server {#6}
+
+### Config
+
+The `Server` class wraps all the defined components together.
+
+At the minimum, the server requires at least one agent to be defined and the supervisor account (we are using Supervaize as the supervisor).
+
+```js reference title="Server definition"
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L174-L181
+```
+
+**📖 See the model reference**
+
+[Server Documentation](/docs/supervaizer-controller/model_reference/model_core#serverserverabstract)
+
+### Server launch
+
+```js reference title="Server launch"
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L183-L185
+```
+
+See [Server Start 🚀](/docs/supervaizer-controller/quickstart#start) for CLI instructions
 
 ## What's next?
 

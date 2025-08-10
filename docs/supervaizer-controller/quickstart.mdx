@@ -2,7 +2,7 @@
 id: quickstart
 title: Supervaizer Controller — Quickstart
 displayed_sidebar: supervaizerControllerSidebar
-slug: /controller/quickstart
+slug: /supervaizer/quickstart
 ---
 
 import Tabs from "@theme/Tabs";
@@ -170,55 +170,120 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_ag
 
 For detailed instructions on customizing your controller, see the **[Controller Setup Guide](setup)**.
 
-## <i className="bi bi-4-circle"></i> Configure credentials & environment {#4}
+## <i className="bi bi-4-circle"></i> Configure your supervaize account & environment {#4}
 
-Create a `.env` (or set OS env vars) in the project root:
+### Supervaize account and credentials
 
-```env title=".env"
-OPENAI_API_KEY=sk-...
-EMAIL_SENDER=ops@yourdomain.com
+[Create your developer account](/docs/fleet/setup-development-environment#getting_started) on the Supervaize platform.
+
+Create your API Key and collect your environment variables.
+
+:::tip
+Use [direnv](https://direnv.net/) for easy management of environment variables in `.envrc` file.
+
+Or setup [python-dotenv](https://github.com/theskumar/python-dotenv) in your python project.
+:::
+
+<Tabs groupId="pm" queryString>
+  <TabItem value=".envrc" label=".envrc (direnv)">
+
+```bash title="Export Environment variables in for .envrc"
+export SUPERVAIZE_API_KEY=...
+export SUPERVAIZE_WORKSPACE_ID=team_1
+export SUPERVAIZE_API_URL=https://app.supervaize.com
 ```
 
-Make sure your agent code reads those values (directly via `os.getenv` or through your parameter wiring).
+    </TabItem>
+      <TabItem value=".env" label=".env (dotenv)">
+
+```bash title="Setup Environment variables for dotenv"
+SUPERVAIZE_API_KEY=...
+SUPERVAIZE_WORKSPACE_ID=team_1
+SUPERVAIZE_API_URL=https://app.supervaize.com
+```
+
+    </TabItem>
+
+</Tabs>
 
 ---
 
-### Start the server 🚀
+### Start the server 🚀 {#start}
+
+:::info
+Use the direct python call for advanced debugging
+:::
 
 <Tabs groupId="pm" queryString>
-  <TabItem value="uv" label="uv">
+  <TabItem value="SupervaizerCLI" label="CLI">
 
 ```bash
-uv run python supervaizer_control_example.py
+# with the virtual environment active
+supervaizer start
 ```
 
   </TabItem>
-  <TabItem value="pip" label="pip">
+  <TabItem value="direct" label="direct">
 
 ```bash
-python supervaizer_control_example.py
+uv run python supervaizer_control.py
 ```
 
   </TabItem>
 </Tabs>
 
-You should see the server start logs. Open `http://127.0.0.1:8000/docs` to try the endpoints.
+```
+2025-08-10 01:11:50.152 | INFO     | supervaizer.storage:__init__:`3 - [StorageManager] 🗃️ Local DB initialized at /Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/Email-AI-Agent/data/entities.json
+2025-08-10 01:11:50.533 | INFO     | supervaizer.server:__init__:303 - [Server launch] 🚀 Deploy Supervaizer routes
+2025-08-10 01:11:50.551 | INFO     | supervaizer.server:__init__:308 - [Server launch] 📢 Deploy A2A routes
+2025-08-10 01:11:50.552 | INFO     | supervaizer.server:__init__:311 - [Server launch] 📢 Deploy ACP routes
+2025-08-10 01:11:50.554 | INFO     | supervaizer.server:__init__:316 - [Server launch] 💼 Deploy Admin interface @ http://0.0.0.0:8001/admin
+2025-08-10 01:11:50.567 | INFO     | supervaizer.server:save_server_info_to_storage:103 - [Server] Server info saved to storage: 0.0.0.0:8001
+2025-08-10 01:11:50.567 | INFO     | supervaizer.storage:load_running_entities_on_startup:431 - [Storage] Entity re-loading complete: 0 running jobs, 0 running cases
+2025-08-10 01:11:50.567 | INFO     | supervaizer.server:__init__:339 - [Server launch] API Key authentication enabled
+2025-08-10 01:11:50.567 | WARNING  | supervaizer.server:__init__:342 - [Server launch] Using auto-generated API key: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+2025-08-10 01:11:50.573| INFO | [Server launch] Starting Supervaize Controller API v0.9.4 - Log : debug
+2025-08-10 01:11:51.644| DEBUG | [API Success] ✅ POST Event SERVER_REGISTER sent : 01K28E7S6Y5617Q0QPAPEJHWS2
+2025-08-10 01:11:51.644| SUCCESS | ✅ POST Event SERVER_REGISTER sent : 01K28E7S6Y5617Q0QPAPEJHWS2
+2025-08-10 01:11:53.084| DEBUG | [API Success] ✅ GET Agent <email-ai-agent>
+2025-08-10 01:11:53.084| DEBUG | [Agent not onboarded] skipping encrypted parameters
+2025-08-10 01:11:53.084| INFO | [Server launch] Updated agent Email AI Agent
+INFO:     Started server process [87009]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+```
+
+:::tip Verify endpoints
+Once the server is running, you'll have:
+
+- **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`
+- **A2A discovery**: `/.well-known/agents.json`
+- **ACP discovery**: `/agents`
+  :::
 
 ---
 
 ## Troubleshooting
 
-- **ImportError on your method path**  
-  Double-check the dotted `method="package.module:function"` matches your agent code and the project root is on `PYTHONPATH`.
+- **supervaizer start** stops after launch
 
-- **401 / missing secrets**  
-  Ensure required `Parameter` items marked `is_environment=True` exist in your shell or `.env`.
+  Debug using direct python start.
+
+```bash
+uv run python supervaizer_control.py
+```
+
+- **Error sending event SERVER_REGISTER**
+
+```
+ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' for url 'https://stage.supervaize.com/w/team_1/api/v1/ctrl-events/'
+```
+
+Check at https://stage.supervaize.com/users/developer/ that the API key you are using is active.
 
 - **Port already in use**  
   Change the port: `sv_server.launch(host="0.0.0.0", port=8010)`.
-
-- **The UI doesn’t show fields**  
-  Confirm each field dict includes `name`, `type`, `field_type`, and `required`.
 
 ---
 
