@@ -1,18 +1,27 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import Heading from "@theme/Heading";
+import Link from "@docusaurus/Link";
 import styles from "./styles.module.css";
 
 type FeatureItem = {
   title: string;
   Svg: React.ComponentType<React.ComponentProps<"svg">>;
   description: ReactNode;
+  link: string;
+  linkText: string;
 };
 
 const FeatureList: FeatureItem[] = [
   {
     title: "Supervaizer Controller",
-    Svg: require("@site/static/img/undraw_controller.svg").default,
+    Svg: () => (
+      <img
+        src="https://cdn.do.supervaize.com/products/supervaizer.png"
+        alt="Supervaizer Controller"
+        className={styles.featureSvg}
+      />
+    ),
     description: (
       <>
         The Supervaizer Controller is a powerful Python-based runtime that lets
@@ -22,10 +31,18 @@ const FeatureList: FeatureItem[] = [
         logic while operations teams gain observability and control.
       </>
     ),
+    link: "/docs/category/supervaizer-controller",
+    linkText: "Get Started",
   },
   {
     title: "Supervaize Fleet Management",
-    Svg: require("@site/static/img/undraw_ai_fleet.svg").default,
+    Svg: () => (
+      <img
+        src="https://cdn.do.supervaize.com/products/supervaize-fleet.png"
+        alt="Supervaize Fleet Management"
+        className={styles.featureSvg}
+      />
+    ),
     description: (
       <>
         Supervaize is the first platform to enable non-technical teams to
@@ -33,10 +50,18 @@ const FeatureList: FeatureItem[] = [
         time. Think of it as your co-pilot for managing AI-powered operations.
       </>
     ),
+    link: "/docs/supervaize-fleet/intro",
+    linkText: "Learn More",
   },
   {
     title: "Supervaize Studio",
-    Svg: require("@site/static/img/undraw_studio_dashboard.svg").default,
+    Svg: () => (
+      <img
+        src="https://cdn.do.supervaize.com/products/supervaize-studio.png"
+        alt="Supervaize Studio"
+        className={styles.featureSvg}
+      />
+    ),
     description: (
       <>
         Supervaize Studio is a no-code control center that empowers business
@@ -47,10 +72,12 @@ const FeatureList: FeatureItem[] = [
         single line of code.
       </>
     ),
+    link: "/docs/supervaize-studio/intro",
+    linkText: "Explore Studio",
   },
 ];
 
-function Feature({ title, Svg, description }: FeatureItem) {
+function Feature({ title, Svg, description, link, linkText }: FeatureItem) {
   return (
     <div className={clsx("col col--4")}>
       <div className="text--center">
@@ -59,6 +86,9 @@ function Feature({ title, Svg, description }: FeatureItem) {
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>
         <p>{description}</p>
+        <Link className="button button--primary button--lg" to={link}>
+          {linkText}
+        </Link>
       </div>
     </div>
   );

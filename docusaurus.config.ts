@@ -114,8 +114,8 @@ const config: Config = {
           title: "Docs",
           items: [
             {
-              label: "Tutorial",
-              to: "/docs/intro",
+              label: "Supervaizer Quickstart",
+              to: "/docs/supervaizer-controller/quickstart",
             },
           ],
         },
@@ -130,10 +130,7 @@ const config: Config = {
             {
               label: "LinkedIn",
               href: "https://www.linkedin.com/company/supervaize",
-            },
-            {
-              label: "X",
-              href: "https://x.com/supervaize",
+              icon: "linkedin",
             },
           ],
         },

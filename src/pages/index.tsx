@@ -20,9 +20,9 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/intro"
+            to="/docs/supervaizer-controller/quickstart"
           >
-            Getting Started with Supervaizer Controller - 5min ⏱️
+            Getting Started with Supervaizer Controller - 10min ⏱️
           </Link>
         </div>
       </div>
