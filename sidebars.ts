@@ -24,6 +24,11 @@ const sidebars: SidebarsConfig = {
           id: "supervaizer-controller/controller-setup",
           label: "Controller Setup Guide",
         },
+        {
+          type: "doc",
+          id: "supervaizer-controller/troubleshooting",
+          label: "Troubleshooting",
+        },
 
         {
           type: "category",
@@ -49,32 +54,32 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: "doc",
-              id: "supervaizer-controller/API_REFERENCE",
+              id: "supervaizer-controller/ref/API_REFERENCE",
               label: "API Reference",
             },
             {
               type: "doc",
-              id: "supervaizer-controller/REST_API",
+              id: "supervaizer-controller/ref/REST_API",
               label: "REST API",
             },
             {
               type: "doc",
-              id: "supervaizer-controller/CLI",
+              id: "supervaizer-controller/ref/CLI",
               label: "Command Line Interface",
             },
             {
               type: "doc",
-              id: "supervaizer-controller/PROTOCOLS",
+              id: "supervaizer-controller/ref/PROTOCOLS",
               label: "Protocols",
             },
             {
               type: "doc",
-              id: "supervaizer-controller/PERSISTENCE",
+              id: "supervaizer-controller/ref/PERSISTENCE",
               label: "Persistence",
             },
             {
               type: "doc",
-              id: "supervaizer-controller/CHANGELOG",
+              id: "supervaizer-controller/ref/CHANGELOG",
               label: "Changelog",
             },
           ],

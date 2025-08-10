@@ -1,0 +1,87 @@
+---
+id: troubleshooting
+title: Troubleshooting
+displayed_sidebar: supervaizerControllerSidebar
+slug: troubleshooting
+---
+
+# Troubleshooting
+
+Common issues and solutions when setting up and running the Supervaizer Controller.
+
+## Server Launch Issues
+
+### **supervaizer start** stops after launch
+
+Debug using direct python start.
+
+```bash
+uv run python supervaizer_control.py
+```
+
+### **Error sending event SERVER_REGISTER**
+
+```
+ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' for url 'https://stage.supervaize.com/w/team_1/api/v1/ctrl-events/'
+```
+
+Check at https://stage.supervaize.com/users/developer/ that the API key you are using is active.
+
+### **Port already in use**
+
+Change the port: `sv_server.launch(host="0.0.0.0", port=8010)`.
+
+## Environment Configuration
+
+### Missing Environment Variables
+
+Ensure all required environment variables are set:
+
+```bash
+export SUPERVAIZE_API_KEY=your_api_key_here
+export SUPERVAIZE_WORKSPACE_ID=your_workspace_id
+export SUPERVAIZE_API_URL=https://app.supervaize.com
+```
+
+### API Key Authentication Issues
+
+- Verify your API key is active in the Supervaize dashboard
+- Check that the workspace ID matches your account
+- Ensure the API URL is correct for your environment (staging vs production)
+
+## Agent Configuration
+
+### Agent Not Discoverable
+
+- Verify the agent ID in your controller matches the expected format
+- Check that all required parameters are properly defined
+- Ensure the agent methods are correctly implemented
+
+### Parameter Validation Errors
+
+- Review the parameter definitions in your controller
+- Check that required fields are properly marked
+- Verify parameter types match expected values
+
+## Network and Connectivity
+
+### Connection Timeouts
+
+- Check your network connectivity
+- Verify firewall settings allow outbound HTTPS connections
+- Ensure the Supervaize API endpoints are accessible from your network
+
+### SSL/TLS Issues
+
+- Verify your system has up-to-date SSL certificates
+- Check for proxy or corporate firewall interference
+- Ensure your Python environment has the required SSL libraries
+
+## Still Need Help?
+
+If you're still experiencing issues:
+
+1. Check the [Supervaizer Controller GitHub repository](https://github.com/supervaize/supervaizer) for known issues
+2. Review the [API Reference](ref/API_REFERENCE) for detailed endpoint information
+3. Check the [CLI documentation](ref/CLI) for command-line troubleshooting options
+4. Ensure you're using the latest version of the Supervaizer package

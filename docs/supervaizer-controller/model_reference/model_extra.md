@@ -10,7 +10,7 @@ _No fields found._
 
 ### `telemetry.Telemetry`
 
-**Inherits from:** [`telemetry.TelemetryModel`](#telemetry-telemetrymodel)
+**Inherits from:** [`telemetry.TelemetryModel`](#telemetrytelemetrymodel)
 
 Base class for all telemetry data in the Supervaize Control system.
 
@@ -28,7 +28,7 @@ _No additional fields beyond parent class._
 
 ### `agent.AgentCustomMethodParams`
 
-**Inherits from:** [`agent.AgentMethodParams`](#agent-agentmethodparams)
+**Inherits from:** [`agent.AgentMethodParams`](#agentagentmethodparams)
 
 #### Model Fields
 
@@ -55,7 +55,7 @@ Method parameters for agent operations.
 
 ### `agent.AgentMethods`
 
-**Inherits from:** [`agent.AgentMethodsAbstract`](#agent-agentmethodsabstract)
+**Inherits from:** [`agent.AgentMethodsAbstract`](#agentagentmethodsabstract)
 
 _No additional fields beyond parent class._
 
@@ -96,7 +96,7 @@ Response model for agent endpoints - values provided by Agent.registration_info
 
 ### `job.Job`
 
-**Inherits from:** [`job.AbstractJob`](#job-abstractjob)
+**Inherits from:** [`job.AbstractJob`](#jobabstractjob)
 
 Jobs are typically created by the platform and are not created by the agent.
 
@@ -116,7 +116,7 @@ _No additional fields beyond parent class._
 
 ### `job.JobContext`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 #### Model Fields
 
@@ -133,7 +133,7 @@ _No additional fields beyond parent class._
 
 ### `job.JobResponse`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 #### Model Fields
 
@@ -148,19 +148,19 @@ _No additional fields beyond parent class._
 
 ### `event.JobStartConfirmationEvent`
 
-**Inherits from:** [`event.Event`](#event-event)
+**Inherits from:** [`event.Event`](#eventevent)
 
 _No additional fields beyond parent class._
 
 ### `case.Case`
 
-**Inherits from:** [`case.CaseAbstractModel`](#case-caseabstractmodel)
+**Inherits from:** [`case.CaseAbstractModel`](#casecaseabstractmodel)
 
 _No additional fields beyond parent class._
 
 ### `case.CaseAbstractModel`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 #### Model Fields
 
@@ -179,7 +179,7 @@ _No additional fields beyond parent class._
 
 ### `case.CaseNode`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 #### Model Fields
 
@@ -191,7 +191,7 @@ _No additional fields beyond parent class._
 
 ### `case.CaseNodeUpdate`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 CaseNodeUpdate is a class that represents an update to a case node.
 
@@ -212,7 +212,7 @@ Returns:
 
 ### `event.AbstractEvent`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 #### Model Fields
 
@@ -226,7 +226,7 @@ Returns:
 
 ### `event.AgentRegisterEvent`
 
-**Inherits from:** [`event.Event`](#event-event)
+**Inherits from:** [`event.Event`](#eventevent)
 
 Event sent when an agent registers with the control system.
 
@@ -236,19 +236,19 @@ _No additional fields beyond parent class._
 
 ### `event.CaseStartEvent`
 
-**Inherits from:** [`event.Event`](#event-event)
+**Inherits from:** [`event.Event`](#eventevent)
 
 _No additional fields beyond parent class._
 
 ### `event.CaseUpdateEvent`
 
-**Inherits from:** [`event.Event`](#event-event)
+**Inherits from:** [`event.Event`](#eventevent)
 
 _No additional fields beyond parent class._
 
 ### `event.Event`
 
-**Inherits from:** [`event.AbstractEvent`](#event-abstractevent)
+**Inherits from:** [`event.AbstractEvent`](#eventabstractevent)
 
 Base class for all events in the Supervaize Control system.
 
@@ -267,19 +267,19 @@ _No additional fields beyond parent class._
 
 ### `event.JobFinishedEvent`
 
-**Inherits from:** [`event.Event`](#event-event)
+**Inherits from:** [`event.Event`](#eventevent)
 
 _No additional fields beyond parent class._
 
 ### `event.ServerRegisterEvent`
 
-**Inherits from:** [`event.Event`](#event-event)
+**Inherits from:** [`event.Event`](#eventevent)
 
 _No additional fields beyond parent class._
 
 ### `job.AbstractJob`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 #### Model Fields
 
@@ -301,7 +301,7 @@ _No additional fields beyond parent class._
 
 ### `job.JobInstructions`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 #### Model Fields
 
@@ -316,7 +316,7 @@ _No additional fields beyond parent class._
 
 ### `routes.CaseUpdateRequest`
 
-**Inherits from:** [`common.SvBaseModel`](#common-svbasemodel)
+**Inherits from:** [`common.SvBaseModel`](#commonsvbasemodel)
 
 Request model for updating a case with answer to a question.
 
@@ -336,7 +336,7 @@ Standard error response model
 | `error` | `str` | **required** |  |
 | `error_type` | `<enum 'ErrorType'>` | **required** |  |
 | `detail` | `str` | `None` |  |
-| `timestamp` | `datetime` | datetime.datetime(2025, 8, 10, 10, 28, 56, 376255) |  |
+| `timestamp` | `datetime` | datetime.datetime(2025, 8, 10, 12, 47, 19, 679229) |  |
 | `status_code` | `int` | **required** |  |
 
 ### `server.ServerInfo`
@@ -368,4 +368,4 @@ A base class for creating Pydantic models.
 | `details` | `Dict[str, Any]` | **required** |  |
 
 
-*Updated on 2025-08-10 10:28:56*
+*Updated on 2025-08-10 12:47:19*

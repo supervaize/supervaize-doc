@@ -42,7 +42,7 @@ Open `supervaizer_control_example.py` and adapt the content to the EmailAIAgent.
 Use **Parameter** / **ParametersSetup** to declare what the agent needs. These show up in Supervaize UI and can be marked as env or secret.
 
 ```js reference title="Map Parameters"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L27-L83
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L27-L83
 ```
 
 **📖 See the model references**
@@ -98,7 +98,7 @@ The `fields` parameter defines the user input form that will be displayed in the
 ### Field setup for the "Start" method
 
 ```js reference title="Fields of Start AgentMethod"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L92-L131
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L92-L131
 ```
 
 **📖 See the model reference**
@@ -110,7 +110,7 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_ag
 The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
 
 ```js reference title="Agent definition"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L145-L165
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L145-L165
 ```
 
 **📖 See the model reference**
@@ -120,7 +120,7 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_ag
 ## 5.Setup the Supervaize Account and configure your Environment variables {#5}
 
 :::info
-This step is not needed to run the supervaizer as an A2A / ACP server only. See [Protocol support](/docs/supervaizer-controller/PROTOCOLS)
+This step is not needed to run the supervaizer as an A2A / ACP server only. See [Protocol support](/docs/supervaizer-controller/ref/PROTOCOLS)
 :::
 
 [Create your developer account](/docs/supervaize-fleet/developer-account#getting_started) on the Supervaize platform.
@@ -130,7 +130,7 @@ Create your API Key and collect your environment variables.
 See the [Quickstart guide](quickstart#4) to setup the environment variables
 
 ```js reference title="Account definition"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L167-L172
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L167-L172
 ```
 
 **📖 See the model reference**
@@ -146,7 +146,7 @@ The `Server` class wraps all the defined components together.
 At the minimum, the server requires at least one agent to be defined and the supervisor account (we are using Supervaize as the supervisor).
 
 ```js reference title="Server definition"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L174-L181
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L174-L181
 ```
 
 **📖 See the model reference**
@@ -156,7 +156,7 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_ag
 ### Server launch
 
 ```js reference title="Server launch"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L183-L185
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L183-L185
 ```
 
 See [Server Start 🚀](/docs/supervaizer-controller/quickstart#start) for CLI instructions
@@ -165,4 +165,4 @@ See [Server Start 🚀](/docs/supervaizer-controller/quickstart#start) for CLI i
 
 - Return to the [Quickstart](/docs/supervaizer-controller/quickstart) to continue with configuration and deployment
 - Check the [Model Reference](/docs/supervaizer-controller/model_reference/model_core) for detailed field specifications
-- Explore [API Reference](/docs/supervaizer-controller/API_REFERENCE) for advanced usage
+- Explore [API Reference](/docs/supervaizer-controller/ref/API_REFERENCE) for advanced usage

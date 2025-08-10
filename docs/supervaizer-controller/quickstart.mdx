@@ -160,10 +160,10 @@ This creates **`supervaizer_control_example.py`**. You’ll customize it to:
 
 ### Shortcut
 
-Get the fully customized controller from GitHub [Email-AI-Agent Supervaizer fork](https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py).
+Get the fully customized controller from GitHub [Email-AI-Agent Supervaizer fork](https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py).
 
-```js reference title="Full example controller supervaizer_email_agent_controller.py"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_email_agent_controller.py#L1-L15
+```js reference title="Full example controller supervaizer_control.py"
+https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L1-L15
 ```
 
 ### Step by step
@@ -264,34 +264,15 @@ Once the server is running, you'll have:
 
 ---
 
-## Troubleshooting
-
-- **supervaizer start** stops after launch
-
-  Debug using direct python start.
-
-```bash
-uv run python supervaizer_control.py
-```
-
-- **Error sending event SERVER_REGISTER**
-
-```
-ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' for url 'https://stage.supervaize.com/w/team_1/api/v1/ctrl-events/'
-```
-
-Check at https://stage.supervaize.com/users/developer/ that the API key you are using is active.
-
-- **Port already in use**  
-  Change the port: `sv_server.launch(host="0.0.0.0", port=8010)`.
-
----
-
 ## What’s next?
 
 - Add more **custom methods** (`chat`, `custom`) to extend control.
 - Turn on **A2A / ACP** discovery for interoperability.
 - Hook your controller into Supervaize to **monitor, audit, and operate** the agent.
+
+## Need Help?
+
+If you run into issues, check the **[Troubleshooting Guide](troubleshooting)** for common problems and solutions.
 
 ---
 
