@@ -8,11 +8,36 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Execution of `supervaizer start` was not maintaining the _main_ namespace so the fastapi server was never starting. Replaced execution by sub-process.
+
+- When supervisor_account is provided, A2A endpoints are automatically activated, because Supervaize needs to be able to trigger the healthchecks.
+
+## [0.9.6]
+
+- Public release to Pypi
+- Fixed the gihut workflows
+- Improve README.md
+
+## [0.9.5]
+
+### Fixed
+
 - Setup : missing `py.typed` in pyproject
+- clarified public_url (replaced registration_host by public_url)
+- changed "supervaizer install" to "supervaizer scaffold"
 
 ### Added
 
 - `gen_model_docs.py`: tool for documentation generation - see disclaimer
+
+### Unit tests results
+
+| Status        | Count |
+| ------------- | ----- |
+| 🤔 Skipped    | 6     |
+| ☑️ Deselected | 0     |
+| ⚠️ Failed     | 0     |
+| ✅ Passed     | 277   |
 
 ## [0.9.4]
 
@@ -65,4 +90,4 @@ Test Coverage : [![Test Coverage](https://img.shields.io/badge/Coverage-81%25-br
 > | 🧪 Tests     | 🧑‍🎨 UI/Style            | 🎼 Controller |
 
 
-*Uploaded on 2025-08-10 14:40:20*
+*Uploaded on 2025-08-11 02:52:31*

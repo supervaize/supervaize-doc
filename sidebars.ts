@@ -102,6 +102,11 @@ const sidebars: SidebarsConfig = {
               id: "supervaizer-controller/ref/ADMIN_README",
               label: "Admin Documentation",
             },
+            {
+              type: "doc",
+              id: "supervaizer-controller/Tunneling-setup",
+              label: "Tunneling Setup",
+            },
           ],
         },
       ],

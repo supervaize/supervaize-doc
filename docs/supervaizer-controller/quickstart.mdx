@@ -206,13 +206,20 @@ SUPERVAIZE_API_URL=https://app.supervaize.com
 
 </Tabs>
 
----
+### For local development only {#localdev}
+
+:::warning Local development
+If the agent is not deployed to a publicly accessible server, you need to install a **Tunneling** solution so that `supervaize` can operate your agent.
+Here are the instructions to [setup a tunnel for your local development](tunneling-setup)
+:::
+
+Store your public hostname in `SUPERVAIZER_HOST` environment variable.
+
+```bash
+export SUPERVAIZER_HOST=silly-peaches-chapter.loca.lt
+```
 
 ### Start the server 🚀 {#start}
-
-:::info
-Use the direct python call for advanced debugging
-:::
 
 <Tabs groupId="pm" queryString>
   <TabItem value="SupervaizerCLI" label="CLI">
@@ -224,6 +231,10 @@ supervaizer start
 
   </TabItem>
   <TabItem value="direct" label="direct">
+
+:::info Debug
+Use the direct python call for advanced debugging
+:::
 
 ```bash
 uv run python supervaizer_control.py

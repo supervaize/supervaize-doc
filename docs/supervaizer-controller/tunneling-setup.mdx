@@ -1,0 +1,102 @@
+---
+id: Tunneling-setup
+title: Setup a Tunneling Solution (for local dev)
+displayed_sidebar: supervaizerControllerSidebar
+slug: tunneling-setup
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Link from "@docusaurus/Link";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+This guide walks you through setting up a Tunneling solution for local development.
+
+To test locally, you need to install a tunnel solution to get an **external url**
+
+## Option 1: Using [**localtunnel** <i className="bi bi-box-arrow-up-right"></i>](https://loca.lt)
+
+### Install
+
+```bash
+npm install -g localtunnel
+```
+
+### Start
+
+Assuming supervaizer server runs on port 8000 (which it does by default)
+
+```bash
+lt --port 8000
+# your url is: https://silly-peaches-chapter.loca.lt
+
+# or optionally, set your own subdomain (if available)
+
+lt --port 8000 --subdomain my_supervaizer_agent
+# your url is: https://my_supervaizer_agent.loca.lt
+```
+
+:::info Keep track of your url
+Make note of the host name (without `http://`) : `my_supervaizer_agent.loca.lt` and store it in the `SUPERVAIZER_HOST` environment variable.
+:::
+
+## Option 2: Using [**ngrok** <i className="bi bi-box-arrow-up-right"></i>](https://ngrok.com/)
+
+### Installation
+
+<Tabs groupId="os" queryString>
+  <TabItem value="mac" label="macOS">
+
+```bash
+brew install ngrok
+```
+
+  </TabItem>
+  <TabItem value="win" label="Windows">
+
+Install via the [Windows App Store <i className="bi bi-box-arrow-up-right"></i>](ms-windows-store://pdp/?ProductId=9mvs1j51gmk6)
+
+  </TabItem>
+  <TabItem value="linux" label="Linux (apt)">
+  ```bash
+  curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+  | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+  && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" \
+  | sudo tee /etc/apt/sources.list.d/ngrok.list \
+  && sudo apt update \
+  && sudo apt install ngrok
+  ```
+
+  </TabItem>
+</Tabs>
+
+### Setup & Deploy
+
+[Sign up to grok (free with limitations) <i className="bi bi-box-arrow-up-right"></i>](https://dashboard.ngrok.com/signup) to get a token
+
+```bash title="Configure"
+ngrok config add-authtoken <token>
+```
+
+```bash title="Run"
+ngrok http 8000
+
+# Or -optionally try to set the url (paid plans)
+ngrok http 8000 --url my_supervaizer_agent.ngrok.dev
+```
+
+```bash title="Ngrok Running" {5}
+Update                        update available (version 3.26.0, Ctrl-U to update)
+Version                       3.22.1
+Region                        United States (us)
+Web Interface                 http://127.0.0.1:4040
+Forwarding                    https://e83bc6b8acec.ngrok-free.app -> http://localhost:8000
+```
+
+:::info Keep track of your url
+Make note of the host name (without `http:/`) : `my_supervaizer_agent.ngrok.dev` and store it in the `SUPERVAIZER_HOST` environment variable.
+:::
+
+## What's next?
+
+[Export your enviornment variable and start the server](quickstart#localdev)

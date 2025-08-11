@@ -1,6 +1,6 @@
 # Model Reference Core
 
-**Version:** 0.9.4
+**Version:** 0.9.7
 
 ### `account.Account`
 
@@ -368,13 +368,15 @@ job execution, and communication with the Supervaize platform.
 The server can be configured with various endpoints (A2A, ACP, admin interface)
 and supports encryption/decryption of parameters using RSA keys.
 
-registration_host: Host to use for outbound connections and registration.
+Note that when the supervisor ccount is set, the A2A protocol is automatically activated to provide HEALTH CHECK endpoints.
+
+public_url: full url (including scheme and port) to use for outbound connections and registration.
             This is especially important in Docker environments where the binding
             address (0.0.0.0) can't be used for outbound connections. Set to
             'host.docker.internal' for Docker or the appropriate service name
             in container environments.
             Examples:
-            - In Docker, set to 'host.docker.internal' to reach the host machine
+            - In Docker, set to 'http://host.docker.internal' to reach the host machine
             - In Kubernetes, might be set to the service name or external DNS
             If not provided, falls back to using the listening host.
 
@@ -396,7 +398,7 @@ registration_host: Host to use for outbound connections and registration.
 | `acp_endpoints` | `bool` | True | Whether to enable ACP endpoints |
 | `private_key` | `RSAPrivateKey` | **required** | RSA private key for secret parameters encryption - Used in server-to-agent communication - Not needed by user |
 | `public_key` | `RSAPublicKey` | **required** | RSA public key for secret parameters encryption - Used in agent-to-server communication - Not needed by user |
-| `registration_host` | `str` | `None` | Host to use for outbound connections and registration - May be used for Docker or Kubernetes environments |
+| `public_url` | `str` | `None` | Public including scheme and port to use for inbound connections |
 | `api_key` | `str` | `None` | Force the API key to access the supervaizer endpoints - if not provided, a random key will be generated |
 | `api_key_header` | `APIKeyHeader` | `None` | API key header for authentication |
 
@@ -433,4 +435,4 @@ registration_host: Host to use for outbound connections and registration.
 ```
 
 
-*Uploaded on 2025-08-10 14:40:20*
+*Uploaded on 2025-08-11 02:52:31*
