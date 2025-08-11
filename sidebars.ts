@@ -131,6 +131,54 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaize-fleet/features/overview",
+          label: "Platform Overview",
+        },
+        {
+          type: "category",
+          label: "Features",
+          collapsible: true,
+          collapsed: false,
+          items: [
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/agent-management",
+              label: "Agent Management",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/mission-management",
+              label: "Mission Management",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/context-management",
+              label: "Context Management",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/job-management",
+              label: "Job Management",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/case-management",
+              label: "Case Management",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/rating-analytics",
+              label: "Rating & Analytics",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/slack-notifications",
+              label: "Slack Notifications",
+            },
+          ],
+        },
+        {
+          type: "doc",
           id: "supervaize-fleet/developer-account",
           label: "Setup Development Environment",
         },

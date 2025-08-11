@@ -1,0 +1,182 @@
+---
+id: agent-management
+title: Agent Management
+displayed_sidebar: supervaizeFleetSidebar
+slug: agent-management
+---
+
+import Link from "@docusaurus/Link";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Agent Management
+
+:::warning Content Under Review
+This content is still under review and may be updated with additional details, screen captures, and refinements.
+:::
+
+Discover, onboard, and configure AI agents for your workspace. Set up secrets, environment variables, and agent parameters to ensure smooth operation.
+
+## Overview
+
+Agent Management is the foundation of the Supervaize Fleet platform. It allows you to discover available AI agents, configure them with the necessary credentials and parameters, and monitor their status and performance.
+
+## <i className="bi bi-1-circle"></i> Discover Newly Added Agent
+
+### Step 1: Access Agent Discovery
+
+Navigate to the **Agents** section in your Supervaize Fleet dashboard.
+
+### Step 2: View Available Agents
+
+The platform will display all discoverable agents in your workspace:
+
+- **Agent Name**: Human-readable identifier
+- **Agent Type**: Category/functionality (e.g., "Email AI", "Data Analysis")
+- **Status**: Online/Offline/Available
+- **Capabilities**: List of supported operations
+- **Required Parameters**: Variables the agent needs to function
+
+### Step 3: Define Agent Secrets & Variables
+
+Click on the agent you want to onboard and configure the required parameters in the form fields:
+
+- **Secrets**: Enter API keys, access tokens, and database credentials
+- **Environment Variables**: Set environment-specific configurations like log levels and timeouts
+
+:::tip Security
+
+- Secrets are encrypted at rest
+- Use environment-specific configurations
+- Rotate credentials regularly
+  :::
+
+## Agent Configuration Options
+
+### Required Secrets
+
+Most agents require some form of authentication or access credentials:
+
+- **API Keys**: For external service integrations
+- **Access Tokens**: For secure API communication
+- **Database Credentials**: For data access and storage
+- **Service Account Keys**: For cloud service authentication
+
+### Environment Variables
+
+Configure agent behavior based on your environment:
+
+- **Environment**: Production, staging, or development
+- **Log Level**: Debug, info, warning, or error
+- **Concurrency Limits**: Maximum simultaneous job processing
+- **Timeout Settings**: Response time limits for operations
+
+## Agent Status Monitoring
+
+### Real-time Status
+
+Monitor your agents' current status:
+
+- **Online**: Agent is available and ready to process jobs
+- **Offline**: Agent is unavailable or experiencing issues
+- **Busy**: Agent is currently processing jobs
+- **Error**: Agent has encountered an error and needs attention
+
+### Performance Metrics
+
+Track agent performance over time:
+
+- **Job Success Rate**: Percentage of successfully completed jobs
+- **Average Response Time**: Typical time to complete tasks
+- **Resource Usage**: CPU, memory, and network utilization
+- **Error Frequency**: Rate of failures and issues
+
+## Agent Assignment
+
+### Mission Assignment
+
+Once configured, agents can be assigned to specific missions:
+
+- **Primary Agent**: Main agent responsible for mission execution
+- **Backup Agent**: Alternative agent for fallback scenarios
+- **Specialized Agents**: Agents with specific capabilities for particular tasks
+
+### Role Configuration
+
+Define how agents participate in missions:
+
+- **Handler**: Primary agent for task execution
+- **Validator**: Agent that reviews and validates results
+- **Escalation**: Agent that handles complex or escalated cases
+
+## Troubleshooting Common Issues
+
+### Agent Offline
+
+**Common causes:**
+
+- Network connectivity issues
+- Service authentication failures
+- Resource constraints
+- Configuration errors
+
+**Solutions:**
+
+- Check network connectivity
+- Verify credentials and permissions
+- Review resource allocation
+- Check configuration settings
+
+### Performance Issues
+
+**Common causes:**
+
+- High resource utilization
+- Network latency
+- Service rate limits
+- Inefficient configurations
+
+**Solutions:**
+
+- Monitor resource usage
+- Optimize agent parameters
+- Implement caching strategies
+- Scale resources if needed
+
+## Best Practices
+
+### Security
+
+- Use environment-specific credentials
+- Implement least-privilege access
+- Regularly rotate secrets and keys
+- Monitor access patterns and anomalies
+
+### Performance
+
+- Set appropriate concurrency limits
+- Monitor resource utilization
+- Implement proper error handling
+- Use caching for frequently accessed data
+
+### Monitoring
+
+- Set up alerts for agent failures
+- Track performance metrics over time
+- Monitor error rates and patterns
+- Implement automated health checks
+
+## Next Steps
+
+After configuring your agents:
+
+1. **Create missions** to organize your AI operations
+2. **Set up monitoring** to track agent performance
+3. **Configure notifications** to stay informed of issues
+4. **Scale operations** by adding more agents as needed
+
+## Related Features
+
+- **[Mission Management](/docs/supervaize-fleet/features/mission-management)**: Assign agents to missions
+- **[Job Management](/docs/supervaize-fleet/features/job-management)**: Execute tasks with configured agents
+- **[Rating & Analytics](/docs/supervaize-fleet/features/rating-analytics)**: Monitor agent performance
+- **[Slack Notifications](/docs/supervaize-fleet/features/slack-notifications)**: Get alerts about agent status

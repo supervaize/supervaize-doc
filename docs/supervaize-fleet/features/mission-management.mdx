@@ -1,0 +1,248 @@
+---
+id: mission-management
+title: Mission Management
+displayed_sidebar: supervaizeFleetSidebar
+slug: mission-management
+---
+
+import Link from "@docusaurus/Link";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Mission Management
+
+:::warning Content Under Review
+This content is still under review and may be updated with additional details, screen captures, and refinements.
+:::
+
+Create and manage missions with specific objectives, team assignments, and success criteria. Organize your AI operations into structured workflows.
+
+## Overview
+
+Mission Management allows you to organize your AI operations into logical, goal-oriented workflows. Each mission represents a specific objective or project that can be executed by one or more AI agents with the support of your team.
+
+## <i className="bi bi-2-circle"></i> Create New Mission
+
+### Step 1: Mission Form
+
+Navigate to **Missions** → **Create New Mission** and fill out the form with:
+
+- **Mission Name**: Enter a descriptive name for your mission
+- **Description**: Provide a detailed description of the mission objectives
+- **Priority**: Select the priority level (Low, Medium, High, Critical)
+- **Deadline**: Set the target completion date
+- **Workspace**: Choose the appropriate workspace
+- **Tags**: Add relevant tags for organization
+
+### Step 2: Define Rating Criteria
+
+Click **Configure Rating Parameters** to set up evaluation metrics. You can configure:
+
+**Basic Metrics:**
+
+- **Response Time**: Set target response times and thresholds
+- **Accuracy**: Define accuracy targets and minimum acceptable levels
+- **Customer Satisfaction**: Set satisfaction score targets
+
+**Advanced Metrics:**
+
+- **Cost Efficiency**: Define cost per interaction targets
+- **Escalation Rate**: Set acceptable escalation percentages
+- **Resolution Rate**: Define successful resolution targets
+- **Learning Curve**: Monitor performance improvement over time
+
+:::info Rating Parameters Page
+For detailed configuration of rating parameters across your workspace, visit the dedicated **Rating Parameters** page under **Workspace Settings**.
+:::
+
+### Step 3: Add Users to Mission
+
+Assign team members and stakeholders using the user management interface:
+
+- **Mission Owner**: Designate the primary mission manager
+- **Team Members**: Add users who will execute and manage the mission
+- **Stakeholders**: Include users who need visibility into mission progress
+- **Permissions**: Configure access levels for viewing, editing, and executing
+
+### Step 4: Add Agent to Mission
+
+Select and configure the agent for this mission using the agent assignment form:
+
+- **Agent Selection**: Choose from available agents in your workspace
+- **Role Assignment**: Define the agent's role (primary, backup, etc.)
+- **Fallback Configuration**: Set up alternative agents if needed
+- **Execution Settings**: Configure priority and concurrency limits
+
+### Step 5: Setup Default Notification Channel (Optional)
+
+Configure alerts and updates using the notification settings panel:
+
+- **Email Notifications**: Set up email alerts for team members
+- **Slack Integration**: Connect to your Slack workspace for real-time updates
+- **Webhook Configuration**: Set up custom webhook endpoints if needed
+- **Event Selection**: Choose which events trigger notifications
+
+## Mission Configuration Options
+
+### Priority Levels
+
+Define the importance and urgency of your mission:
+
+- **Low**: Non-critical operations with flexible timelines
+- **Medium**: Standard operations with moderate urgency
+- **High**: Important operations requiring attention
+- **Critical**: Urgent operations with immediate impact
+
+### Workspace Organization
+
+Organize missions by workspace for better team collaboration:
+
+- **Team-specific**: Missions assigned to specific teams
+- **Project-based**: Missions organized by project or initiative
+- **Department-wide**: Missions spanning multiple teams
+- **Organization-wide**: Missions affecting the entire organization
+
+### Tagging System
+
+Use tags to categorize and organize your missions:
+
+- **Function**: Customer support, data analysis, content creation
+- **Technology**: AI model, integration type, platform
+- **Business Unit**: Sales, marketing, operations, support
+- **Status**: Active, planning, completed, archived
+
+## Mission Lifecycle Management
+
+### Planning Phase
+
+- Define mission objectives and success criteria
+- Assign team members and agents
+- Set timelines and milestones
+- Configure monitoring and alerts
+
+### Execution Phase
+
+- Monitor mission progress in real-time
+- Track job completion and performance
+- Handle escalations and issues
+- Adjust resources and priorities as needed
+
+### Review Phase
+
+- Analyze mission outcomes and metrics
+- Review team and agent performance
+- Document lessons learned
+- Plan improvements for future missions
+
+## Team Collaboration Features
+
+### Role-based Access Control
+
+Define different permission levels:
+
+- **Viewer**: Can see mission details and progress
+- **Contributor**: Can add context and update information
+- **Executor**: Can create and manage jobs
+- **Admin**: Full control over mission configuration
+
+### Communication Tools
+
+Keep your team informed and coordinated:
+
+- **Mission Chat**: Dedicated communication channel
+- **Status Updates**: Real-time progress notifications
+- **File Sharing**: Upload relevant documents and resources
+- **Comment System**: Add notes and feedback to specific items
+
+## Mission Analytics
+
+### Performance Tracking
+
+Monitor mission effectiveness:
+
+- **Completion Rate**: Percentage of successfully completed missions
+- **Time to Completion**: Average duration from start to finish
+- **Resource Utilization**: Efficiency of team and agent usage
+- **Quality Metrics**: Customer satisfaction and accuracy scores
+
+### Comparative Analysis
+
+Benchmark your missions:
+
+- **Team Performance**: Compare different team outcomes
+- **Agent Effectiveness**: Evaluate agent performance across missions
+- **Process Efficiency**: Identify optimization opportunities
+- **Cost Analysis**: Track resource costs and ROI
+
+## Best Practices
+
+### Mission Planning
+
+- Clearly define objectives and success criteria
+- Set realistic timelines and milestones
+- Assign appropriate team members and agents
+- Plan for potential issues and escalations
+
+### Execution Management
+
+- Monitor progress regularly and proactively
+- Communicate updates to stakeholders
+- Adjust resources and priorities as needed
+- Document decisions and changes
+
+### Continuous Improvement
+
+- Review mission outcomes and performance
+- Identify areas for improvement
+- Update processes and procedures
+- Share learnings across the organization
+
+## Troubleshooting Common Issues
+
+### Mission Delays
+
+**Common causes:**
+
+- Unrealistic timelines
+- Resource constraints
+- Agent performance issues
+- Team availability problems
+
+**Solutions:**
+
+- Review and adjust timelines
+- Reallocate resources
+- Optimize agent configurations
+- Improve team coordination
+
+### Quality Issues
+
+**Common causes:**
+
+- Unclear success criteria
+- Insufficient agent training
+- Poor context definition
+- Inadequate monitoring
+
+**Solutions:**
+
+- Refine success metrics
+- Enhance agent capabilities
+- Improve context management
+- Strengthen monitoring systems
+
+## Next Steps
+
+After creating your mission:
+
+1. **Add context** to enhance agent understanding
+2. **Create jobs** to execute specific tasks
+3. **Monitor progress** through real-time dashboards
+4. **Track performance** using defined metrics
+
+## Related Features
+
+- **[Agent Management](/docs/supervaize-fleet/features/agent-management)**: Configure agents for mission execution
+- **[Context Management](/docs/supervaize-fleet/features/context-management)**: Add business context to missions
+- **[Job Management](/docs/supervaize-fleet/features/job-management)**: Execute tasks within missions
+- **[Rating & Analytics](/docs/supervaize-fleet/features/rating-analytics)**: Track mission performance
+- **[Slack Notifications](/docs/supervaize-fleet/features/slack-notifications)**: Get mission updates
