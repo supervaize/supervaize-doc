@@ -74,4 +74,5 @@ All CLI options can also be configured through environment variables:
 | SUPERVAIZER_OUTPUT_PATH   | Path for install command output  | supervaizer_control.py       |
 | SUPERVAIZER_FORCE_INSTALL | Force overwrite existing file    | false                        |
 
-_Uploaded on 2025-08-11 02:52:31_
+
+*Uploaded on 2025-08-12 14:19:38*
