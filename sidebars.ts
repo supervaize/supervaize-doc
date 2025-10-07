@@ -26,6 +26,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaizer-controller/deploy",
+          label: "Cloud Deployment",
+        },
+        {
+          type: "doc",
           id: "supervaizer-controller/troubleshooting",
           label: "Troubleshooting",
         },

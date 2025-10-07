@@ -16,6 +16,9 @@ supervaizer scaffold
 # Start the server using the configuration file
 supervaizer start
 
+# Deploy to cloud platforms
+supervaizer deploy up --platform cloud-run --name my-agent
+
 # To get all the start options
 supervaizer start --help
 ```
@@ -57,6 +60,73 @@ supervaizer start --debug --reload
 supervaizer start --log-level=DEBUG
 ```
 
+### deploy
+
+Deploy Supervaizer agents to cloud platforms with full automation
+
+```bash
+# Plan deployment (preview changes)
+supervaizer deploy plan --platform cloud-run --name my-agent --env prod
+
+# Test locally with Docker
+supervaizer deploy local --name my-agent --generate-api-key
+
+# Deploy to cloud platform
+supervaizer deploy up --platform cloud-run --name my-agent --env prod
+
+# Check deployment status
+supervaizer deploy status --platform cloud-run --name my-agent --env prod
+
+# Remove deployment
+supervaizer deploy down --platform cloud-run --name my-agent --env prod
+```
+
+**Supported Platforms:**
+
+- `cloud-run` - Google Cloud Run
+- `aws-app-runner` - AWS App Runner
+- `do-app-platform` - DigitalOcean App Platform
+
+**Common Options:**
+
+- `--platform` - Cloud platform (required)
+- `--name` - Service name (default: current directory)
+- `--env` - Environment (dev/staging/prod, default: dev)
+- `--region` - Provider region
+- `--generate-api-key` - Create secure API key
+- `--yes` - Non-interactive mode
+
+### local
+
+Test Supervaizer agents locally using Docker before cloud deployment
+
+```bash
+# Test locally with default settings
+supervaizer deploy local --name my-agent
+
+# Test with custom options
+supervaizer deploy local \
+  --name email-agent \
+  --env dev \
+  --port 8000 \
+  --generate-api-key \
+  --generate-rsa \
+  --timeout 60 \
+  --verbose
+```
+
+**Local Testing Options:**
+
+- `--name` - Service name (default: current directory)
+- `--env` - Environment (dev/staging/prod, default: dev)
+- `--port` - Application port (default: 8000)
+- `--generate-api-key` - Create secure API key for testing
+- `--generate-rsa` - Generate RSA private key for testing
+- `--timeout` - Seconds to wait for service startup (default: 30)
+- `--verbose` - Show Docker Compose output
+
+For detailed deployment documentation, see the [Cloud Deployment Guide](../deploy).
+
 ## Environment Variables
 
 All CLI options can also be configured through environment variables:
@@ -74,5 +144,4 @@ All CLI options can also be configured through environment variables:
 | SUPERVAIZER_OUTPUT_PATH   | Path for install command output  | supervaizer_control.py       |
 | SUPERVAIZER_FORCE_INSTALL | Force overwrite existing file    | false                        |
 
-
-*Uploaded on 2025-08-12 14:19:38*
+_Uploaded on 2025-08-12 14:19:38_
