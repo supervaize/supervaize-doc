@@ -194,20 +194,9 @@ const sidebars: SidebarsConfig = {
   // Supervaize Studio sidebar
   supervaizeStudioSidebar: [
     {
-      type: "category",
-      label: "Supervaize Studio",
-      link: {
-        type: "generated-index",
-        title: "Supervaize Studio Documentation",
-        description: "Documentation for Supervaize Studio",
-      },
-      items: [
-        {
-          type: "doc",
-          id: "supervaize-studio/intro",
-          label: "Introduction",
-        },
-      ],
+      type: "doc",
+      id: "supervaize-studio/intro",
+      label: "Introduction",
     },
   ],
 };

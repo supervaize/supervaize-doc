@@ -71,6 +71,15 @@ supervaizer deploy plan --platform cloud-run --name my-agent --env prod
 # Test locally with Docker
 supervaizer deploy local --name my-agent --generate-api-key
 
+# Generate Docker files only (for CI/CD or manual testing)
+supervaizer deploy local --docker-files-only --name my-agent --generate-api-key
+
+# Custom source directory and controller file
+supervaizer deploy local --source-dir . --controller-file my_controller.py
+
+# Combined with docker-files-only
+supervaizer deploy local --docker-files-only --source-dir lib --controller-file custom_controller.py
+
 # Deploy to cloud platform
 supervaizer deploy up --platform cloud-run --name my-agent --env prod
 
@@ -124,6 +133,9 @@ supervaizer deploy local \
 - `--generate-rsa` - Generate RSA private key for testing
 - `--timeout` - Seconds to wait for service startup (default: 30)
 - `--verbose` - Show Docker Compose output
+- `--docker-files-only` - Only generate Docker files without running them
+- `--source-dir` - Source directory path (default: src)
+- `--controller-file` - Controller file name (default: supervaizer_control.py)
 
 For detailed deployment documentation, see the [Cloud Deployment Guide](../deploy).
 

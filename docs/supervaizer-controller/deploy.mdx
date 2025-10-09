@@ -10,6 +10,16 @@ import TabItem from "@theme/TabItem";
 import Link from "@docusaurus/Link";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
+:::warning Work in Progress
+
+This deployment feature is currently only available in the `feature/deploy` branch.
+
+**GitHub Repository**: [https://github.com/supervaize/supervaizer/tree/feature/deploy](https://github.com/supervaize/supervaizer/tree/feature/deploy)
+
+This documentation covers features that are under active development and may change before the next stable release.
+
+:::
+
 The `supervaizer deploy` command provides **fully automated** deployment of Supervaizer agents to cloud platforms with zero-downtime updates, health verification, and automatic rollback capabilities.
 
 ## Overview
@@ -351,15 +361,80 @@ docker-compose -f .deployment/docker-compose.yml down
 
 **Local Testing Options:**
 
-| Option               | Description                            | Default                |
-| -------------------- | -------------------------------------- | ---------------------- |
-| `--name`             | Service base name                      | Current directory name |
-| `--env`              | Environment (`dev`, `staging`, `prod`) | `dev`                  |
-| `--port`             | Application port                       | `8000`                 |
-| `--generate-api-key` | Create secure API key for testing      | `false`                |
-| `--generate-rsa`     | Generate RSA private key for testing   | `false`                |
-| `--timeout`          | Seconds to wait for service startup    | `30`                   |
-| `--verbose`          | Show Docker Compose output             | `false`                |
+| Option                | Description                                     | Default                  |
+| --------------------- | ----------------------------------------------- | ------------------------ |
+| `--name`              | Service base name                               | Current directory name   |
+| `--env`               | Environment (`dev`, `staging`, `prod`)          | `dev`                    |
+| `--port`              | Application port                                | `8000`                   |
+| `--generate-api-key`  | Create secure API key for testing               | `false`                  |
+| `--generate-rsa`      | Generate RSA private key for testing            | `false`                  |
+| `--timeout`           | Seconds to wait for service startup             | `30`                     |
+| `--verbose`           | Show Docker Compose output                      | `false`                  |
+| `--docker-files-only` | Only generate Docker files without running them | `false`                  |
+| `--source-dir`        | Source directory path                           | `src`                    |
+| `--controller-file`   | Controller file name                            | `supervaizer_control.py` |
+
+**Docker Files Only Mode:**
+
+Use `--docker-files-only` to generate Docker configuration files without starting the services:
+
+```bash
+# Generate Docker files only
+supervaizer deploy local --docker-files-only --name my-agent
+
+# Generate files with custom configuration
+supervaizer deploy local \
+  --docker-files-only \
+  --name email-agent \
+  --port 8080 \
+  --generate-api-key \
+  --generate-rsa
+```
+
+This mode is useful for:
+
+- **CI/CD pipelines** - Generate files for external Docker execution
+- **Custom Docker setups** - Use generated files with your own Docker workflow
+- **File inspection** - Review generated Dockerfile and docker-compose.yml before running
+- **Manual testing** - Run Docker commands manually with generated configuration
+
+**Generated Files:**
+
+- `.deployment/Dockerfile` - Container image definition
+- `.deployment/docker-compose.yml` - Service orchestration
+- `.deployment/.dockerignore` - Docker build exclusions
+- `.deployment/secrets/` - Generated API keys and RSA keys
+
+**Custom Source Directory and Controller File:**
+
+Use `--source-dir` and `--controller-file` to customize your project structure:
+
+```bash
+# Default usage (backward compatible)
+supervaizer deploy local
+
+# Custom source directory
+supervaizer deploy local --source-dir .
+
+# Custom controller file
+supervaizer deploy local --controller-file my_controller.py
+
+# Both custom parameters
+supervaizer deploy local --source-dir lib --controller-file custom_controller.py
+
+# Combined with docker-files-only
+supervaizer deploy local \
+  --docker-files-only \
+  --source-dir . \
+  --controller-file my_controller.py
+```
+
+**Use Cases:**
+
+- **Non-standard project layouts** - When your source code is not in a `src/` directory
+- **Multiple controllers** - When you have different controller files for different environments
+- **Monorepo setups** - When working with multiple services in a single repository
+- **Legacy projects** - When adapting existing projects with different directory structures
 
 **Local Environment Variables:**
 
