@@ -5,6 +5,7 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import Heading from "@theme/Heading";
+import JsonLd from "@site/src/components/JsonLd";
 
 import styles from "./index.module.css";
 
@@ -32,11 +33,30 @@ function HomepageHeader() {
 
 export default function Home(): ReactNode {
   const { siteConfig } = useDocusaurusContext();
+
+  // JSON-LD structured data for the homepage
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.title,
+    description: siteConfig.tagline,
+    url: siteConfig.url,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteConfig.url}search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <Layout
       title={`${siteConfig.title} Documentation`}
       description="Documentation for Supervaize"
     >
+      <JsonLd data={jsonLd} />
       <HomepageHeader />
       <main>
         <HomepageFeatures />

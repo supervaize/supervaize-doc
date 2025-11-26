@@ -71,6 +71,27 @@ const config: Config = {
     ],
   ],
 
+  // Global JSON-LD structured data (Organization schema)
+  headTags: [
+    {
+      tagName: "script",
+      attributes: {
+        type: "application/ld+json",
+      },
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Supervaize",
+        url: "https://supervaize.com",
+        logo: "https://doc.supervaize.com/img/supervaize-black-green.png",
+        sameAs: [
+          "https://github.com/supervaize",
+          "https://www.linkedin.com/company/supervaize",
+        ],
+      }),
+    },
+  ],
+
   themeConfig: {
     // Replace with your project's social card
     image: "img/supervaize-black-green.png",
