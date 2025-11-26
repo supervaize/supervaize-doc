@@ -51,6 +51,15 @@ h6 {
   color: var(--ifm-color-primary-dark);
   text-decoration: none !important;
 }
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: var(--ifm-color-primary-lightest);
+}
 h1 {
   font-size: 2.7rem;
 }
@@ -104,6 +113,15 @@ h4 {
 .hero__title {
   color: var(--ifm-color-primary-lightest) !important;
 }
+
+.hero__subtitle {
+  color: var(--ifm-color-content);
+}
+
+[data-theme="dark"] .hero__subtitle {
+  color: var(--ifm-color-content-secondary);
+}
+
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme="dark"] {
   --ifm-color-primary: #e9e9f0;
@@ -112,7 +130,7 @@ h4 {
   --ifm-color-primary-darkest: #3d4cb8;
   --ifm-color-primary-light: #6376ff;
   --ifm-color-primary-lighter: #687bff;
-  --ifm-color-primary-lightest: #7a8aff;
+  --ifm-color-primary-lightest: #b5e925;
   --ifm-color-secondary: #b5e925;
   --ifm-color-success: #6f9013;
   --ifm-color-info: #0dcaf0;
@@ -120,4 +138,33 @@ h4 {
   --ifm-color-danger: #e92825;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
   --navbar-link-color: #b5e925;
+  --ifm-footer-background-color: var(--ifm-navbar-background-color);
+  --ifm-footer-color: var(--ifm-font-color-base);
+  --ifm-footer-link-color: var(--ifm-color-content-secondary);
+  --ifm-footer-link-hover-color: var(--ifm-color-primary-lightest);
+  --ifm-footer-title-color: var(--ifm-color-primary-lightest);
+}
+
+[data-theme="dark"] .footer__title {
+  color: var(--ifm-footer-title-color) !important;
+}
+
+[data-theme="dark"] .footer__link-item {
+  color: var(--ifm-footer-link-color) !important;
+}
+
+[data-theme="dark"] .footer__link-item:hover {
+  color: var(--ifm-footer-link-hover-color) !important;
+}
+
+[data-theme="dark"] .footer__copyright {
+  color: var(--ifm-footer-link-color) !important;
+}
+
+[data-theme="dark"] .footer__icon-link {
+  color: var(--ifm-footer-link-color) !important;
+}
+
+[data-theme="dark"] .footer__icon-link:hover {
+  color: var(--ifm-footer-link-hover-color) !important;
 }
