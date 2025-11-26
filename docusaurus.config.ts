@@ -183,7 +183,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Supervaize. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Supervaize.<br> <i>Built with Docusaurus - ${new Date().toISOString()}</i>`,
     },
     prism: {
       theme: prismThemes.github,

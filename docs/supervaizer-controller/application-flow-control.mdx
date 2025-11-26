@@ -1,0 +1,740 @@
+---
+id: application-flow-control
+title: Application Flow Control
+displayed_sidebar: supervaizerControllerSidebar
+slug: application-flow-control
+---
+
+import Link from "@docusaurus/Link";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+This guide explains how to manage application flow and track progress using the `Case` class and related objects in your Supervaizer agent.
+
+## Overview
+
+:::info
+
+This guide uses the [<i className="bi bi-github"></i> CallAgent](https://github.com/alain-sv/callagen) as the primary example.
+
+See the [Controller Setup Guide](controller-setup) for initial setup instructions.
+:::
+
+Application flow control allows you to:
+- Track individual tasks within a job using **Cases**
+- Update progress and status with **CaseNodeUpdate**
+- Request human input when decisions are needed
+- Return structured responses with **JobResponse**
+- Manage costs and errors throughout execution
+
+## Case Class and Methods
+
+The `Case` class represents an individual task or unit of work within a job. Each case can track its own progress, costs, and results.
+
+### Case.start()
+
+Creates a new case for tracking a specific task. This is a static method that returns a `Case` instance.
+
+**Parameters:**
+- `job_id` (str, required): The ID of the parent job
+- `account` (Account, required): The account object from your controller setup
+- `name` (str, required): Descriptive name for the case
+- `description` (str, required): Detailed description of what this case represents
+- `case_id` (str, optional): Custom case identifier. If not provided, one will be generated
+
+**Returns:** `Case` instance
+
+**Getting `job_id` from context:**
+
+The `job_id` is provided by the Supervaize platform when your agent method is called. Extract it from the `context` parameter in your method's `kwargs`:
+
+```python
+# Get job_id from context
+context_raw = kwargs.get("context")
+if context_raw is None:
+    raise ValueError("context is required in kwargs")
+
+# Convert dict to JobContext if needed, otherwise use as-is
+if isinstance(context_raw, dict):
+    job_context = JobContext(**context_raw)
+elif isinstance(context_raw, JobContext):
+    job_context = context_raw
+else:
+    raise ValueError(f"context must be a dict or JobContext, got {type(context_raw)}")
+
+job_instructions: JobInstructions = job_context.job_instructions
+job_id = job_context.job_id
+```
+
+**Explanation:**
+- When Supervaize calls your agent method (e.g., `job_start`), it automatically passes a `context` parameter in `kwargs`
+- The `context` contains a `JobContext` object (or dict that can be converted to one) with job information
+- Extract `job_id` by accessing `job_context.job_id` after converting the context to a `JobContext` instance
+- This `job_id` uniquely identifies the job and is used to associate cases with their parent job
+
+The `context` parameter is automatically provided by Supervaizer when your agent method is invoked. It contains a `JobContext` object with the `job_id` and other job-related information.
+
+**Example:**
+
+```159:165:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+        case = Case.start(
+            job_id=job_id,
+            account=account,
+            name=f"Call to {phone_number}",
+            description=f"Outbound call to {phone_number}",
+            case_id=f"call_{phone_number}",
+        )
+```
+
+**When to create a case:**
+- One case per phone number, email, or individual task
+- When you need to track multiple related but independent operations
+- When you want granular progress visibility in the Supervaize UI
+
+### case.update()
+
+Updates a case with progress information, status changes, or intermediate results. Use this method throughout case execution to provide visibility into what's happening.
+
+**Parameters:**
+- `update` (CaseNodeUpdate, required): The update object containing progress information
+
+**Example - Initial progress update:**
+
+```196:206:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"📞 Starting Outgoing Call (Try #{attempt})",
+                        cost=0.0,
+                        payload={
+                            "attempt": attempt,
+                            "call_id": call_id,
+                        },
+                        is_final=False,
+                    )
+                )
+```
+
+**Example - Status updates during execution:**
+
+```218:224:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                        case.update(
+                            CaseNodeUpdate(
+                                name=f"#{iteration} {call_status}: {duration:.2f}s",
+                                is_final=False,
+                                payload=RetellCalls.status_fields(call_record),
+                            )
+                        )
+```
+
+**Example - Final result update:**
+
+```229:243:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"📄 Transcript for Outgoing Call (Try #{attempt})",
+                        payload={
+                            "attempt": attempt,
+                            "call_id": call_id,
+                            "call_status": call_status,
+                            "transcript": call.transcript,
+                            "cost so far": call.cost,
+                            "expected_values": None,  # Will be populated later if available
+                            "status_fields": status_fields,
+                        },
+                        is_final=False,
+                    )
+                )
+```
+
+**Example - Success update:**
+
+```255:270:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                    case.update(
+                        CaseNodeUpdate(
+                            name="✅ Call Completed Successfully",
+                            cost=call.cost,
+                            payload={
+                                "status": "success",
+                                "call_id": call_id,
+                                "call_status": call_status,
+                                "duration_seconds": duration_seconds,
+                                "transcript": str(call.transcript),
+                                "expected_values": extracted_values or {},
+                                "metadata": RetellCalls.metadata_fields(call_record),
+                            },
+                            is_final=False,
+                        )
+                    )
+```
+
+**Example - Error update:**
+
+```290:302:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"❌ Call Failed (Try #{attempt})",
+                        cost=call_cost,
+                        error=str(e),
+                        payload={
+                            "status": "failed",
+                            "attempt": attempt,
+                            "error": str(e),
+                        },
+                        is_final=False,
+                    )
+                )
+```
+
+**The `is_final` parameter:**
+- Set to `False` for intermediate updates (progress, status changes)
+- Set to `True` for final updates before closing the case
+- When `True`, this update represents the final state before case closure
+
+### case.request_human_input()
+
+Requests human input during case execution. This pauses the case and waits for a human operator to provide input through the Supervaize UI.
+
+**Parameters:**
+- `update` (CaseNodeUpdate, required): Update object containing the form definition in the `payload` with a `supervaizer_form` key
+- `message` (str, required): Human-readable message explaining what input is needed
+
+**Example:**
+
+```387:417:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/ai-toolbox/packages/todosyncer/src/todosyncer/supervaize_config.py
+            human_pr_review_case.request_human_input(
+                CaseNodeUpdate(
+                    name="Human PR review",
+                    cost=0.0,
+                    payload={
+                        "supervaizer_form": {
+                            "question": f"Please review the PR : {pr_url} and approve or reject it. If approved,  it will be merged automatically, if rejected it will be closed.",
+                            "answer": {
+                                "fields": [
+                                    {
+                                        "name": "Approved",
+                                        "description": "The PR has been approved",
+                                        "type": bool,
+                                        "field_type": "BooleanField",
+                                        "required": False,
+                                    },
+                                    {
+                                        "name": "Rejected",
+                                        "description": "The PR has been rejected",
+                                        "type": bool,
+                                        "field_type": "BooleanField",
+                                        "required": False,
+                                    },
+                                ],
+                            },
+                        }
+                    },
+                    is_final=False,
+                ),
+                "Please review the PR and approve it if it is ready to be merged.",
+            )
+```
+
+**Form structure:**
+The `supervaizer_form` in the payload must contain:
+- `question` (str): The question or prompt to display to the human operator
+- `answer` (dict): Form definition with:
+  - `fields` (list): Array of field definitions following Django form field format
+    - `name` (str): Field identifier
+    - `description` (str): Field description
+    - `type`: Python type (bool, str, int, etc.)
+    - `field_type` (str): Django field type (BooleanField, CharField, IntegerField, etc.)
+    - `required` (bool): Whether the field is required
+
+**When to use:**
+- Approval workflows (PR reviews, content moderation)
+- Decision points requiring human judgment
+- Escalation scenarios
+- Quality checks before proceeding
+
+### case.receive_human_input()
+
+** to verify** - Retrieves the human input that was provided in response to `request_human_input()`.
+
+**Parameters:** ** to verify**
+
+**Return value:** ** to verify**
+
+**Usage:** ** to verify** - This method is used to retrieve the response after a human operator has provided input through the Supervaize UI.
+
+### case.close()
+
+Closes a case with final results and cost information. This should be called when the case is complete (successfully or with failure).
+
+**Parameters:**
+- `case_result` (dict, required): Dictionary containing the final case results
+- `final_cost` (float, required): Total cost incurred for this case
+
+**Example - Success case:**
+
+```272:279:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                    case_result_dict = {
+                        "status": "success",
+                        "call_id": call_id,
+                        "call_status": call_status,
+                        "duration_seconds": duration_seconds,
+                        "cost": call.cost,
+                    }
+                    case.close(case_result=case_result_dict, final_cost=call.cost)
+```
+
+**Example - Failure case:**
+
+```304:309:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                case_result_dict = {
+                    "status": "failed",
+                    "error": str(e),
+                    "attempt": attempt,
+                }
+                case.close(case_result=case_result_dict, final_cost=call_cost)
+```
+
+**What to include in `case_result`:**
+- `status`: Overall case status (e.g., "success", "failed")
+- Task-specific results (IDs, durations, extracted values, etc.)
+- Error information if the case failed
+- Any metadata relevant to the case outcome
+
+**When to close:**
+- After successful completion of the task
+- After all retry attempts are exhausted
+- When an unrecoverable error occurs
+- Always close cases, even on failure, to provide final status
+
+## CaseNodeUpdate
+
+`CaseNodeUpdate` represents a single update to a case, tracking progress, costs, and status information.
+
+### Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `index` | `int` | `None` | ** to verify** - Usage unclear from examples |
+| `cost` | `float` | `None` | Cost incurred for this specific update |
+| `name` | `str` | `None` | Descriptive name for this update (displayed in UI) |
+| `payload` | `dict[str, Any]` | `None` | Arbitrary data associated with this update |
+| `is_final` | `bool` | `False` | Whether this is a final update before case closure |
+| `error` | `str` | `None` | Error message if this update represents a failure |
+
+### Usage Examples
+
+**Progress tracking:**
+
+```196:206:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"📞 Starting Outgoing Call (Try #{attempt})",
+                        cost=0.0,
+                        payload={
+                            "attempt": attempt,
+                            "call_id": call_id,
+                        },
+                        is_final=False,
+                    )
+                )
+```
+
+**Status updates:**
+
+```218:224:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                        case.update(
+                            CaseNodeUpdate(
+                                name=f"#{iteration} {call_status}: {duration:.2f}s",
+                                is_final=False,
+                                payload=RetellCalls.status_fields(call_record),
+                            )
+                        )
+```
+
+**Human input requests:**
+
+```388:415:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/ai-toolbox/packages/todosyncer/src/todosyncer/supervaize_config.py
+                CaseNodeUpdate(
+                    name="Human PR review",
+                    cost=0.0,
+                    payload={
+                        "supervaizer_form": {
+                            "question": f"Please review the PR : {pr_url} and approve or reject it. If approved,  it will be merged automatically, if rejected it will be closed.",
+                            "answer": {
+                                "fields": [
+                                    {
+                                        "name": "Approved",
+                                        "description": "The PR has been approved",
+                                        "type": bool,
+                                        "field_type": "BooleanField",
+                                        "required": False,
+                                    },
+                                    {
+                                        "name": "Rejected",
+                                        "description": "The PR has been rejected",
+                                        "type": bool,
+                                        "field_type": "BooleanField",
+                                        "required": False,
+                                    },
+                                ],
+                            },
+                        }
+                    },
+                    is_final=False,
+                ),
+```
+
+**Final results:**
+
+```255:270:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+                    case.update(
+                        CaseNodeUpdate(
+                            name="✅ Call Completed Successfully",
+                            cost=call.cost,
+                            payload={
+                                "status": "success",
+                                "call_id": call_id,
+                                "call_status": call_status,
+                                "duration_seconds": duration_seconds,
+                                "transcript": str(call.transcript),
+                                "expected_values": extracted_values or {},
+                                "metadata": RetellCalls.metadata_fields(call_record),
+                            },
+                            is_final=False,
+                        )
+                    )
+```
+
+**📖 See the model reference**
+
+[CaseNodeUpdate Documentation](/docs/supervaizer-controller/model_reference/model_extra#casecasenodeupdate)
+
+## JobResponse
+
+`JobResponse` is the return type for all agent methods (`job_start`, `job_stop`, `job_status`, and custom methods). It provides structured information about the overall job execution status.
+
+### Fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `job_id` | `str` | **required** | The ID of the job this response relates to |
+| `status` | `EntityStatus` | **required** | Overall job status (COMPLETED, FAILED, RUNNING, CANCELLED, etc.) |
+| `message` | `str` | **required** | Human-readable message describing the job status |
+| `payload` | `dict[str, Any]` | `None` | Additional data about the job execution |
+| `error_message` | `str` | `None` | ** to verify** - Error message if job failed (may be `error` instead) |
+| `error_traceback` | `str` | `None` | Full error traceback if job failed |
+
+### Usage Examples
+
+**Success response:**
+
+```316:327:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+    return JobResponse(
+        job_id=job_id,
+        status=overall_status,
+        message=message,
+        payload={
+            "total_calls": len(phone_numbers),
+            "success_count": success_count,
+            "failure_count": failure_count,
+            "total_cost": total_cost,
+            "results": all_results,
+        },
+    )
+```
+
+**Error response:**
+
+```103:109:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+        return JobResponse(
+            job_id=job_id if "job_id" in locals() else "unknown",
+            status=EntityStatus.FAILED,
+            message=f"Job failed: {str(e)}",
+            payload={"error": str(e)},
+            error=str(e),
+        )
+```
+
+**Stop response:**
+
+```358:363:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+    return JobResponse(
+        job_id=job_id,
+        status=EntityStatus.CANCELLED,
+        message="Call job stop requested",
+        payload={"status": "stopped"},
+    )
+```
+
+**Status response:**
+
+```394:399:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
+    return JobResponse(
+        job_id=job_id,
+        status=EntityStatus.RUNNING,
+        message="Call job status retrieved",
+        payload={"status": "unknown"},
+    )
+```
+
+### When to Use JobResponse vs Case Updates
+
+**Use `JobResponse` for:**
+- Overall job status (the job as a whole)
+- Aggregated results across multiple cases
+- Job-level errors or failures
+- Return value from agent methods
+
+**Use `Case` updates for:**
+- Individual task progress within a job
+- Task-specific status and results
+- Granular cost tracking per task
+- Task-level errors and retries
+
+**Relationship:**
+- A `JobResponse` represents the entire job execution
+- A `Case` represents an individual task within that job
+- One job can have multiple cases
+- Each case tracks its own progress and results
+- The final `JobResponse` typically aggregates results from all cases
+
+**📖 See the model reference**
+
+[JobResponse Documentation](/docs/supervaizer-controller/model_reference/model_extra#jobjobresponse)
+
+## Complete Example Flow
+
+Here's a complete workflow showing how all the pieces work together, based on the CallAgent example:
+
+```python
+def call_agent_start(**kwargs: Any) -> JobResponse:
+    """Start calls to phone numbers - complete workflow example."""
+    
+    # 1. Extract job context and parameters
+    fields = kwargs.get("fields", {})
+    context_raw = kwargs.get("context")
+    job_context = JobContext(**context_raw)
+    job_id = job_context.job_id
+    
+    phone_numbers = [pn.strip() for pn in fields.get("phone_numbers", "").split(",") if pn.strip()]
+    
+    # 2. Initialize resources
+    retell_client = RetellClient()
+    handler = CallHandler(retell_client=retell_client)
+    
+    # 3. Process each phone number as a separate case
+    all_results = []
+    success_count = 0
+    failure_count = 0
+    
+    for phone_number in phone_numbers:
+        # 3a. Create a case for this phone number
+        case = Case.start(
+            job_id=job_id,
+            account=account,
+            name=f"Call to {phone_number}",
+            description=f"Outbound call to {phone_number}",
+            case_id=f"call_{phone_number}",
+        )
+        
+        # 3b. Try calling with retries
+        for attempt in range(1, max_retries + 1):
+            try:
+                # 3c. Update case with initial progress
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"📞 Starting Outgoing Call (Try #{attempt})",
+                        cost=0.0,
+                        payload={"attempt": attempt, "call_id": call_id},
+                        is_final=False,
+                    )
+                )
+                
+                # 3d. Execute the call and update status
+                # ... call execution logic ...
+                
+                # 3e. Update with intermediate status
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"#{iteration} {call_status}: {duration:.2f}s",
+                        is_final=False,
+                        payload=RetellCalls.status_fields(call_record),
+                    )
+                )
+                
+                # 3f. Update with final transcript
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"📄 Transcript for Outgoing Call (Try #{attempt})",
+                        payload={
+                            "transcript": call.transcript,
+                            "cost so far": call.cost,
+                        },
+                        is_final=False,
+                    )
+                )
+                
+                # 3g. If successful, update and close case
+                if call_status in ["ended", "completed"]:
+                    case.update(
+                        CaseNodeUpdate(
+                            name="✅ Call Completed Successfully",
+                            cost=call.cost,
+                            payload={"status": "success", ...},
+                            is_final=False,
+                        )
+                    )
+                    case.close(
+                        case_result={"status": "success", "call_id": call_id, ...},
+                        final_cost=call.cost
+                    )
+                    success_count += 1
+                    break
+                    
+            except Exception as e:
+                # 3h. On error, update and close case with failure
+                case.update(
+                    CaseNodeUpdate(
+                        name=f"❌ Call Failed (Try #{attempt})",
+                        cost=call_cost,
+                        error=str(e),
+                        payload={"status": "failed", "error": str(e)},
+                        is_final=False,
+                    )
+                )
+                case.close(
+                    case_result={"status": "failed", "error": str(e)},
+                    final_cost=call_cost
+                )
+                failure_count += 1
+    
+    # 4. Return final JobResponse with aggregated results
+    return JobResponse(
+        job_id=job_id,
+        status=EntityStatus.COMPLETED if failure_count == 0 else EntityStatus.FAILED,
+        message=f"Processed {len(phone_numbers)} phone number(s): {success_count} success, {failure_count} failed",
+        payload={
+            "total_calls": len(phone_numbers),
+            "success_count": success_count,
+            "failure_count": failure_count,
+            "results": all_results,
+        },
+    )
+```
+
+**Key patterns:**
+1. **Job-level**: Start with job context, return `JobResponse`
+2. **Case-level**: Create a `Case` for each independent task
+3. **Progress**: Use `case.update()` with `CaseNodeUpdate` throughout execution
+4. **Completion**: Always `case.close()` with results, even on failure
+5. **Aggregation**: Final `JobResponse` summarizes all cases
+
+## Best Practices
+
+### When to Create Multiple Cases vs Single Case
+
+**Create multiple cases when:**
+- Processing multiple independent items (phone numbers, emails, files)
+- Each item can succeed or fail independently
+- You want granular visibility into each item's progress
+- Items can be processed in parallel or have different outcomes
+
+**Use a single case when:**
+- All work is part of a single cohesive task
+- Steps are sequential and dependent
+- You don't need granular tracking of sub-tasks
+- The entire task succeeds or fails together
+
+### Cost Tracking Patterns
+
+**Track costs at multiple levels:**
+- Per `CaseNodeUpdate`: Use the `cost` field for individual operation costs
+- Per case: Accumulate costs and pass `final_cost` to `case.close()`
+- Per job: Aggregate case costs in the final `JobResponse` payload
+
+**Example:**
+```python
+# Track cost per update
+case.update(CaseNodeUpdate(name="API call", cost=0.05, ...))
+
+# Track total cost when closing
+total_case_cost = sum(update.cost for update in case.updates)
+case.close(case_result={...}, final_cost=total_case_cost)
+```
+
+### Error Handling Patterns
+
+**Always close cases, even on failure:**
+```python
+try:
+    # ... execute task ...
+    case.close(case_result={"status": "success", ...}, final_cost=cost)
+except Exception as e:
+    case.update(CaseNodeUpdate(name="Error", error=str(e), ...))
+    case.close(case_result={"status": "failed", "error": str(e)}, final_cost=cost)
+```
+
+**Provide context in error updates:**
+```python
+case.update(
+    CaseNodeUpdate(
+        name="❌ Operation Failed",
+        error=str(e),
+        payload={
+            "error": str(e),
+            "attempt": attempt,
+            "context": relevant_context,
+        },
+        is_final=False,
+    )
+)
+```
+
+**Use retry patterns with case updates:**
+```python
+for attempt in range(1, max_retries + 1):
+    try:
+        case.update(CaseNodeUpdate(name=f"Attempt {attempt}", ...))
+        # ... execute ...
+        break
+    except Exception as e:
+        if attempt == max_retries:
+            case.close(case_result={"status": "failed", ...}, final_cost=cost)
+```
+
+### Human Input Workflow Patterns
+
+**Request input at decision points:**
+```python
+# Request approval before proceeding
+case.request_human_input(
+    CaseNodeUpdate(
+        name="Approval Required",
+        payload={
+            "supervaizer_form": {
+                "question": "Should we proceed with this operation?",
+                "answer": {"fields": [...]}
+            }
+        },
+        is_final=False,
+    ),
+    "Please review and approve before continuing."
+)
+
+# ** to verify** - Retrieve the response
+# response = case.receive_human_input()
+# if response.get("Approved"):
+#     # Continue with operation
+```
+
+**Use clear, actionable questions:**
+- Be specific about what decision is needed
+- Provide context in the message parameter
+- Define form fields that match the decision type
+- Use appropriate field types (BooleanField for yes/no, CharField for text input)
+
+## What's next?
+
+- Return to the [Controller Setup Guide](controller-setup) to review agent configuration
+- Check the [Model Reference](/docs/supervaizer-controller/model_reference/model_core) for detailed field specifications
+- Explore [API Reference](/docs/supervaizer-controller/ref/API_REFERENCE) for advanced usage
+- Review [Case Management](/docs/supervaize-fleet/features/case-management) in Supervaize Fleet for UI features
+

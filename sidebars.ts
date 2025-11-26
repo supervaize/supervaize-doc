@@ -26,6 +26,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaizer-controller/application-flow-control",
+          label: "Application Flow Control",
+        },
+        {
+          type: "doc",
           id: "supervaizer-controller/deploy",
           label: "Cloud Deployment",
         },
