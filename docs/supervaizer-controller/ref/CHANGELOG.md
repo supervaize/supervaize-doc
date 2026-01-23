@@ -21,7 +21,7 @@ All notable changes to this project will be documented in this file.
 
 - **🚀 Cloud Deployment CLI** - Complete automated deployment system for Supervaizer agents
 
-  - Full implementation of [RFC-001: Cloud Deployment CLI](rfc/001-cloud-deployment-cli.md)
+  - Full implementation of RFC-001: Cloud Deployment CLI
   - Support for three major cloud platforms:
     - **Google Cloud Run** with Artifact Registry and Secret Manager
     - **AWS App Runner** with ECR and Secrets Manager

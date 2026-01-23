@@ -10,8 +10,7 @@ A Python toolkit for building, managing, and connecting AI agents with full [Age
 
 > **⚠️ Beta Disclaimer**: SUPERVAIZER is currently in beta mode. Not everything works as expected yet. Please report any issues you encounter.
 
-- [SUPERVAIZER](#supervaizer)
-  - [Description](#description)
+- [Description](#description)
   - [Quick Start](#quick-start)
     - [What we'll do](#what-well-do)
     - [1. Install Supervaizer](#1-install-supervaizer)
@@ -31,7 +30,7 @@ A Python toolkit for building, managing, and connecting AI agents with full [Age
   - [API Documentation \& User Interfaces](#api-documentation--user-interfaces)
     - [Admin Interface (`/admin`)](#admin-interface-admin)
       - [Quick Start](#quick-start-2)
-- [Calculating costs](#calculating-costs)
+  - [Calculating costs](#calculating-costs)
   - [Documentation](#documentation-1)
   - [Contributing](#contributing)
   - [License](#license)
@@ -191,7 +190,6 @@ supervaizer deploy up --platform do-app-platform --region nyc
 
 ### Documentation
 
-- [RFC-001: Cloud Deployment CLI](rfc/001-cloud-deployment-cli.md) - Complete specification
 - [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
 
 ## Using the CLI
@@ -225,7 +223,7 @@ server.launch()
 print(f"Admin Interface: http://localhost:8000/admin/")
 ```
 
-# Calculating costs
+## Calculating costs
 
 Developers are free to define the cost of the transaction the way they want when updating the cases.
 Here is a way to easily get an estimate of the cost of an LLM transaction (note that litellm also supports custom pricing. )

@@ -18,3 +18,12 @@ build:
 upgrade_packages:
     npx npm-check-updates -u
     npm install
+
+release_patch:
+    npm run release:patch
+
+release_minor:
+    npm run release:minor
+
+release_major:
+    npm run release:major

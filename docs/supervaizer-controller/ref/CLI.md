@@ -216,7 +216,6 @@ supervaizer deploy clean --verbose
 ### Deployment Documentation
 
 For detailed deployment documentation, see:
-- [RFC-001: Cloud Deployment CLI](rfc/001-cloud-deployment-cli.md) - Complete specification
 - [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
 
 ## Environment Variables
