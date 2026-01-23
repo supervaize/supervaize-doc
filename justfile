@@ -4,6 +4,10 @@ set shell := ["bash", "-uc"]
 nowts := `date +%Y%m%d_%H%M%S`
 YYYYMMDD := `date +%Y%m%d`
 
+# Default recipe
+default:
+    @just --list
+
 
 start_local:
     npx docusaurus start

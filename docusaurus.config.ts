@@ -149,7 +149,7 @@ const config: Config = {
           items: [
             {
               label: "Slack",
-              href: "https://join.slack.com/t/supervaize/shared_invite/zt-3ay81n5ap-~gggl0BGbzREcyCdLUf9Kw",
+              href: "https://supervaize.com/join-slack",
               icon: "slack",
             },
             {

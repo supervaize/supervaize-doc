@@ -20,6 +20,7 @@ See the [Controller Setup Guide](controller-setup) for initial setup instruction
 :::
 
 Application flow control allows you to:
+
 - Track individual tasks within a job using **Cases**
 - Update progress and status with **CaseNodeUpdate**
 - Request human input when decisions are needed
@@ -35,6 +36,7 @@ The `Case` class represents an individual task or unit of work within a job. Eac
 Creates a new case for tracking a specific task. This is a static method that returns a `Case` instance.
 
 **Parameters:**
+
 - `job_id` (str, required): The ID of the parent job
 - `account` (Account, required): The account object from your controller setup
 - `name` (str, required): Descriptive name for the case
@@ -66,6 +68,7 @@ job_id = job_context.job_id
 ```
 
 **Explanation:**
+
 - When Supervaize calls your agent method (e.g., `job_start`), it automatically passes a `context` parameter in `kwargs`
 - The `context` contains a `JobContext` object (or dict that can be converted to one) with job information
 - Extract `job_id` by accessing `job_context.job_id` after converting the context to a `JobContext` instance
@@ -86,6 +89,7 @@ The `context` parameter is automatically provided by Supervaizer when your agent
 ```
 
 **When to create a case:**
+
 - One case per phone number, email, or individual task
 - When you need to track multiple related but independent operations
 - When you want granular progress visibility in the Supervaize UI
@@ -95,6 +99,7 @@ The `context` parameter is automatically provided by Supervaizer when your agent
 Updates a case with progress information, status changes, or intermediate results. Use this method throughout case execution to provide visibility into what's happening.
 
 **Parameters:**
+
 - `update` (CaseNodeUpdate, required): The update object containing progress information
 
 **Example - Initial progress update:**
@@ -185,6 +190,7 @@ Updates a case with progress information, status changes, or intermediate result
 ```
 
 **The `is_final` parameter:**
+
 - Set to `False` for intermediate updates (progress, status changes)
 - Set to `True` for final updates before closing the case
 - When `True`, this update represents the final state before case closure
@@ -194,6 +200,7 @@ Updates a case with progress information, status changes, or intermediate result
 Requests human input during case execution. This pauses the case and waits for a human operator to provide input through the Supervaize UI.
 
 **Parameters:**
+
 - `update` (CaseNodeUpdate, required): Update object containing the form definition in the `payload` with a `supervaizer_form` key
 - `message` (str, required): Human-readable message explaining what input is needed
 
@@ -235,6 +242,7 @@ Requests human input during case execution. This pauses the case and waits for a
 
 **Form structure:**
 The `supervaizer_form` in the payload must contain:
+
 - `question` (str): The question or prompt to display to the human operator
 - `answer` (dict): Form definition with:
   - `fields` (list): Array of field definitions following Django form field format
@@ -245,26 +253,89 @@ The `supervaizer_form` in the payload must contain:
     - `required` (bool): Whether the field is required
 
 **When to use:**
+
 - Approval workflows (PR reviews, content moderation)
 - Decision points requiring human judgment
 - Escalation scenarios
 - Quality checks before proceeding
 
-### case.receive_human_input()
+### Receiving Human Input ( human_answer Agent Method)
 
-** to verify** - Retrieves the human input that was provided in response to `request_human_input()`.
+When `request_human_input()` is called, the case execution pauses and waits for human input. Once the human operator provides input through the Supervaize UI, the Supervaizer system calls a **custom agent method** to handle the response.
 
-**Parameters:** ** to verify**
+**Important:** `receive_human_input()` is **not** a method on the `Case` object. Instead, you must define a custom `AgentMethod` in your agent configuration that will be called when human input is received.
 
-**Return value:** ** to verify**
+**Setup:**
 
-**Usage:** ** to verify** - This method is used to retrieve the response after a human operator has provided input through the Supervaize UI.
+1. Define a human_answer method in your `supervaizer_control.py`:
+
+```python
+receive_human_input = AgentMethod(
+    name="receive_human_input",
+    method="your_module.handle_human_input",  # Your handler function
+    is_async=False,
+    fields=[]  # Human input is passed via context/payload, not fields _ TODO: verify
+)
+```
+
+2. Add it to your agent's methods as a custom method:
+
+```python
+Agent(
+    # ... other config ...
+    methods=AgentMethods(
+        start=job_start,
+        stop=job_stop,
+        status=job_status,
+        human_answer= receive_human_input,
+    )
+)
+```
+
+3. Implement the handler function:
+
+```python
+def handle_human_input(**kwargs) -> JobResponse:
+    """Handle human input response."""
+    context_raw = kwargs.get("context")
+    job_context = JobContext(**context_raw)
+    job_id = job_context.job_id
+
+    # Human input is provided in the payload/fields
+    fields = kwargs.get("fields", {})
+    human_response = fields  # Contains the form field values
+
+    # Get the case that requested input
+    # (case_id or other identifier should be in context/payload)
+
+    # Process the human input and continue case execution
+    if human_response.get("Approved"):
+        # Continue with approved operation
+        pass
+    elif human_response.get("Rejected"):
+        # Handle rejection
+        pass
+
+    return JobResponse(
+        job_id=job_id,
+        status=EntityStatus.COMPLETED,
+        message="Human input processed",
+    )
+```
+
+**How it works:**
+
+- `request_human_input()` pauses the case and displays the form in the UI
+- When the human submits the form, Supervaizer calls your custom `receive_human_input` agent method
+- Your handler receives the form data in `kwargs["fields"]`
+- You can then continue the case execution based on the human's response
 
 ### case.close()
 
 Closes a case with final results and cost information. This should be called when the case is complete (successfully or with failure).
 
 **Parameters:**
+
 - `case_result` (dict, required): Dictionary containing the final case results
 - `final_cost` (float, required): Total cost incurred for this case
 
@@ -293,12 +364,14 @@ Closes a case with final results and cost information. This should be called whe
 ```
 
 **What to include in `case_result`:**
+
 - `status`: Overall case status (e.g., "success", "failed")
 - Task-specific results (IDs, durations, extracted values, etc.)
 - Error information if the case failed
 - Any metadata relevant to the case outcome
 
 **When to close:**
+
 - After successful completion of the task
 - After all retry attempts are exhausted
 - When an unrecoverable error occurs
@@ -310,14 +383,14 @@ Closes a case with final results and cost information. This should be called whe
 
 ### Fields
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `index` | `int` | `None` | ** to verify** - Usage unclear from examples |
-| `cost` | `float` | `None` | Cost incurred for this specific update |
-| `name` | `str` | `None` | Descriptive name for this update (displayed in UI) |
-| `payload` | `dict[str, Any]` | `None` | Arbitrary data associated with this update |
-| `is_final` | `bool` | `False` | Whether this is a final update before case closure |
-| `error` | `str` | `None` | Error message if this update represents a failure |
+| Field      | Type             | Default | Description                                        |
+| ---------- | ---------------- | ------- | -------------------------------------------------- |
+| `index`    | `int`            | `None`  | ** to verify** - Usage unclear from examples       |
+| `cost`     | `float`          | `None`  | Cost incurred for this specific update             |
+| `name`     | `str`            | `None`  | Descriptive name for this update (displayed in UI) |
+| `payload`  | `dict[str, Any]` | `None`  | Arbitrary data associated with this update         |
+| `is_final` | `bool`           | `False` | Whether this is a final update before case closure |
+| `error`    | `str`            | `None`  | Error message if this update represents a failure  |
 
 ### Usage Examples
 
@@ -413,14 +486,14 @@ Closes a case with final results and cost information. This should be called whe
 
 ### Fields
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `job_id` | `str` | **required** | The ID of the job this response relates to |
-| `status` | `EntityStatus` | **required** | Overall job status (COMPLETED, FAILED, RUNNING, CANCELLED, etc.) |
-| `message` | `str` | **required** | Human-readable message describing the job status |
-| `payload` | `dict[str, Any]` | `None` | Additional data about the job execution |
-| `error_message` | `str` | `None` | ** to verify** - Error message if job failed (may be `error` instead) |
-| `error_traceback` | `str` | `None` | Full error traceback if job failed |
+| Field             | Type             | Default      | Description                                                           |
+| ----------------- | ---------------- | ------------ | --------------------------------------------------------------------- |
+| `job_id`          | `str`            | **required** | The ID of the job this response relates to                            |
+| `status`          | `EntityStatus`   | **required** | Overall job status (COMPLETED, FAILED, RUNNING, CANCELLED, etc.)      |
+| `message`         | `str`            | **required** | Human-readable message describing the job status                      |
+| `payload`         | `dict[str, Any]` | `None`       | Additional data about the job execution                               |
+| `error_message`   | `str`            | `None`       | ** to verify** - Error message if job failed (may be `error` instead) |
+| `error_traceback` | `str`            | `None`       | Full error traceback if job failed                                    |
 
 ### Usage Examples
 
@@ -478,18 +551,21 @@ Closes a case with final results and cost information. This should be called whe
 ### When to Use JobResponse vs Case Updates
 
 **Use `JobResponse` for:**
+
 - Overall job status (the job as a whole)
 - Aggregated results across multiple cases
 - Job-level errors or failures
 - Return value from agent methods
 
 **Use `Case` updates for:**
+
 - Individual task progress within a job
 - Task-specific status and results
 - Granular cost tracking per task
 - Task-level errors and retries
 
 **Relationship:**
+
 - A `JobResponse` represents the entire job execution
 - A `Case` represents an individual task within that job
 - One job can have multiple cases
@@ -507,24 +583,24 @@ Here's a complete workflow showing how all the pieces work together, based on th
 ```python
 def call_agent_start(**kwargs: Any) -> JobResponse:
     """Start calls to phone numbers - complete workflow example."""
-    
+
     # 1. Extract job context and parameters
     fields = kwargs.get("fields", {})
     context_raw = kwargs.get("context")
     job_context = JobContext(**context_raw)
     job_id = job_context.job_id
-    
+
     phone_numbers = [pn.strip() for pn in fields.get("phone_numbers", "").split(",") if pn.strip()]
-    
+
     # 2. Initialize resources
     retell_client = RetellClient()
     handler = CallHandler(retell_client=retell_client)
-    
+
     # 3. Process each phone number as a separate case
     all_results = []
     success_count = 0
     failure_count = 0
-    
+
     for phone_number in phone_numbers:
         # 3a. Create a case for this phone number
         case = Case.start(
@@ -534,7 +610,7 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
             description=f"Outbound call to {phone_number}",
             case_id=f"call_{phone_number}",
         )
-        
+
         # 3b. Try calling with retries
         for attempt in range(1, max_retries + 1):
             try:
@@ -547,10 +623,10 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
                         is_final=False,
                     )
                 )
-                
+
                 # 3d. Execute the call and update status
                 # ... call execution logic ...
-                
+
                 # 3e. Update with intermediate status
                 case.update(
                     CaseNodeUpdate(
@@ -559,7 +635,7 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
                         payload=RetellCalls.status_fields(call_record),
                     )
                 )
-                
+
                 # 3f. Update with final transcript
                 case.update(
                     CaseNodeUpdate(
@@ -571,7 +647,7 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
                         is_final=False,
                     )
                 )
-                
+
                 # 3g. If successful, update and close case
                 if call_status in ["ended", "completed"]:
                     case.update(
@@ -588,7 +664,7 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
                     )
                     success_count += 1
                     break
-                    
+
             except Exception as e:
                 # 3h. On error, update and close case with failure
                 case.update(
@@ -605,7 +681,7 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
                     final_cost=call_cost
                 )
                 failure_count += 1
-    
+
     # 4. Return final JobResponse with aggregated results
     return JobResponse(
         job_id=job_id,
@@ -621,6 +697,7 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
 ```
 
 **Key patterns:**
+
 1. **Job-level**: Start with job context, return `JobResponse`
 2. **Case-level**: Create a `Case` for each independent task
 3. **Progress**: Use `case.update()` with `CaseNodeUpdate` throughout execution
@@ -632,12 +709,14 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
 ### When to Create Multiple Cases vs Single Case
 
 **Create multiple cases when:**
+
 - Processing multiple independent items (phone numbers, emails, files)
 - Each item can succeed or fail independently
 - You want granular visibility into each item's progress
 - Items can be processed in parallel or have different outcomes
 
 **Use a single case when:**
+
 - All work is part of a single cohesive task
 - Steps are sequential and dependent
 - You don't need granular tracking of sub-tasks
@@ -646,11 +725,13 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
 ### Cost Tracking Patterns
 
 **Track costs at multiple levels:**
+
 - Per `CaseNodeUpdate`: Use the `cost` field for individual operation costs
 - Per case: Accumulate costs and pass `final_cost` to `case.close()`
 - Per job: Aggregate case costs in the final `JobResponse` payload
 
 **Example:**
+
 ```python
 # Track cost per update
 case.update(CaseNodeUpdate(name="API call", cost=0.05, ...))
@@ -663,6 +744,7 @@ case.close(case_result={...}, final_cost=total_case_cost)
 ### Error Handling Patterns
 
 **Always close cases, even on failure:**
+
 ```python
 try:
     # ... execute task ...
@@ -673,6 +755,7 @@ except Exception as e:
 ```
 
 **Provide context in error updates:**
+
 ```python
 case.update(
     CaseNodeUpdate(
@@ -689,6 +772,7 @@ case.update(
 ```
 
 **Use retry patterns with case updates:**
+
 ```python
 for attempt in range(1, max_retries + 1):
     try:
@@ -703,6 +787,7 @@ for attempt in range(1, max_retries + 1):
 ### Human Input Workflow Patterns
 
 **Request input at decision points:**
+
 ```python
 # Request approval before proceeding
 case.request_human_input(
@@ -719,13 +804,21 @@ case.request_human_input(
     "Please review and approve before continuing."
 )
 
-# ** to verify** - Retrieve the response
-# response = case.receive_human_input()
-# if response.get("Approved"):
-#     # Continue with operation
+# When human provides input, your custom receive_human_input agent method is called
+# The handler function receives the form data in kwargs["fields"]
+# Example handler:
+# def handle_human_input(**kwargs) -> JobResponse:
+#     fields = kwargs.get("fields", {})
+#     if fields.get("Approved"):
+#         # Continue with operation
+#         case.update(CaseNodeUpdate(name="Approved, proceeding...", ...))
+#     elif fields.get("Rejected"):
+#         # Handle rejection
+#         case.close(case_result={"status": "rejected"}, final_cost=0.0)
 ```
 
 **Use clear, actionable questions:**
+
 - Be specific about what decision is needed
 - Provide context in the message parameter
 - Define form fields that match the decision type
@@ -737,4 +830,3 @@ case.request_human_input(
 - Check the [Model Reference](/docs/supervaizer-controller/model_reference/model_core) for detailed field specifications
 - Explore [API Reference](/docs/supervaizer-controller/ref/API_REFERENCE) for advanced usage
 - Review [Case Management](/docs/supervaize-fleet/features/case-management) in Supervaize Fleet for UI features
-

@@ -130,3 +130,7 @@ Create manually or extend the schemas helper
 - [Schema.org Documentation](https://schema.org/)
 - [Google Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data)
 - [Docusaurus headTags API](https://docusaurus.io/docs/api/docusaurus-config#headtags)
+
+
+
+

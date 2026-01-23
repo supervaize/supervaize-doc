@@ -1,10 +1,13 @@
 # SUPERVAIZER CLI
 
-SUPERVAIZER includes a command-line interface to simplify setup and operation:
+SUPERVAIZER includes a command-line interface to simplify setup, operation, and deployment:
 
 ```bash
 # Install Supervaizer
 pip install supervaizer
+
+# For deployment features, install with deploy extras
+pip install supervaizer[deploy]
 
 # Get Help
 supervaizer --help
@@ -12,26 +15,23 @@ supervaizer --help
 # Create a supervaizer_control.py file in your current directory
 supervaizer scaffold
 
-
 # Start the server using the configuration file
 supervaizer start
 
 # Deploy to cloud platforms
-supervaizer deploy up --platform cloud-run --name my-agent
-
-# To get all the start options
-supervaizer start --help
+supervaizer deploy --help
 ```
 
 ## CLI Commands
 
-### install
+### scaffold
 
 Creates a starter configuration file (supervaizer_control.py)
 
 ```bash
 # Basic usage (creates supervaizer_control.py in current directory)
 supervaizer scaffold
+
 # Specify a custom output path
 supervaizer scaffold --output-path=my_config.py
 
@@ -62,92 +62,174 @@ supervaizer start --log-level=DEBUG
 
 ### deploy
 
-Deploy Supervaizer agents to cloud platforms with full automation
+Automated deployment to cloud platforms. Requires installation with deploy extras: `pip install supervaizer[deploy]`
+
+#### deploy local
+
+Test your deployment locally using Docker and docker-compose
 
 ```bash
-# Plan deployment (preview changes)
-supervaizer deploy plan --platform cloud-run --name my-agent --env prod
+# Basic local testing
+supervaizer deploy local
 
-# Test locally with Docker
-supervaizer deploy local --name my-agent --generate-api-key
+# With generated secrets
+supervaizer deploy local --generate-api-key --generate-rsa
 
-# Generate Docker files only (for CI/CD or manual testing)
-supervaizer deploy local --docker-files-only --name my-agent --generate-api-key
+# Custom port
+supervaizer deploy local --port 8080
 
-# Custom source directory and controller file
-supervaizer deploy local --source-dir . --controller-file my_controller.py
-
-# Combined with docker-files-only
-supervaizer deploy local --docker-files-only --source-dir lib --controller-file custom_controller.py
-
-# Deploy to cloud platform
-supervaizer deploy up --platform cloud-run --name my-agent --env prod
-
-# Check deployment status
-supervaizer deploy status --platform cloud-run --name my-agent --env prod
-
-# Remove deployment
-supervaizer deploy down --platform cloud-run --name my-agent --env prod
+# With verbose output
+supervaizer deploy local --verbose
 ```
 
-**Supported Platforms:**
+**Options:**
+- `--name TEXT` - Service name (default: current directory name)
+- `--env [dev|staging|prod]` - Environment (default: dev)
+- `--port INTEGER` - Local port to expose (default: 8000)
+- `--generate-api-key` - Generate secure API key
+- `--generate-rsa` - Generate RSA private key
+- `--timeout INTEGER` - Service startup timeout in seconds (default: 300)
+- `--verbose` - Show detailed output
 
-- `cloud-run` - Google Cloud Run
-- `aws-app-runner` - AWS App Runner
-- `do-app-platform` - DigitalOcean App Platform
+#### deploy plan
 
-**Common Options:**
-
-- `--platform` - Cloud platform (required)
-- `--name` - Service name (default: current directory)
-- `--env` - Environment (dev/staging/prod, default: dev)
-- `--region` - Provider region
-- `--generate-api-key` - Create secure API key
-- `--yes` - Non-interactive mode
-
-### local
-
-Test Supervaizer agents locally using Docker before cloud deployment
+Preview deployment actions before applying changes
 
 ```bash
-# Test locally with default settings
-supervaizer deploy local --name my-agent
+# Plan deployment to Google Cloud Run
+supervaizer deploy plan --platform cloud-run --region us-central1
 
-# Test with custom options
-supervaizer deploy local \
-  --name email-agent \
-  --env dev \
-  --port 8000 \
-  --generate-api-key \
-  --generate-rsa \
-  --timeout 60 \
-  --verbose
+# Plan deployment to AWS App Runner
+supervaizer deploy plan --platform aws-app-runner --region us-east-1
+
+# Plan deployment to DigitalOcean
+supervaizer deploy plan --platform do-app-platform --region nyc
 ```
 
-**Local Testing Options:**
+**Options:**
+- `--platform [cloud-run|aws-app-runner|do-app-platform]` - Cloud platform (required)
+- `--name TEXT` - Service name (default: current directory name)
+- `--env [dev|staging|prod]` - Environment (default: dev)
+- `--region TEXT` - Cloud provider region
+- `--project-id TEXT` - GCP project / AWS account / DO project ID
+- `--verbose` - Show detailed output
 
-- `--name` - Service name (default: current directory)
-- `--env` - Environment (dev/staging/prod, default: dev)
-- `--port` - Application port (default: 8000)
-- `--generate-api-key` - Create secure API key for testing
-- `--generate-rsa` - Generate RSA private key for testing
-- `--timeout` - Seconds to wait for service startup (default: 30)
-- `--verbose` - Show Docker Compose output
-- `--docker-files-only` - Only generate Docker files without running them
-- `--source-dir` - Source directory path (default: src)
-- `--controller-file` - Controller file name (default: supervaizer_control.py)
+#### deploy up
 
-For detailed deployment documentation, see the [Cloud Deployment Guide](../deploy).
+Deploy to cloud platform with automated build, push, and verification
+
+```bash
+# Deploy to Google Cloud Run
+supervaizer deploy up --platform cloud-run --region us-central1
+
+# Deploy to AWS App Runner
+supervaizer deploy up --platform aws-app-runner --region us-east-1
+
+# Deploy to DigitalOcean App Platform
+supervaizer deploy up --platform do-app-platform --region nyc
+
+# Deploy with generated secrets
+supervaizer deploy up --platform cloud-run --region us-central1 \
+  --generate-api-key --generate-rsa
+
+# Non-interactive deployment
+supervaizer deploy up --platform cloud-run --region us-central1 --yes
+```
+
+**Options:**
+- `--platform [cloud-run|aws-app-runner|do-app-platform]` - Cloud platform (required)
+- `--name TEXT` - Service name (default: current directory name)
+- `--env [dev|staging|prod]` - Environment (default: dev)
+- `--region TEXT` - Cloud provider region (required)
+- `--project-id TEXT` - GCP project / AWS account / DO project ID
+- `--image TEXT` - Container image (default: auto-generated from git SHA)
+- `--port INTEGER` - Container port (default: 8000)
+- `--generate-api-key` - Generate secure API key
+- `--generate-rsa` - Generate RSA private key
+- `--rsa-key-path PATH` - Path to existing RSA private key PEM file
+- `--yes` - Non-interactive mode (skip confirmations)
+- `--no-rollback` - Keep failed revision (don't rollback on failure)
+- `--timeout INTEGER` - Deployment timeout in seconds
+- `--verbose` - Show detailed output
+
+#### deploy down
+
+Tear down deployment and clean up resources
+
+```bash
+# Remove deployment from Google Cloud Run
+supervaizer deploy down --platform cloud-run
+
+# Remove deployment from AWS App Runner
+supervaizer deploy down --platform aws-app-runner
+
+# Non-interactive removal
+supervaizer deploy down --platform cloud-run --yes
+```
+
+**Options:**
+- `--platform [cloud-run|aws-app-runner|do-app-platform]` - Cloud platform (required)
+- `--name TEXT` - Service name (default: current directory name)
+- `--env [dev|staging|prod]` - Environment (default: dev)
+- `--region TEXT` - Cloud provider region
+- `--yes` - Non-interactive mode (skip confirmations)
+- `--verbose` - Show detailed output
+
+#### deploy status
+
+Check deployment status and health
+
+```bash
+# Check status on Google Cloud Run
+supervaizer deploy status --platform cloud-run
+
+# Check status on AWS App Runner
+supervaizer deploy status --platform aws-app-runner
+
+# Verbose status with detailed information
+supervaizer deploy status --platform cloud-run --verbose
+```
+
+**Options:**
+- `--platform [cloud-run|aws-app-runner|do-app-platform]` - Cloud platform (required)
+- `--name TEXT` - Service name (default: current directory name)
+- `--env [dev|staging|prod]` - Environment (default: dev)
+- `--region TEXT` - Cloud provider region
+- `--verbose` - Show detailed output
+
+#### deploy clean
+
+Clean up deployment artifacts and state files
+
+```bash
+# Clean deployment artifacts
+supervaizer deploy clean
+
+# Clean with confirmation prompts
+supervaizer deploy clean --verbose
+```
+
+**Options:**
+- `--yes` - Non-interactive mode (skip confirmations)
+- `--verbose` - Show detailed output
+
+### Deployment Documentation
+
+For detailed deployment documentation, see:
+- [RFC-001: Cloud Deployment CLI](rfc/001-cloud-deployment-cli.md) - Complete specification
+- [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
 
 ## Environment Variables
 
 All CLI options can also be configured through environment variables:
 
+### Server Configuration
+
 | Environment Variable      | Description                      | Default Value                |
 | ------------------------- | -------------------------------- | ---------------------------- |
 | SUPERVAIZER_PUBLIC_URL    | Url used for inbound connections | defaults to scheme+host+port |
-| SUPERVAIZER_HOST          | Host to bind the server to       | 0.0.0.0                      |
-| SUPERVAIZER_PORT          | Port to bind the server to       | 8000                         |
+| SUPERVAIZER_HOST          | Host to bind the server to      | 0.0.0.0                      |
+| SUPERVAIZER_PORT          | Port to bind the server to      | 8000                         |
 | SUPERVAIZER_ENVIRONMENT   | Environment name                 | dev                          |
 | SUPERVAIZER_LOG_LEVEL     | Log level (DEBUG, INFO, etc.)    | INFO                         |
 | SUPERVAIZER_DEBUG         | Enable debug mode (true/false)   | false                        |
@@ -156,4 +238,21 @@ All CLI options can also be configured through environment variables:
 | SUPERVAIZER_OUTPUT_PATH   | Path for install command output  | supervaizer_control.py       |
 | SUPERVAIZER_FORCE_INSTALL | Force overwrite existing file    | false                        |
 
-_Uploaded on 2025-08-12 14:19:38_
+### Deployment Configuration
+
+These environment variables are used during cloud deployment:
+
+| Environment Variable           | Description                                    | Default Value |
+| ------------------------------ | ---------------------------------------------- | ------------- |
+| SUPERVAIZER_API_KEY            | API key for authentication                     | -             |
+| SV_RSA_PRIVATE_KEY             | RSA private key (inline value)                 | -             |
+| SV_RSA_PRIVATE_KEY_PATH        | Path to RSA private key PEM file               | -             |
+| SV_LOG_LEVEL                   | Log level for deployed service                 | INFO          |
+| SUPERVAIZE_API_KEY             | Supervaize platform API key                    | -             |
+| SUPERVAIZE_WORKSPACE_ID        | Supervaize workspace identifier                | -             |
+| SUPERVAIZE_API_URL             | Supervaize API endpoint URL                    | -             |
+
+**Note:** Deployment secrets (API keys, RSA keys) are securely stored in cloud provider secret stores and not exposed in environment variables or logs.
+
+
+*Uploaded on 2026-01-17 16:08:02*

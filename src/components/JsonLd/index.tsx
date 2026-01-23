@@ -34,3 +34,7 @@ export default function JsonLd({ data }: JsonLdProps) {
 
   return null;
 }
+
+
+
+
