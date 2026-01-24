@@ -2,7 +2,6 @@
   "name": "supervaize-doc",
   "version": "0.0.2",
   "private": true,
-  "type": "module",
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
@@ -25,6 +24,7 @@
     "@docusaurus/preset-classic": "^3.9.2",
     "@docusaurus/theme-search-algolia": "^3.9.2",
     "@mdx-js/react": "^3.1.1",
+    "@saucelabs/theme-github-codeblock": "^0.3.0",
     "bootstrap-icons": "^1.13.1",
     "clsx": "^2.1.1",
     "prism-react-renderer": "^2.4.1",
