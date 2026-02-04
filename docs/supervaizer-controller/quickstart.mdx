@@ -12,43 +12,38 @@ import CodeBlock from "@theme/CodeBlock";
 import Link from "@docusaurus/Link";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-Kickstart a **Python** agent with the **Supervaizer Controller** so it’s discoverable and operable by [Supervaize](https://www.supervaize.com).
+Kickstart a **Python** agent with the **Supervaizer Controller** so it's discoverable and operable by [Supervaize](https://www.supervaize.com).
 
 ## What we'll do
 
-[<i className="bi bi-1-circle"></i> **Get an agent** (we'll reuse an open source email agent)](#1)
+[<i className="bi bi-1-circle"></i> **Clone the Hello World example** (a minimal Supervaizer agent)](#1)
 
-[<i className="bi bi-2-circle"></i> **Install Supervaizer** in that project](#2)
+[<i className="bi bi-2-circle"></i> **Setup the environment** and install dependencies](#2)
 
-[<i className="bi bi-3-circle"></i> **Scaffold the controller** and map it to your agent](#3)
+[<i className="bi bi-3-circle"></i> **Configure secrets & env**, then **start** the server 🚀](#3)
 
-[<i className="bi bi-4-circle"></i> **Configure secrets & env**, then **start** the server 🚀](#4)
-
-## <i className="bi bi-1-circle"></i> Create or find an AI Agent {#1}
-
-### An open source langchain agent
+## <i className="bi bi-1-circle"></i> Clone the Hello World Example {#1}
 
 :::info
 The Supervaizer Controller currently supports **Python-based** agents.
 :::
 
-We’ll use this example agent:  
-**Email AI Agent** by [parthshr370](https://github.com/parthshr370) — [<i className="bi bi-github"></i> GitHub](https://github.com/parthshr370/Email-AI-Agent?tab=readme-ov-file) • [Guide](https://medium.com/@parthshr370/building-your-first-agent-with-deepseek-ai-email-agent-e6f17d3c290e)
+We'll use the **Supervaize Hello World** example — a minimal agent that demonstrates all core Supervaizer concepts:
+[<i className="bi bi-github"></i> GitHub Repository](https://github.com/alain-sv/supervaize_hello_world)
 
 ```bash title="Clone the repo"
-git clone https://github.com/alain-sv/Email-AI-Agent.git
-cd Email-AI-Agent
+git clone https://github.com/alain-sv/supervaize_hello_world.git
+cd supervaize_hello_world
 ```
 
-### Setup the agent
+## <i className="bi bi-2-circle"></i> Setup the Environment {#2}
 
 :::tip
-We are using **uv** as a matter of preference & performance
+We recommend using **uv** for faster dependency management
 :::
-Install the dependencies with your preferred tool:
 
 <Tabs groupId="pm" queryString>
-  <TabItem value="uv" label="uv">
+  <TabItem value="uv" label="uv (Recommended)">
     <Tabs groupId="os" queryString>
       <TabItem value="mac" label="macOS / Linux">
 
@@ -58,12 +53,12 @@ Install the dependencies with your preferred tool:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-#### Create a virtual environment and install requirements
+#### Create a virtual environment and install dependencies
 
-```bash title="Install requirements using uv"
+```bash title="Install dependencies using uv"
 uv venv
 source .venv/bin/activate
-uv pip install -r requirements.txt
+uv pip install -e .
 ```
 
       </TabItem>
@@ -72,18 +67,15 @@ uv pip install -r requirements.txt
 #### Install uv — see https://docs.astral.sh/uv/
 
 ```powershell
-# Install uv — see https://docs.astral.sh/uv/
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-
 ```
 
-#### Create a virtual environment and install requirements
+#### Create a virtual environment and install dependencies
 
-```bash
-# Create a virtual environment and install requirements
+```powershell
 uv venv
 .\.venv\Scripts\Activate.ps1
-uv pip install -r requirements.txt
+uv pip install -e .
 ```
 
       </TabItem>
@@ -95,23 +87,23 @@ uv pip install -r requirements.txt
     <Tabs groupId="os" queryString>
       <TabItem value="mac" label="macOS / Linux">
 
-#### Create virtual environment and install requirements
+#### Create virtual environment and install dependencies
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e .
 ```
 
       </TabItem>
       <TabItem value="win" label="Windows (PowerShell)">
 
-#### Create virtual environment and install requirements
+#### Create virtual environment and install dependencies
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+pip install -e .
 ```
 
       </TabItem>
@@ -120,57 +112,30 @@ pip install -r requirements.txt
   </TabItem>
 </Tabs>
 
-## <i className="bi bi-2-circle"></i> Install Supervaizer in the agent project {#2}
+### Understanding the Controller
 
-<Tabs groupId="pm" queryString>
-  <TabItem value="uv" label="uv">
+The Hello World example includes a pre-configured `supervaizer_control.py` that demonstrates:
 
-```bash title="Install supervaizer using uv"
-uv pip install supervaizer
+- **Agent parameters** — secrets and environment variables
+- **Agent methods** — start, stop, and status handlers
+- **Server configuration** — A2A protocol support and admin interface
+
+```js reference title="Hello World controller supervaizer_control.py"
+https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L1-L20
 ```
 
-  </TabItem>
-  <TabItem value="pip" label="pip">
+### Creating Your Own Controller
 
-```bash title="Install supervaizer using pip"
-pip install supervaizer
-```
+To scaffold a new controller for your own agent:
 
-  </TabItem>
-</Tabs>
-
----
-
-## <i className="bi bi-3-circle"></i> Scaffold the controller {#3}
-
-### Generate an example
-
-Generate a starter controller in your project:
-
-```bash title="Create template controller file" {2}
+```bash title="Create template controller file"
 supervaizer scaffold
-> Success: Created an example file at supervaizer_control_example.py
+# Success: Created an example file at supervaizer_control_example.py
 ```
-
-This creates **`supervaizer_control_example.py`**. You’ll customize it to:
-
-- Define **agent parameters** (secrets, env, required inputs)
-- Define **agent methods** (start/stop/status, etc.)
-- Map those methods to **your agent’s functions**
-
-### Shortcut
-
-Get the fully customized controller from GitHub [Email-AI-Agent Supervaizer fork](https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py).
-
-```js reference title="Full example controller supervaizer_control.py"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L1-L15
-```
-
-### Step by step
 
 For detailed instructions on customizing your controller, see the **[Controller Setup Guide](controller-setup)**.
 
-## <i className="bi bi-4-circle"></i> Configure your supervaize account & environment {#4}
+## <i className="bi bi-3-circle"></i> Configure your Supervaize account & environment {#3}
 
 ### Supervaize account and credentials
 
@@ -244,25 +209,18 @@ uv run python supervaizer_control.py
 </Tabs>
 
 ```
-2025-08-10 01:11:50.152 | INFO     | supervaizer.storage:__init__:`3 - [StorageManager] 🗃️ Local DB initialized at /Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/Email-AI-Agent/data/entities.json
-2025-08-10 01:11:50.533 | INFO     | supervaizer.server:__init__:303 - [Server launch] 🚀 Deploy Supervaizer routes
-2025-08-10 01:11:50.551 | INFO     | supervaizer.server:__init__:308 - [Server launch] 📢 Deploy A2A routes
-2025-08-10 01:11:50.552 | INFO     | supervaizer.server:__init__:311 - [Server launch] 📢 Deploy ACP routes
-2025-08-10 01:11:50.554 | INFO     | supervaizer.server:__init__:316 - [Server launch] 💼 Deploy Admin interface @ http://0.0.0.0:8001/admin
-2025-08-10 01:11:50.567 | INFO     | supervaizer.server:save_server_info_to_storage:103 - [Server] Server info saved to storage: 0.0.0.0:8001
-2025-08-10 01:11:50.567 | INFO     | supervaizer.storage:load_running_entities_on_startup:431 - [Storage] Entity re-loading complete: 0 running jobs, 0 running cases
-2025-08-10 01:11:50.567 | INFO     | supervaizer.server:__init__:339 - [Server launch] API Key authentication enabled
-2025-08-10 01:11:50.567 | WARNING  | supervaizer.server:__init__:342 - [Server launch] Using auto-generated API key: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-2025-08-10 01:11:50.573| INFO | [Server launch] Starting Supervaize Controller API v0.9.4 - Log : debug
-2025-08-10 01:11:51.644| DEBUG | [API Success] ✅ POST Event SERVER_REGISTER sent : 01K28E7S6Y5617Q0QPAPEJHWS2
-2025-08-10 01:11:51.644| SUCCESS | ✅ POST Event SERVER_REGISTER sent : 01K28E7S6Y5617Q0QPAPEJHWS2
-2025-08-10 01:11:53.084| DEBUG | [API Success] ✅ GET Agent <email-ai-agent>
-2025-08-10 01:11:53.084| DEBUG | [Agent not onboarded] skipping encrypted parameters
-2025-08-10 01:11:53.084| INFO | [Server launch] Updated agent Email AI Agent
-INFO:     Started server process [87009]
-INFO:     Waiting for application startup.
+INFO     | supervaizer.storage:__init__ - [StorageManager] 🗃️ Local DB initialized
+INFO     | supervaizer.server:__init__ - [Server launch] 🚀 Deploy Supervaizer routes
+INFO     | supervaizer.server:__init__ - [Server launch] 📢 Deploy A2A routes
+INFO     | supervaizer.server:__init__ - [Server launch] 💼 Deploy Admin interface @ http://0.0.0.0:8000/admin
+INFO     | supervaizer.server:__init__ - [Server launch] API Key authentication enabled
+WARNING  | supervaizer.server:__init__ - [Server launch] Using auto-generated API key: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+INFO     | [Server launch] Starting Supervaize Controller API
+SUCCESS  | ✅ POST Event SERVER_REGISTER sent
+INFO     | [Server launch] Updated agent Hello World Agent
+INFO:     Started server process
 INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
 :::tip Verify endpoints
@@ -270,7 +228,7 @@ Once the server is running, you'll have:
 
 - **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`
 - **A2A discovery**: `/.well-known/agents.json`
-- **ACP discovery**: `/agents`
+- **Admin interface**: `http://127.0.0.1:8000/admin`
   :::
 
 ---
@@ -279,7 +237,7 @@ Once the server is running, you'll have:
 
 - **Deploy to the cloud** using the [Cloud Deployment Guide](deploy) for production-ready hosting
 - Add more **custom methods** (`chat`, `custom`) to extend control
-- Turn on **A2A / ACP** discovery for interoperability
+- Enable **A2A** discovery for agent interoperability
 - Hook your controller into Supervaize to **monitor, audit, and operate** the agent
 
 ## Need Help?
@@ -291,9 +249,9 @@ If you run into issues, check the **[Troubleshooting Guide](troubleshooting)** f
 ## Reference
 
 - **Parameter Model**: [docs link](https://doc.supervaize.com/docs/Supervaizer%20Controller/model_reference#parameterparametermodel)
-- **A2A example**: `examples/a2a-controller.py` (in the `supervaizer` package)
+- **Protocol Support**: See the [Protocols documentation](ref/PROTOCOLS) for A2A protocol details
 - **API docs**: visit `/docs` and `/redoc` when the server is running
 
 :::note
-Supervaizer is the **controller & interoperability layer**; it doesn’t replace your agent framework. It makes your agent **discoverable, operable, and governable**.
+Supervaizer is the **controller & interoperability layer**; it doesn't replace your agent framework. It makes your agent **discoverable, operable, and governable**.
 :::

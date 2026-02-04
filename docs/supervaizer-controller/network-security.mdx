@@ -1,0 +1,32 @@
+---
+id: network-security
+title: Network Security
+displayed_sidebar: supervaizerControllerSidebar
+slug: network-security
+---
+
+## Network access and firewall considerations
+
+:::warning Avoid strict network access control
+
+**Do not deploy agents behind strict network access control** (e.g. firewalls or security groups that allow only a fixed allowlist of IPs) unless you have explicitly allowed all Supervaize app IP addresses.
+
+Agents must reach Supervaize services to register, receive work, and report status. If outbound traffic is restricted to a narrow allowlist, connections will fail and agents will not function correctly.
+
+:::
+
+### Allowing Supervaize app IP addresses
+
+If your environment uses IP allowlisting (firewall rules, security groups, egress proxies, or similar), you must allow outbound traffic to the full set of IPs used by the Supervaize app.
+
+**Full list of Supervaize app IP addresses:**
+
+**[https://app.supervaize.com/network-access/](https://app.supervaize.com/network-access/)**
+
+Use this page to obtain the current list of IP addresses and keep your allowlist updated when Supervaize publishes changes.
+
+### Recommendations
+
+- Prefer environments that allow outbound HTTPS to `*.supervaize.com` (or the specific hostnames your agent uses) rather than IP-based allowlists, when possible.
+- If you must use IP allowlists, subscribe to or periodically refresh from the network-access page and automate updates where feasible.
+- Test agent connectivity after any firewall or network policy change.

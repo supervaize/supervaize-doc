@@ -4,24 +4,31 @@ All notable changes to this project will be documented in this file.
 
 > The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
-
 ## TODO
 
 - Review and test feature/data-persistance
 - Complete feature/smartinstall implementation
 - Fix receive_human_input
-- Test and fix deploy 
+- Test and fix deploy
 
 ## Unreleased
+
+## [0.10.1]
+
+### Changed
+
+- **🐍 Python 3.13 Support** - Added Python 3.13 compatibility
+  - Updated package classifiers to include Python 3.13
+  - Build process now uses Python 3.13 for wheel generation
+  - CI test matrix includes Python 3.13
+  - Wheels built with Python 3.13 are compatible with both Python 3.12 and 3.13
 
 ## [0.10.0]
 
 ### Added
 
 - **🚀 Cloud Deployment CLI** - Complete automated deployment system for Supervaizer agents
-
-  - Full implementation of RFC-001: Cloud Deployment CLI
+  - Full implementation of [RFC-001: Cloud Deployment CLI](rfc/001-cloud-deployment-cli.md)
   - Support for three major cloud platforms:
     - **Google Cloud Run** with Artifact Registry and Secret Manager
     - **AWS App Runner** with ECR and Secrets Manager
@@ -41,12 +48,10 @@ All notable changes to this project will be documented in this file.
   - See [Local Testing Documentation](LOCAL_TESTING.md) for details
 
 - **Agent Instructions Template** - New HTML page served by FastAPI for Supervaize integration instructions
-
   - Accessible at `/admin/supervaize-instructions`
   - Provides step-by-step setup guide for agents
 
 - **Version Check Utility** - Automatic check for latest Supervaizer version
-
   - Helps users stay up-to-date with latest features and fixes
   - Located in `supervaizer.utils.version_check`
 
@@ -58,7 +63,6 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - **🔄 Protocol Unification** - Removed ACP protocol in favor of unified A2A protocol
-
   - Removed `src/supervaizer/protocol/acp/` directory and all ACP-specific code
   - Removed `acp_endpoints` parameter from Server class
   - Removed ACP route registration and test files
@@ -68,7 +72,6 @@ All notable changes to this project will be documented in this file.
   - **Breaking Change**: `acp_endpoints` parameter no longer accepted in Server initialization
 
 - **📦 Dependency Optimization** - Cloud SDKs moved to optional dependencies
-
   - Base package size significantly reduced
   - Cloud deployment dependencies now optional: `pip install supervaizer[deploy]`
   - Optional `deploy` group includes: boto3, docker, google-cloud-artifact-registry, google-cloud-run, google-cloud-secret-manager, psutil
@@ -128,7 +131,6 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - **Parameter Validation System**: Refactored to provide separate validation endpoints for different concerns
-
   - **Agent Parameters**: Now validated separately through `/validate-agent-parameters` endpoint
   - **Method Fields**: Now validated separately through `/validate-method-fields` endpoint
   - **Clean Architecture**: Removed legacy endpoint for cleaner, more focused API design
@@ -219,4 +221,4 @@ Test Coverage : [![Test Coverage](https://img.shields.io/badge/Coverage-81%25-br
 > | 🧪 Tests     | 🧑‍🎨 UI/Style            | 🎼 Controller |
 
 
-*Uploaded on 2026-01-17 16:08:02*
+*Uploaded on 2026-01-25 14:28:59*

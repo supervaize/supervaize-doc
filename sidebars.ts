@@ -36,6 +36,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaizer-controller/network-security",
+          label: "Network Security",
+        },
+        {
+          type: "doc",
           id: "supervaizer-controller/troubleshooting",
           label: "Troubleshooting",
         },

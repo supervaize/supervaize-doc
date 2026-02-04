@@ -216,6 +216,7 @@ supervaizer deploy clean --verbose
 ### Deployment Documentation
 
 For detailed deployment documentation, see:
+- [RFC-001: Cloud Deployment CLI](rfc/001-cloud-deployment-cli.md) - Complete specification
 - [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
 
 ## Environment Variables
@@ -254,4 +255,4 @@ These environment variables are used during cloud deployment:
 **Note:** Deployment secrets (API keys, RSA keys) are securely stored in cloud provider secret stores and not exposed in environment variables or logs.
 
 
-*Uploaded on 2026-01-17 16:08:02*
+*Uploaded on 2026-01-25 14:28:59*

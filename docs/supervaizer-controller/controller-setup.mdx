@@ -14,7 +14,7 @@ This guide walks you through customizing your Supervaizer controller step by ste
 
 :::info
 
-This step-by-step guide uses the [<i className="bi bi-github"></i> EmailAIAgent](https://github.com/parthshr370/Email-AI-Agent?tab=readme-ov-file) as an example.
+This step-by-step guide uses the [<i className="bi bi-github"></i> Hello World Agent](https://github.com/alain-sv/supervaize_hello_world) as a reference example.
 
 See the [Quickstart guide](quickstart) for installation instructions.
 :::
@@ -34,7 +34,7 @@ After running `supervaizer scaffold`, you'll have a template file to customize. 
 [<i className="bi bi-6-circle-fill"></i> Setup the server: Server()](#6)
 
 :::note
-Open `supervaizer_control_example.py` and adapt the content to the EmailAIAgent.
+Open `supervaizer_control_example.py` and adapt the content to your agent.
 :::
 
 ## 1. Define agent parameters {#1}
@@ -42,7 +42,7 @@ Open `supervaizer_control_example.py` and adapt the content to the EmailAIAgent.
 Use **Parameter** / **ParametersSetup** to declare what the agent needs. These show up in Supervaize UI and can be marked as env or secret.
 
 ```js reference title="Map Parameters"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L27-L83
+https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L10-L30
 ```
 
 **📖 See the model references**
@@ -56,33 +56,33 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.
 Point Supervaizer to your agent's functions.
 
 :::tip
-It usually saves time to duplicate the main file of the script and create an adapted version where all methods are called with the expected parameters.
-This is what we have done in the **[sv_main.py](https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/sv_main.py)** file.
+It usually saves time to create a wrapper module where your agent's methods are called with the expected parameters.
 :::
 
-```python title="Methods: wire your agent's functions" {8}
+```python title="Methods: wire your agent's functions"
 from supervaizer import AgentMethod
 
 job_start = AgentMethod(
-    name="start", # This is required
-    method="sv_main.process_email_workflow", # Path to the main function in dotted notation.
-    params={}, # If default parameters must be passed to the function.
-    is_async=False, # Only use sync methods for the moment
-    fields=[] # Defined below
+    name="start",  # This is required
+    method="agent_simple.job_start",  # Path to the main function in dotted notation
+    params={},  # Default parameters to pass to the function
+    is_async=False,  # Only use sync methods for the moment
+    fields=[]  # Defined below
+)
 ```
 
 [See below for definition of fields ](#3)
 
 ```python title="Additional required methods"
 job_stop = AgentMethod(
-    name="stop", # Must be present
-    method="email_agent.jobs.stop",   # Initial deployment does not require this method to do anything
+    name="stop",  # Must be present
+    method="agent_simple.job_stop",
     is_async=False,
 )
 
 job_status = AgentMethod(
-    name="status", # Must be present
-    method="email_agent.jobs.status", # Initial deployment does not require this method to do anything
+    name="status",  # Must be present
+    method="agent_simple.job_status",
     is_async=False,
 )
 ```
@@ -98,7 +98,7 @@ The `fields` parameter defines the user input form that will be displayed in the
 ### Field setup for the "Start" method
 
 ```js reference title="Fields of Start AgentMethod"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L92-L131
+https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L32-L60
 ```
 
 **📖 See the model reference**
@@ -110,7 +110,7 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.
 The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
 
 ```js reference title="Agent definition"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L145-L165
+https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L62-L85
 ```
 
 **📖 See the model reference**
@@ -120,17 +120,17 @@ https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.
 ## 5.Setup the Supervaize Account and configure your Environment variables {#5}
 
 :::info
-This step is not needed to run the supervaizer as an A2A / ACP server only. See [Protocol support](/docs/supervaizer-controller/ref/PROTOCOLS)
+This step is not needed to run the supervaizer as an A2A server only. See [Protocol support](/docs/supervaizer-controller/ref/PROTOCOLS)
 :::
 
 [Create your developer account](/docs/supervaize-fleet/developer-account#getting_started) on the Supervaize platform.
 
 Create your API Key and collect your environment variables.
 
-See the [Quickstart guide](quickstart#4) to setup the environment variables
+See the [Quickstart guide](quickstart#3) to setup the environment variables
 
 ```js reference title="Account definition"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L167-L172
+https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L87-L95
 ```
 
 **📖 See the model reference**
@@ -146,7 +146,7 @@ The `Server` class wraps all the defined components together.
 At the minimum, the server requires at least one agent to be defined and the supervisor account (we are using Supervaize as the supervisor).
 
 ```js reference title="Server definition"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L174-L181
+https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L97-L105
 ```
 
 :::warning Important
@@ -160,7 +160,7 @@ Note that if `supervisor_account` is provided, the A2A protocol is automatically
 ### Server launch
 
 ```js reference title="Server launch"
-https://github.com/alain-sv/Email-AI-Agent/blob/supervaizer/supervaizer_control.py#L183-L185
+https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L107-L115
 ```
 
 See [Server Start 🚀](/docs/supervaizer-controller/quickstart#start) for CLI instructions
