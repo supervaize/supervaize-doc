@@ -21,6 +21,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaizer-controller/core-concepts",
+          label: "Core Concepts",
+        },
+        {
+          type: "doc",
           id: "supervaizer-controller/controller-setup",
           label: "Controller Setup Guide",
         },

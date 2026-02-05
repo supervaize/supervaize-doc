@@ -28,6 +28,7 @@ const config: Config = {
 
   onBrokenLinks: "throw",
   markdown: {
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: "warn",
     },
@@ -40,7 +41,7 @@ const config: Config = {
     defaultLocale: "en",
     locales: ["en"],
   },
-  themes: ["@saucelabs/theme-github-codeblock"],
+  themes: ["@saucelabs/theme-github-codeblock", "@docusaurus/theme-mermaid"],
   presets: [
     [
       "classic",

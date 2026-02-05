@@ -14,7 +14,7 @@ This guide walks you through customizing your Supervaizer controller step by ste
 
 :::info
 
-This step-by-step guide uses the [<i className="bi bi-github"></i> Hello World Agent](https://github.com/alain-sv/supervaize_hello_world) as a reference example.
+This step-by-step guide uses the [<i className="bi bi-github"></i> Hello World Agent](https://github.com/supervaize/supervaize_hello_world) as a reference example.
 
 See the [Quickstart guide](quickstart) for installation instructions.
 :::
@@ -42,7 +42,7 @@ Open `supervaizer_control_example.py` and adapt the content to your agent.
 Use **Parameter** / **ParametersSetup** to declare what the agent needs. These show up in Supervaize UI and can be marked as env or secret.
 
 ```js reference title="Map Parameters"
-https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L10-L30
+https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L10-L30
 ```
 
 **📖 See the model references**
@@ -98,7 +98,7 @@ The `fields` parameter defines the user input form that will be displayed in the
 ### Field setup for the "Start" method
 
 ```js reference title="Fields of Start AgentMethod"
-https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L32-L60
+https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L32-L60
 ```
 
 **📖 See the model reference**
@@ -110,7 +110,7 @@ https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control
 The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
 
 ```js reference title="Agent definition"
-https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L62-L85
+https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L62-L85
 ```
 
 **📖 See the model reference**
@@ -130,7 +130,7 @@ Create your API Key and collect your environment variables.
 See the [Quickstart guide](quickstart#3) to setup the environment variables
 
 ```js reference title="Account definition"
-https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L87-L95
+https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L87-L95
 ```
 
 **📖 See the model reference**
@@ -146,7 +146,7 @@ The `Server` class wraps all the defined components together.
 At the minimum, the server requires at least one agent to be defined and the supervisor account (we are using Supervaize as the supervisor).
 
 ```js reference title="Server definition"
-https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L97-L105
+https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L97-L105
 ```
 
 :::warning Important
@@ -160,7 +160,7 @@ Note that if `supervisor_account` is provided, the A2A protocol is automatically
 ### Server launch
 
 ```js reference title="Server launch"
-https://github.com/alain-sv/supervaize_hello_world/blob/main/supervaizer_control.py#L107-L115
+https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L107-L115
 ```
 
 See [Server Start 🚀](/docs/supervaizer-controller/quickstart#start) for CLI instructions
