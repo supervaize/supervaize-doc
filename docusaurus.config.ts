@@ -50,21 +50,7 @@ const config: Config = {
           sidebarPath: "./sidebars.ts",
           editUrl: "https://github.com/supervaize/supervaize-doc/blob/main/",
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ["rss", "atom"],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
-          // Useful options to enforce blogging best practices
-          onInlineTags: "warn",
-          onInlineAuthors: "warn",
-          onUntruncatedBlogPosts: "warn",
-        },
+        blog: false,
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -113,23 +99,22 @@ const config: Config = {
           sidebarId: "supervaizerControllerSidebar",
           position: "left",
           label: "Supervaizer Controller",
-          activeBasePath: "/supervaizer-controller",
+          activeBasePath: "/docs/supervaizer-controller",
         },
         {
           type: "docSidebar",
           sidebarId: "supervaizeFleetSidebar",
           position: "left",
           label: "Supervaize Fleet",
-          activeBasePath: "/supervaize-fleet",
+          activeBasePath: "/docs/supervaize-fleet",
         },
         {
           type: "docSidebar",
           sidebarId: "supervaizeStudioSidebar",
           position: "left",
           label: "Supervaize Studio",
-          activeBasePath: "/supervaize-studio",
+          activeBasePath: "/docs/supervaize-studio",
         },
-        { to: "/blog", label: "Blog", position: "left" },
         {
           href: "https://github.com/supervaize",
           label: "GitHub",
@@ -177,10 +162,6 @@ const config: Config = {
         {
           title: "More",
           items: [
-            {
-              label: "Blog",
-              to: "/blog",
-            },
             {
               label: "GitHub",
               href: "https://github.com/supervaize",

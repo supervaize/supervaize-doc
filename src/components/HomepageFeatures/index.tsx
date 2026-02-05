@@ -64,12 +64,11 @@ const FeatureList: FeatureItem[] = [
     ),
     description: (
       <>
-        Supervaize Studio is a no-code control center that empowers business
-        teams to onboard, monitor, and operate AI agents across their
-        organization. With built-in dashboards, workflow orchestration,
-        human-in-the-loop controls, and compliance-ready audit trails, Studio
-        makes it easy to scale and supervise your AI fleet—without writing a
-        single line of code.
+        Supervaize Studio is the control center that empowers business teams to
+        onboard, monitor, and operate AI agents across their organization. With
+        built-in dashboards, workflow orchestration, human-in-the-loop controls,
+        and compliance-ready audit trails, Studio makes it easy to scale and
+        supervise your AI fleet with confidence.
       </>
     ),
     link: "/docs/supervaize-studio/intro",

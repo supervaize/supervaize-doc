@@ -92,6 +92,13 @@ h4 {
   text-decoration: none !important;
 }
 
+/* Clear active state for current section in top nav */
+.navbar__item.navbar__link--active {
+  font-weight: 700 !important;
+  color: var(--ifm-color-primary) !important;
+  border-bottom: 2px solid var(--ifm-color-secondary);
+}
+
 /* Apply Comfortaa font to navbar title */
 .navbar__title {
   font-family: "Comfortaa", sans-serif;
