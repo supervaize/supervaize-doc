@@ -1,0 +1,86 @@
+{
+  "name": "My workflow 11",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supervaize-test-6",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1e20bba5-1964-45e9-9a31-45769f2cc61a",
+      "name": "Webhook",
+      "webhookId": "f743eef5-bc74-44b7-8b15-f14c01d36062"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n   name: \"Hello World!\"}\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9d054854-3b27-4880-a5cc-a6266417b482",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7c1cfcd5-da92-4c88-b917-16b9ac54f518",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "ffaf8b45-a424-49ea-83c7-6f8a4f2efded",
+  "meta": {
+    "instanceId": "5866ffd121c17c49d8bae5d83a26cb85d0ddac496f9fdae62ea1fd241314b5ae"
+  },
+  "id": "Rp-0z-SooAFeoQa10As7T",
+  "tags": []
+}

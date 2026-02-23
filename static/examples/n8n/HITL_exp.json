@@ -1,0 +1,693 @@
+{
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supervaize-job-start-1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        -128
+      ],
+      "id": "4a98568f-f180-470f-9258-98cc556cf567",
+      "name": "Webhook",
+      "webhookId": "be16be20-4e60-474e-82d0-c10c581a9168"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://outgoing-awaited-treefrog.ngrok-free.app/api/mcp",
+        "tool": {
+          "__rl": true,
+          "value": "report_case_start",
+          "mode": "list",
+          "cachedResultName": "report_case_start"
+        },
+        "parameters": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "team_slug": "system",
+            "job_id": "={{ $json['job_id'] }}",
+            "execution_id": "={{ $json.execution_id }}",
+            "name": "=Case for {{ $json['job_id'] }}",
+            "description": "n8n workflow execution"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "team_slug",
+              "displayName": "team_slug",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClient",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -128
+      ],
+      "id": "0db6b797-b7be-4002-b994-05e547215c1d",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "92cc13ae-b511-4e9d-8ba3-acdff1225c59",
+              "name": "=job_id",
+              "value": "={{ $json.body.job_id }}",
+              "type": "string"
+            },
+            {
+              "id": "187c4a87-84b2-4e87-9436-2f2ff10d7244",
+              "name": "=job_context",
+              "value": "={{ $json.body.job_context ?? {} }}",
+              "type": "object"
+            },
+            {
+              "id": "9bf68ce9-a064-4546-ae72-0e4c0af01aab",
+              "name": "execution_id",
+              "value": "={{ $execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "4b957b20-9d8e-4df5-9540-dfa37e1d553b",
+              "name": "job_fields",
+              "value": "={{ $json.body.job_fields ?? {} }}",
+              "type": "object"
+            },
+            {
+              "id": "4eb07c26-0a2e-4b1e-a449-7a38e611018f",
+              "name": "correlation_id",
+              "value": "={{ $json.body.correlation_id ?? '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -128
+      ],
+      "id": "3c453ef3-7445-4f92-8d01-00a6d8806bf8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://outgoing-awaited-treefrog.ngrok-free.app/api/mcp",
+        "tool": {
+          "__rl": true,
+          "value": "report_case_step",
+          "mode": "list",
+          "cachedResultName": "report_case_step"
+        },
+        "parameters": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $('Edit Fields').item.json.execution_id }}",
+            "team_slug": "system",
+            "index": 1,
+            "name": "Processing Started",
+            "payload": "{\"status\": \"processing\", \"message\": \"Workflow started\"}\n",
+            "is_final": false
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "team_slug",
+              "displayName": "team_slug",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "index",
+              "displayName": "index",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "object",
+              "defaultValue": "{}",
+              "removed": false
+            },
+            {
+              "id": "cost",
+              "displayName": "cost",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "number",
+              "removed": true
+            },
+            {
+              "id": "is_final",
+              "displayName": "is_final",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "error",
+              "displayName": "error",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClient",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -128
+      ],
+      "id": "3d0e9670-6c0b-4098-b3e8-d81ec467069d",
+      "name": "MCP Client2"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://outgoing-awaited-treefrog.ngrok-free.app/api/mcp",
+        "tool": {
+          "__rl": true,
+          "value": "request_human_input",
+          "mode": "list",
+          "cachedResultName": "request_human_input"
+        },
+        "parameters": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "form_fields": "[\n  {\n    \"name\": \"decision\",\n    \"field_type\": \"select\",\n    \"description\": \"Select your decision\",\n    \"required\": true,\n    \"options\": [\"approve\", \"reject\", \"request_changes\"]\n  },\n  {\n    \"name\": \"comments\",\n    \"field_type\": \"text\",\n    \"description\": \"Additional comments\",\n    \"required\": false\n  }\n]",
+            "execution_id": "={{ $('Edit Fields').item.json.execution_id }}",
+            "team_slug": "system",
+            "step_index": 2,
+            "message": "Please review and approve this workflow execution"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "team_slug",
+              "displayName": "team_slug",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "step_index",
+              "displayName": "step_index",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "form_fields",
+              "displayName": "form_fields",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "array",
+              "defaultValue": "[\n  {\n    \"name\": \"string\",\n    \"field_type\": \"string\",\n    \"description\": \"string\",\n    \"required\": false\n  }\n]",
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClient",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -128
+      ],
+      "id": "ce0ef2bc-2a14-4865-a65e-9685a1b5656a",
+      "name": "MCP Client1"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        -128
+      ],
+      "id": "0dfcf43e-7a80-4608-89c2-598f8f68882f",
+      "name": "Wait",
+      "webhookId": "0fdd6f43-2ca6-4e4d-ac72-74e4a0fd8d11"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://outgoing-awaited-treefrog.ngrok-free.app/api/mcp",
+        "tool": {
+          "__rl": true,
+          "value": "get_case_status",
+          "mode": "list",
+          "cachedResultName": "get_case_status"
+        },
+        "parameters": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $('Edit Fields').item.json.execution_id }}",
+            "team_slug": "system"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "team_slug",
+              "displayName": "team_slug",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "correlation_id",
+              "displayName": "correlation_id",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClient",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        -128
+      ],
+      "id": "c9c96b4e-f1b8-4b90-930f-74e87d41ac60",
+      "name": "MCP Client3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0f3abc4a-5b3a-4ac0-9202-ec217472b526",
+              "leftValue": "={{ $json.decision }}",
+              "rightValue": "approved",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1904,
+        -128
+      ],
+      "id": "0d6c665c-d4f4-43d2-b171-6b8afb0ae357",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://outgoing-awaited-treefrog.ngrok-free.app/api/mcp",
+        "tool": {
+          "__rl": true,
+          "value": "report_case_step",
+          "mode": "list",
+          "cachedResultName": "report_case_step"
+        },
+        "parameters": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $('Edit Fields').item.json.execution_id }}",
+            "team_slug": "system",
+            "index": 3,
+            "name": "Workflow Approved & Completed",
+            "payload": "={\"result\": \"success\", \"decision\": \"approved\"}\n",
+            "is_final": true
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "team_slug",
+              "displayName": "team_slug",
+              "defaultMatch": false,
+              "required": true,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "index",
+              "displayName": "index",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "object",
+              "defaultValue": "{}",
+              "removed": false
+            },
+            {
+              "id": "cost",
+              "displayName": "cost",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "number",
+              "removed": true
+            },
+            {
+              "id": "is_final",
+              "displayName": "is_final",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "error",
+              "displayName": "error",
+              "defaultMatch": false,
+              "required": false,
+              "display": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClient",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        -224
+      ],
+      "id": "ae70793d-c0e7-4dff-b791-c23a35d46c42",
+      "name": "MCP Client4"
+    },
+    {
+      "parameters": {
+        "content": "We can use a wait for webhook node in prod instead of wait node to avoid false timeouts\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "911aaedf-bc6b-40e3-bb8b-22e65cc96acd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the MCP response from MCP Client3\nconst mcpResponse = $('MCP Client3').first().json;\n\n// The text field has format: type='text' text='{\"json\": \"here\"}' annotations=None\nconst rawText = mcpResponse.content[0].text;\n\n// Extract the JSON from within text='...'\n// Find the content between text=' and the closing '\nconst match = rawText.match(/text='(.+?)'\\s*annotations/);\n\nlet parsed;\nif (match && match[1]) {\n  // Unescape any escaped quotes\n  const jsonString = match[1].replace(/\\\\'/g, \"'\").replace(/\\\\\"/g, '\"');\n  parsed = JSON.parse(jsonString);\n} else {\n  // Try parsing the whole thing as JSON (fallback)\n  try {\n    parsed = JSON.parse(rawText);\n  } catch (e) {\n    // Return error info for debugging\n    return [{\n      json: {\n        error: \"Could not parse response\",\n        rawText: rawText,\n        decision: null\n      }\n    }];\n  }\n}\n\n// Return the parsed data\nreturn [{\n  json: {\n    success: parsed.success,\n    case_id: parsed.case_id,\n    execution_id: parsed.execution_id,\n    status: parsed.status,\n    job_id: parsed.job_id,\n    response: parsed.response,\n    decision: parsed.decision\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        -128
+      ],
+      "id": "f5b3e96b-97fa-4ff4-84f2-ffb03a1357e8",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "main": [
+        [
+          {
+            "node": "MCP Client2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "MCP Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client2": {
+      "main": [
+        [
+          {
+            "node": "MCP Client1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "MCP Client3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "MCP Client4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "versionId": "c5f93082-3271-4a6c-b3a2-a5210804a2a1",
+  "meta": {
+    "instanceId": "5866ffd121c17c49d8bae5d83a26cb85d0ddac496f9fdae62ea1fd241314b5ae"
+  },
+  "id": "cmQavybf-OT2vOR2Flor8",
+  "tags": []
+}

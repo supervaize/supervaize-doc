@@ -1,0 +1,144 @@
+{
+  "name": "My workflow 10",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supervaize-test-4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        -112
+      ],
+      "id": "02550f28-32c3-4f46-a168-60a995574005",
+      "name": "Webhook",
+      "webhookId": "39ae3d68-a010-4dbb-b98c-80fb124332ee"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract the incoming payload from webhook\nconst body = $input.first().json.body || $input.first().json;\n\nconst jobId = body.job_id || 'unknown';\nconst agentParams = body.agent_parameters || {};\nconst jobFields = body.job_fields || {};\n\n// Validate required parameter\nconst apiKey = agentParams.API_KEY || '';\nconst lookupCount = parseInt(agentParams.LOOKUP_COUNT || '3', 10);\nconst notificationEmail = agentParams.NOTIFICATION_EMAIL || 'none';\n\nif (!apiKey) {\n  throw new Error('API_KEY parameter is required but was not provided');\n}\n\nreturn [{\n  json: {\n    job_id: jobId,\n    api_key: apiKey,\n    lookup_count: lookupCount,\n    notification_email: notificationEmail,\n    job_fields: jobFields,\n    validation: 'passed'\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        -112
+      ],
+      "id": "44bb8273-f8be-44db-b00f-fd010a1a2650",
+      "name": "Validate Params"
+    },
+    {
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/users",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "=_limit",
+              "value": "={{ $json.lookup_count }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        320,
+        -112
+      ],
+      "id": "f83eb88c-ae54-41c2-aa2f-ae8621e6348e",
+      "name": "Fetch Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the validated params from Validate Params node\nconst params = $('Validate Params').first().json;\n\n// Get all fetched users\nconst users = $input.all().map(item => ({\n  name: item.json.name,\n  email: item.json.email,\n  company: item.json.company?.name || 'N/A',\n  city: item.json.address?.city || 'N/A'\n}));\n\nreturn [{\n  json: {\n    job_id: params.job_id,\n    status: 'success',\n    contacts_found: users.length,\n    contacts: users,\n    notification_email: params.notification_email,\n    processed_at: new Date().toISOString(),\n    message: `Found ${users.length} contacts for job ${params.job_id}`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -112
+      ],
+      "id": "e24bb88f-31c1-4f6a-bd45-79a7b8279d63",
+      "name": "Process Results"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        736,
+        -112
+      ],
+      "id": "5cf70038-26b5-4c1e-9103-38ae12213363",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Params": {
+      "main": [
+        [
+          {
+            "node": "Fetch Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Data": {
+      "main": [
+        [
+          {
+            "node": "Process Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Results": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "ae5c19be-ce8e-4d8a-80ce-70d21263d67d",
+  "meta": {
+    "instanceId": "5866ffd121c17c49d8bae5d83a26cb85d0ddac496f9fdae62ea1fd241314b5ae"
+  },
+  "id": "oztBz6Qvj9bCLBS2odaL1",
+  "tags": []
+}

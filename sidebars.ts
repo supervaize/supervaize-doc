@@ -213,6 +213,11 @@ const sidebars: SidebarsConfig = {
       id: "supervaize-studio/intro",
       label: "Introduction",
     },
+    {
+      type: "doc",
+      id: "supervaize-studio/n8n-integration",
+      label: "n8n Integration",
+    },
   ],
 };
 
