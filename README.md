@@ -6,4 +6,4 @@ This repository manages the content of the [Supervaize Documentation](https://do
 
 - Supervaize Studio SaaS
 
-- Supervaize Studio Management SaaS
+- Integrations

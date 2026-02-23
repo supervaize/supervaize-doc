@@ -25,7 +25,9 @@ Use this when you want the fastest setup and do not want to modify your workflow
 What you need:
 
 - an n8n workflow with a **Webhook** trigger node
+  - for example: [`hello_world_zero_touch.json`](/examples/n8n/hello_world_zero_touch.json)
 - an **n8n API Key**
+  - see [get n8n api](#get-n8n-api-) for how to get your API key
 
 What Supervaize does:
 
@@ -64,17 +66,17 @@ Prepare these values:
 - `n8n API Key` (in n8n go to `Settings` -> `n8n API`, then click **Create an API Key**)
 - `MCP Access Token` (only for MCP mode; in n8n go to `Settings` -> `Instance-level MCP`)
 
-`n8n API` screen:
+#### Get `n8n API` :
 
 ![n8n API key setup](/img/n8n_api_setup.png)
+
+#### Setup `Instance-level MCP` :
 
 For the MCP token in n8n:
 
 - make sure **Instance-level MCP** is **Enabled**
 - open **Connection details** and copy the access token
 - if the page shows `No workflows enabled`, click **Enable workflows** for the workflows you want MCP clients to discover/execute
-
-`Instance-level MCP` screen:
 
 ![n8n Instance-level MCP setup](/img/n8n_instance_level_mcp.png)
 
