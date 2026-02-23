@@ -133,15 +133,15 @@ const sidebars: SidebarsConfig = {
     },
   ],
 
-  // Supervaize Fleet sidebar
+  // Supervaize Studio sidebar
   supervaizeFleetSidebar: [
     {
       type: "category",
-      label: "Supervaize Fleet",
+      label: "Supervaize Studio",
       link: {
         type: "generated-index",
-        title: "Supervaize Fleet Documentation",
-        description: "Documentation for Supervaize Fleet Management",
+        title: "Supervaize Studio Documentation",
+        description: "Documentation for Supervaize Studio Management",
       },
       items: [
         {
@@ -206,16 +206,16 @@ const sidebars: SidebarsConfig = {
     },
   ],
 
-  // Supervaize Studio sidebar
-  supervaizeStudioSidebar: [
+  // Integrations sidebar
+  integrationsSidebar: [
     {
       type: "doc",
-      id: "supervaize-studio/intro",
+      id: "integrations/intro",
       label: "Introduction",
     },
     {
       type: "doc",
-      id: "supervaize-studio/n8n-integration",
+      id: "integrations/n8n-integration",
       label: "n8n Integration",
     },
   ],

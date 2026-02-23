@@ -4,14 +4,14 @@ supervaize:
   description: Supervaize Company
 
 supervaize-fleet:
-  label: Supervaize Fleet
-  permalink: /supervaize-fleet
-  description: Supervaize Fleet
-
-supervaize-studio:
   label: Supervaize Studio
-  permalink: /supervaize-studio
+  permalink: /supervaize-fleet
   description: Supervaize Studio
+
+integrations:
+  label: Integrations
+  permalink: /integrations
+  description: Integrations
 
 supervaize-controller:
   label: Supervaize Controller

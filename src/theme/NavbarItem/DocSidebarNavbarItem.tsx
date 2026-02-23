@@ -10,7 +10,7 @@ import {useLayoutDocsSidebar} from '@docusaurus/plugin-content-docs/client';
 import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
 import type {Props} from '@theme/NavbarItem/DocSidebarNavbarItem';
 
-// First link can be category index (/docs/category/supervaizer-controller) or doc (/docs/supervaize-studio/intro).
+// First link can be category index (/docs/category/supervaizer-controller) or doc (/docs/integrations/intro).
 // Return the section base path(s) to match: category index and/or doc prefix so only one nav item is active.
 function getSectionPaths(path: string): {categoryPath?: string; docPath?: string} {
   const normalized = path.startsWith('/') ? path : `/${path}`;

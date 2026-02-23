@@ -35,11 +35,11 @@ const FeatureList: FeatureItem[] = [
     linkText: "Get Started",
   },
   {
-    title: "Supervaize Fleet Management",
+    title: "Supervaize Studio Management",
     Svg: () => (
       <img
         src="https://cdn.do.supervaize.com/products/supervaize-fleet.png"
-        alt="Supervaize Fleet Management"
+        alt="Supervaize Studio Management"
         className={styles.featureSvg}
       />
     ),
@@ -54,25 +54,23 @@ const FeatureList: FeatureItem[] = [
     linkText: "Learn More",
   },
   {
-    title: "Supervaize Studio",
+    title: "Third Party Integrations",
     Svg: () => (
       <img
         src="https://cdn.do.supervaize.com/products/supervaize-studio.png"
-        alt="Supervaize Studio"
+        alt="Third Party Integrations"
         className={styles.featureSvg}
       />
     ),
     description: (
       <>
-        Supervaize Studio is the control center that empowers business teams to
-        onboard, monitor, and operate AI agents across their organization. With
-        built-in dashboards, workflow orchestration, human-in-the-loop controls,
-        and compliance-ready audit trails, Studio makes it easy to scale and
-        supervise your AI fleet with confidence.
+        Third Party Integrations are the control center that empowers business
+        teams to integrate with third party applications and services. Discover
+        integration with n8n, slack, and more.
       </>
     ),
-    link: "/docs/supervaize-studio/intro",
-    linkText: "Explore Studio",
+    link: "/docs/integrations/intro",
+    linkText: "Explore Integrations",
   },
 ];
 
