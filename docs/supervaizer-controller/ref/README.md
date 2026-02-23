@@ -1,4 +1,4 @@
-# SUPERVAIZER
+# SUPERVAIZER {#supervaizer}
 
 [Operate AI Agents with confidence]
 
@@ -225,7 +225,7 @@ server.launch()
 print(f"Admin Interface: http://localhost:8000/admin/")
 ```
 
-# Calculating costs
+# Calculating costs {#calculating-costs}
 
 Developers are free to define the cost of the transaction the way they want when updating the cases.
 Here is a way to easily get an estimate of the cost of an LLM transaction (note that litellm also supports custom pricing. )

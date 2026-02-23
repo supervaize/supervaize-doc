@@ -23,5 +23,6 @@ Choose a section from the sidebar to get started:
 ## Quick Links
 
 - [Supervaizer Controller](/docs/supervaizer-controller/quickstart)
+- [Integrations (n8n)](/docs/integrations/n8n-integration)
 - [GitHub Repository](https://github.com/supervaize)
 - [Community Slack](https://join.slack.com/t/supervaize/shared_invite/zt-3ay81n5ap-~gggl0BGbzREcyCdLUf9Kw)
