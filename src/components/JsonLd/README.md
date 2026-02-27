@@ -44,8 +44,8 @@ export const jsonLd = createArticleSchema({
   authorName: "Author Name",
   datePublished: "2025-01-15",
   siteUrl: "https://doc.supervaize.com",
-  siteName: "Supervaize Documentation",
-  logoUrl: "https://doc.supervaize.com/img/supervaize-black-green.png",
+  siteName: "Runwaize Documentation",
+  logoUrl: "https://doc.supervaize.com/img/runwaize.png",
 });
 
 <JsonLd data={jsonLd} />
@@ -78,7 +78,7 @@ export const articleJsonLd = createArticleSchema({
   authorName: "Supervaize",
   datePublished: "2025-01-15",
   siteUrl: "https://doc.supervaize.com",
-  siteName: "Supervaize Documentation",
+  siteName: "Runwaize Documentation",
   logoUrl: "https://doc.supervaize.com/img/supervaize-black-green.png",
 });
 
@@ -130,7 +130,3 @@ Create manually or extend the schemas helper
 - [Schema.org Documentation](https://schema.org/)
 - [Google Structured Data Guide](https://developers.google.com/search/docs/appearance/structured-data)
 - [Docusaurus headTags API](https://docusaurus.io/docs/api/docusaurus-config#headtags)
-
-
-
-

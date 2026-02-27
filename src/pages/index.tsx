@@ -11,11 +11,20 @@ import styles from "./index.module.css";
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
+  const title = siteConfig.title;
+  const [first, ...rest] = title.split(" ");
+  const titleRest = rest.length > 0 ? rest.join(" ") : "";
   return (
-    <header className={clsx("hero hero--primary", styles.heroBanner)}>
+    <header className={clsx("hero", styles.heroBanner, styles.heroRunwaize)}>
       <div className="container">
         <Heading as="h1" className="hero__title">
-          {siteConfig.title}
+          {first}
+          {titleRest && (
+            <>
+              {" "}
+              <span className={styles.heroTitleGreen}>{titleRest}</span>
+            </>
+          )}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>

@@ -60,6 +60,7 @@ const sidebars: SidebarsConfig = {
             title: "Technical Documentation",
             description:
               "Advanced technical documentation for developers and contributors",
+            slug: "category/technical-documentation",
           },
           items: [
             {
@@ -142,6 +143,7 @@ const sidebars: SidebarsConfig = {
         type: "generated-index",
         title: "Supervaize Studio Documentation",
         description: "Documentation for Supervaize Studio Management",
+        slug: "category/supervaize-studio",
       },
       items: [
         {
@@ -203,6 +205,15 @@ const sidebars: SidebarsConfig = {
           label: "Setup Development Environment",
         },
       ],
+    },
+  ],
+
+  // The Skills Cookbook sidebar
+  skillsCookbookSidebar: [
+    {
+      type: "doc",
+      id: "skills-cookbook/intro",
+      label: "Introduction",
     },
   ],
 

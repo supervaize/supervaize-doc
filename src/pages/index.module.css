@@ -1,6 +1,7 @@
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules
  * and scoped locally.
+ * Hero styled to match Runwaize marketing hero: dark bg, grid, green glow.
  */
 
 .heroBanner {
@@ -8,6 +9,74 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+}
+
+/* Runwaize hero: dark background, grid, green ambient glow */
+.heroRunwaize {
+  --hero-bg: #080808;
+  --hero-green: #3fde47;
+  --hero-green-glow: rgba(63, 222, 71, 0.12);
+  background-color: var(--hero-bg);
+  background-image:
+    linear-gradient(var(--hero-green-glow) 0%, transparent 50%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+  background-position: -20% 50%, 0 0, 0 0;
+  color: #fff;
+}
+
+.heroRunwaize::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 60% at 15% 50%,
+    var(--hero-green-glow) 0%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+.heroRunwaize .container {
+  position: relative;
+  z-index: 1;
+}
+
+.heroRunwaize .hero__title {
+  color: #fff !important;
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.heroRunwaize .heroTitleGreen {
+  color: var(--hero-green);
+  text-shadow: 0 0 24px var(--hero-green-glow);
+}
+
+.heroRunwaize .hero__subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.heroRunwaize .buttons .button {
+  border-radius: 9999px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+}
+
+.heroRunwaize .buttons .button--secondary {
+  background: #fff;
+  color: #080808;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.heroRunwaize .buttons .button--secondary:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: #080808;
 }
 
 @media screen and (max-width: 996px) {

@@ -4,7 +4,7 @@ title: Introduction
 sidebar_label: Introduction
 ---
 
-# Welcome to Supervaize Documentation
+# Welcome to Runwaize Documentation
 
 Supervaize is an AI platform that enables you to build and deploy AI agents with confidence.
 

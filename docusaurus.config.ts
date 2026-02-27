@@ -5,9 +5,9 @@ import type * as Preset from "@docusaurus/preset-classic";
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: "Supervaize Documentation",
+  title: "Runwaize Documentation",
   tagline: "AI Agents with confidence",
-  favicon: "img/favicon.ico",
+  favicon: "img/runwaize.svg",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -27,6 +27,7 @@ const config: Config = {
   projectName: "supervaize-docs", // Usually your repo name.
 
   onBrokenLinks: "throw",
+  onBrokenAnchors: "warn",
   markdown: {
     mermaid: true,
     hooks: {
@@ -63,7 +64,13 @@ const config: Config = {
   ],
 
   // Global JSON-LD structured data (Organization schema)
+  // Guard: gtag plugin may call window.gtag before the async gtag script loads
   headTags: [
+    {
+      tagName: "script",
+      attributes: {},
+      innerHTML: "window.gtag = window.gtag || function() {};",
+    },
     {
       tagName: "script",
       attributes: {
@@ -72,8 +79,8 @@ const config: Config = {
       innerHTML: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "Organization",
-        name: "Supervaize",
-        url: "https://supervaize.com",
+        name: "Runwaize",
+        url: "https://runwaize.com",
         logo: "https://doc.supervaize.com/img/supervaize-black-green.png",
         sameAs: [
           "https://github.com/supervaize",
@@ -87,11 +94,11 @@ const config: Config = {
     // Replace with your project's social card
     image: "img/supervaize-black-green.png",
     navbar: {
-      title: "supervaize",
+      title: "Runwaize",
       logo: {
-        alt: "Supervaize Logo",
-        src: "img/logo.svg",
-        srcDark: "img/logo-dark.svg",
+        alt: "Runwaize Logo",
+        src: "img/runwaize.svg",
+        srcDark: "img/runwaize.svg",
       },
       items: [
         {
@@ -107,6 +114,11 @@ const config: Config = {
           position: "left",
           label: "Supervaize Studio",
           activeBasePath: "/docs/supervaize-fleet",
+        },
+        {
+          href: "https://skills.runwaize.com/getting-started",
+          label: "The Skills Cookbook",
+          position: "left",
         },
         {
           type: "docSidebar",

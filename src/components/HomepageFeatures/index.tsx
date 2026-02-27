@@ -24,11 +24,10 @@ const FeatureList: FeatureItem[] = [
     ),
     description: (
       <>
-        The Supervaizer Controller is a powerful Python-based runtime that lets
-        you register, describe, and expose your AI agents to any A2A- or
-        ACP-compatible client. It handles lifecycle management, job execution,
-        agent cards, health checks, and telemetry—so developers can focus on the
-        logic while operations teams gain observability and control.
+        The Supervaizer Controller is a Python-based runtime that lets you
+        register, describe, and expose your AI agents to any A2A compatible
+        client. It is the too used for managing and operating AI agents in the
+        Supervaize Studio platform.
       </>
     ),
     link: "/docs/category/supervaizer-controller",
@@ -39,7 +38,7 @@ const FeatureList: FeatureItem[] = [
     Svg: () => (
       <img
         src="https://cdn.do.supervaize.com/products/supervaize-fleet.png"
-        alt="Supervaize Studio Management"
+        alt="Supervaize Studio "
         className={styles.featureSvg}
       />
     ),
