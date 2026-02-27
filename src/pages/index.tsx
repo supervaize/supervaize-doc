@@ -63,7 +63,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title={`${siteConfig.title} Documentation`}
-      description="Documentation for Supervaize"
+      description="Documentation for Runwaize"
     >
       <JsonLd data={jsonLd} />
       <HomepageHeader />

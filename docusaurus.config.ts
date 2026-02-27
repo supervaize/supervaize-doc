@@ -91,6 +91,10 @@ const config: Config = {
   ],
 
   themeConfig: {
+    colorMode: {
+      defaultMode: "dark",
+      respectPrefersColorScheme: false,
+    },
     // Replace with your project's social card
     image: "img/supervaize-black-green.png",
     navbar: {
@@ -146,6 +150,31 @@ const config: Config = {
             },
           ],
         },
+
+        {
+          title: "Runwaize",
+          items: [
+            {
+              label: "Runwaize",
+              href: "https://runwaize.com",
+            },
+            {
+              label: "Supervaize studio",
+              href: "https://app.supervaize.com",
+              icon: "app-store",
+            },
+            {
+              label: "Supervaizer controller",
+              href: "https://github.com/supervaize/supervaizer",
+              icon: "github",
+            },
+            {
+              label: "The Skills Cookbook",
+              href: "https://skills.runwaize.com",
+              icon: "book",
+            },
+          ],
+        },
         {
           title: "Community",
           items: [
@@ -159,21 +188,6 @@ const config: Config = {
               href: "https://www.linkedin.com/company/supervaize",
               icon: "linkedin",
             },
-          ],
-        },
-        {
-          title: "Supervaize",
-          items: [
-            {
-              label: "Supervaize",
-              href: "https://supervaize.com",
-            },
-          ],
-        },
-
-        {
-          title: "More",
-          items: [
             {
               label: "GitHub",
               href: "https://github.com/supervaize",
@@ -181,7 +195,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Supervaize.<br> <i>Built with Docusaurus - ${new Date().toISOString()}</i>`,
+      copyright: `Copyright © ${new Date().getFullYear()} Runwaize.<br> <i>Built with Docusaurus - ${new Date().toISOString()}</i>`,
     },
     prism: {
       theme: prismThemes.github,
