@@ -51,6 +51,21 @@ https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_contr
 
 [ParameterSetup Documentation](/docs/supervaizer-controller/model_reference/model_core#parameterparameterssetup)
 
+<details>
+<summary>**Prompt: Define agent parameters**</summary>
+
+```text
+In my supervaizer_control.py, define the agent parameters using ParametersSetup and Parameter from the supervaizer package.
+
+My agent needs the following configuration:
+- [Describe each parameter: name, description, whether it's an environment variable, whether it's a secret]
+
+Use ParametersSetup.from_list([...]) with Parameter objects.
+Set is_environment=True for env variables and is_secret=True for secrets.
+```
+
+</details>
+
 ## 2. Define agent methods {#2}
 
 Point Supervaizer to your agent's functions.
@@ -91,6 +106,27 @@ job_status = AgentMethod(
 
 [ParameterModel Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentmethodabstract)
 
+<details>
+<summary>**Prompt: Define agent methods**</summary>
+
+```text
+In my supervaizer_control.py, define the AgentMethod entries that wire Supervaizer to my agent's functions.
+
+My agent module is called [my_agent_module] and exposes these functions:
+- [function_name] for starting jobs
+- [function_name] for stopping jobs
+- [function_name] for checking status
+
+Create three AgentMethod objects:
+1. job_start with name="start", method="[my_agent_module].[start_function]", is_async=False, params and fields (fields will be defined next)
+2. job_stop with name="stop", method="[my_agent_module].[stop_function]", is_async=False
+3. job_status with name="status", method="[my_agent_module].[status_function]", is_async=False
+
+The "start" and "stop" and "status" method names are required by Supervaizer.
+```
+
+</details>
+
 ## 3. Define the fields of the AgentMethods {#3}
 
 The `fields` parameter defines the user input form that will be displayed in the Supervaize UI. Each field specifies what data users need to provide when calling your agent method.
@@ -105,6 +141,23 @@ https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_contr
 
 [AgentMethodField Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentmethodfield)
 
+<details>
+<summary>**Prompt: Define AgentMethod fields**</summary>
+
+```text
+In my supervaizer_control.py, define the AgentMethodField entries for the "start" method's fields parameter.
+
+These fields define the user input form displayed in the Supervaize UI when a job is launched.
+
+My start method needs the following user inputs:
+- [Field name, type (str/int/float/bool), field_type (CharField/IntegerField/TextField/BooleanField), required or optional]
+
+Create AgentMethodField objects and assign them to the fields=[] list of the job_start AgentMethod.
+Each field needs: name, type, field_type, and required.
+```
+
+</details>
+
 ## 4. Declare the agent {#4}
 
 The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
@@ -116,6 +169,26 @@ https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_contr
 **📖 See the model reference**
 
 [Agent Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentabstract)
+
+<details>
+<summary>**Prompt: Declare the agent**</summary>
+
+```text
+In my supervaizer_control.py, declare the Agent instance that registers my agent with Supervaizer.
+
+Use the following metadata:
+- name: [My Agent Name]
+- author: [Author Name <email>]
+- version: [version string, e.g. "1.0"]
+- description: [What the agent does]
+- tags: [list of tags for discovery, e.g. "automation", "data processing"]
+
+Generate a deterministic ID using shortuuid.uuid(name).
+Wire the previously defined methods using AgentMethods(job_start=..., job_stop=..., job_status=...).
+Attach the parameters_setup defined in step 1.
+```
+
+</details>
 
 ## 5.Setup the Supervaize Account and configure your Environment variables {#5}
 
@@ -136,6 +209,22 @@ https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_contr
 **📖 See the model reference**
 
 [Account Documentation](/docs/supervaizer-controller/model_reference/model_core#accountaccountabstract)
+
+<details>
+<summary>**Prompt: Setup the account**</summary>
+
+```text
+In my supervaizer_control.py, define the Supervaize Account using environment variables.
+
+Create an Account instance with:
+- workspace_id from SUPERVAIZE_WORKSPACE_ID env var (default to a dummy value)
+- api_key from SUPERVAIZE_API_KEY env var (default to a dummy value)
+- api_url from SUPERVAIZE_API_URL env var (default to "https://app.supervaize.com")
+
+Use os.getenv() with fallback defaults to prevent errors when env vars are missing.
+```
+
+</details>
 
 ## 6. Setup the Server {#6}
 
@@ -164,6 +253,27 @@ https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_contr
 ```
 
 See [Server Start 🚀](/docs/supervaizer-controller/quickstart#start) for CLI instructions
+
+<details>
+<summary>**Prompt: Setup the server**</summary>
+
+```text
+In my supervaizer_control.py, define the Server instance and the launch entry point.
+
+Create a Server with:
+- agents: list of my Agent instances defined in step 4
+- a2a_endpoints: True to enable A2A protocol discovery
+- supervisor_account: the Account instance defined in step 5
+
+Expose the FastAPI app for deployment:
+  app = sv_server.app
+
+Add the main entry point:
+  if __name__ == "__main__":
+      sv_server.launch(log_level="DEBUG")
+```
+
+</details>
 
 ## What's next?
 
