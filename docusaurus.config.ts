@@ -103,6 +103,8 @@ const config: Config = {
         alt: "Runwaize Logo",
         src: "img/runwaize.svg",
         srcDark: "img/runwaize.svg",
+        href: "https://www.runwaize.com",
+        target: "_self",
       },
       items: [
         {
