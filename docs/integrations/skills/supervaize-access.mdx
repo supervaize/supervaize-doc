@@ -37,20 +37,30 @@ The skill supports **three backends** because no single surface exposes everythi
 | **Supervaize MCP endpoint** | MCP tools like `get_case_status`, `report_case_start`, `report_case_step` |
 | **Supervaizer controller** | Actual job starts (`POST /job/start`) |
 
-## Setup
+## Install
 
-### 1. Add the skill files to your project
+### Via Claude Code Plugin Marketplace (Recommended)
 
-```bash
-# Clone the skills repository
-git clone https://github.com/runwaize/runwaize_skills.git /tmp/runwaize_skills
+Install directly from the Claude Code plugin marketplace:
 
-# Copy skill files into your project
-mkdir -p .claude/skills
-cp /tmp/runwaize_skills/supervaize_access/SKILL.md .claude/skills/supervaize-access.md
+```
+/plugin marketplace add runwaize/runwaize_skills
+/plugin install supervaize-access@runwaize-skills
 ```
 
-### 2. Set environment variables
+### Manual Installation
+
+Alternatively, clone the repository and point your coding agent to the skill definition:
+
+```bash
+git clone https://github.com/runwaize/runwaize_skills.git
+```
+
+Then load the `SKILL.md` file from `supervaize_access/SKILL.md` in your coding agent.
+
+## Setup
+
+### Set environment variables
 
 ```bash
 export SUPERVAIZE_API_KEY=...
@@ -129,7 +139,18 @@ Uses `ctrl-events` to aggregate job lifecycle events. Accuracy depends on agent 
 
 ### Skill does not appear in Claude Code
 
-Check that the skill file exists at `.claude/skills/supervaize-access.md`.
+Verify the plugin is installed:
+
+```
+/plugin list
+```
+
+If missing, reinstall:
+
+```
+/plugin marketplace add runwaize/runwaize_skills
+/plugin install supervaize-access@runwaize-skills
+```
 
 ### Authentication errors
 

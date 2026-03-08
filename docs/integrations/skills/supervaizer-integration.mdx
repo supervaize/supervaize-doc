@@ -49,35 +49,28 @@ You need:
 - A Python AI agent project (Python 3.12+)
 - A package manager: **uv** (recommended), **pip**, or **poetry**
 
-## Setup
+## Install
 
-### 1. Add the skill files to your project
+### Via Claude Code Plugin Marketplace (Recommended)
 
-Copy the skill files from the [runwaize_skills](https://github.com/runwaize/runwaize_skills) repository:
+Install directly from the Claude Code plugin marketplace:
+
+```
+/plugin marketplace add runwaize/runwaize_skills
+/plugin install supervaizer_integration
+```
+
+### Manual Installation
+
+Alternatively, clone the repository and point your coding agent to the skill definition:
 
 ```bash
-# Clone the skills repository
-git clone https://github.com/runwaize/runwaize_skills.git /tmp/runwaize_skills
-
-# Copy skill files into your project
-mkdir -p .claude/skills .claude/commands
-cp /tmp/runwaize_skills/supervaizer_integration/SKILL.md .claude/skills/supervaizer-integrate.md
+git clone https://github.com/runwaize/runwaize_skills.git
 ```
 
-### 2. (Optional) Add a CLAUDE.md
+Then load the `SKILL.md` file from `supervaizer_integration/SKILL.md` in your coding agent.
 
-If your project already has a `CLAUDE.md`, add this section so Claude Code discovers the skill automatically:
-
-```markdown
-## Skills
-
-### Supervaizer-integrate
-- **Trigger**: When user wants to integrate the Supervaizer Controller
-- **Command**: `/supervaizer-integrate`
-- **Location**: `.claude/skills/supervaizer-integrate.md`
-```
-
-### 3. Run the skill
+## Run the Skill
 
 Open Claude Code in your project directory:
 
@@ -373,7 +366,18 @@ The AI analyzes your specific code and adapts the generated files accordingly.
 
 ### Skill does not appear in Claude Code
 
-Check that the skill file exists at `.claude/skills/supervaizer-integrate.md`.
+Verify the plugin is installed:
+
+```
+/plugin list
+```
+
+If missing, reinstall:
+
+```
+/plugin marketplace add runwaize/runwaize_skills
+/plugin install supervaizer_integration
+```
 
 ### Import errors after generation
 
