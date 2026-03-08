@@ -197,7 +197,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Runwaize.<br> <i>Built with Docusaurus - ${new Date().toISOString()}</i>`,
+      copyright: `Copyright © ${new Date().getFullYear()} Runwaize.<br> <i>Built with Docusaurus - v${require('./package.json').version} - ${new Date().toISOString()}</i>`,
     },
     prism: {
       theme: prismThemes.github,
