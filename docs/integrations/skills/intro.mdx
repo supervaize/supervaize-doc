@@ -1,0 +1,48 @@
+---
+id: skills-intro
+title: Skills
+displayed_sidebar: integrationsSidebar
+---
+
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Skills
+
+Supervaize provides a set of **AI agent skills** — reusable instruction sets that chatbots like [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), Cursor, Codex, or Gemini CLI can load and follow to interact with the Supervaize ecosystem.
+
+All skills are hosted in the [<i className="bi bi-github"></i> runwaize_skills](https://github.com/runwaize/runwaize_skills) repository. Each subfolder is a self-contained skill.
+
+## Available Skills
+
+| Skill | Purpose | When to use |
+|---|---|---|
+| [**Supervaizer Integration**](supervaizer-integration) | Integrate an existing Python agent with the Supervaizer Controller | You have agent code and need Supervaizer instrumentation |
+| [**Supervaize Access**](supervaize-access) | Operate against an existing Supervaize workspace from a chatbot | Your workspace is live and you want to call/query it |
+
+## When to Use Which Skill
+
+```
+Agent code exists and needs Supervaizer instrumentation  →  supervaizer_integration
+Workspace is live and you want to call/query it          →  supervaize_access
+```
+
+## Common Environment Variables
+
+Both skills use these environment variables to connect to Supervaize:
+
+```bash
+export SUPERVAIZE_API_KEY=...
+export SUPERVAIZE_WORKSPACE_ID=team_1
+export SUPERVAIZE_API_URL=https://app.supervaize.com
+
+# Optional — for MCP / controller flows
+export SUPERVAIZE_MCP_URL=https://app.supervaize.com/w/team_1/api/mcp
+export SUPERVAIZE_CONTROLLER_URL=http://127.0.0.1:8000
+export CONTROLLER_AUTH_KEY=...
+```
+
+## Dependencies
+
+```bash
+pip install typer
+```

@@ -215,6 +215,18 @@ const sidebars: SidebarsConfig = {
       id: "skills-cookbook/intro",
       label: "Introduction",
     },
+    {
+      type: "category",
+      label: "Claude Code Skills",
+      collapsed: false,
+      items: [
+        {
+          type: "doc",
+          id: "skills-cookbook/claude-code-skill",
+          label: "Supervaizer Integration Skill",
+        },
+      ],
+    },
   ],
 
   // Integrations sidebar
@@ -228,6 +240,27 @@ const sidebars: SidebarsConfig = {
       type: "doc",
       id: "integrations/n8n-integration",
       label: "n8n Integration",
+    },
+    {
+      type: "category",
+      label: "Skills",
+      collapsed: false,
+      link: {
+        type: "doc",
+        id: "integrations/skills/skills-intro",
+      },
+      items: [
+        {
+          type: "doc",
+          id: "integrations/skills/supervaizer-integration",
+          label: "Supervaizer Integration",
+        },
+        {
+          type: "doc",
+          id: "integrations/skills/supervaize-access",
+          label: "Supervaize Access",
+        },
+      ],
     },
   ],
 };

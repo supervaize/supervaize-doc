@@ -1,0 +1,401 @@
+---
+id: supervaizer-integration
+title: Supervaizer Integration
+displayed_sidebar: integrationsSidebar
+---
+
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Supervaizer Integration
+
+**Repository**: [<i className="bi bi-github"></i> runwaize_skills/supervaizer_integration](https://github.com/runwaize/runwaize_skills/tree/main/supervaizer_integration)
+
+This skill integrates an **existing Python agent** with the Supervaizer Controller and Supervaize SaaS. The primary goal is to correctly map your agent's workflow to the Supervaizer model:
+
+| Concept | Meaning |
+|---|---|
+| **Job** | One end-to-end agent run |
+| **Case** | One repeated unit inside the job (email, phone number, document, lead, ...) |
+| **Step** | A meaningful stage inside a case — with or without human-in-the-loop |
+
+Once the mapping is defined, the skill generates and helps customize:
+
+- `supervaizer_control.py` — controller configuration (agent, methods, parameters, step nodes, server)
+- A **workflow adapter** file — bridges Supervaizer's calling convention to your existing agent logic (naming fits the project: `agent_impl.py`, `sv_main.py`, or a module inside the agent's package)
+- `.envrc_template` — environment variables for Supervaize platform and agent secrets
+- Optionally a separate `steps.py` for complex step node definitions
+
+:::tip Key Principle
+The most important integration decision is **semantic mapping**, not syntax. If the Job/Case/Step mapping is wrong, the controller code may run but the Supervaize UI and telemetry will be misleading.
+:::
+
+## How It Works
+
+The skill guides the AI through five phases:
+
+| Phase | What Happens |
+|---|---|
+| **1. Discovery** | Scans your project structure, analyzes agent code, identifies inputs/outputs/stages |
+| **2. Requirements** | Asks 6 question sets covering agent identity, cases & steps, data reporting, HITL, parameters, and job input fields — with smart defaults inferred from your code |
+| **3. Install** | Detects your package manager and installs `supervaizer` with dependencies (`fastapi`, `loguru`, `shortuuid`) |
+| **4. Generate** | Creates `supervaizer_control.py`, the workflow adapter, `.envrc_template`, and optionally `steps.py` — all customized to your agent |
+| **5. Validate** | Verifies the generated files compile and presents next steps |
+
+## Before You Start
+
+You need:
+
+- A chatbot with skill support — [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview), Cursor, Codex, or Gemini CLI
+- A Python AI agent project (Python 3.12+)
+- A package manager: **uv** (recommended), **pip**, or **poetry**
+
+## Setup
+
+### 1. Add the skill files to your project
+
+Copy the skill files from the [runwaize_skills](https://github.com/runwaize/runwaize_skills) repository:
+
+```bash
+# Clone the skills repository
+git clone https://github.com/runwaize/runwaize_skills.git /tmp/runwaize_skills
+
+# Copy skill files into your project
+mkdir -p .claude/skills .claude/commands
+cp /tmp/runwaize_skills/supervaizer_integration/SKILL.md .claude/skills/supervaizer-integrate.md
+```
+
+### 2. (Optional) Add a CLAUDE.md
+
+If your project already has a `CLAUDE.md`, add this section so Claude Code discovers the skill automatically:
+
+```markdown
+## Skills
+
+### Supervaizer-integrate
+- **Trigger**: When user wants to integrate the Supervaizer Controller
+- **Command**: `/supervaizer-integrate`
+- **Location**: `.claude/skills/supervaizer-integrate.md`
+```
+
+### 3. Run the skill
+
+Open Claude Code in your project directory:
+
+```bash
+claude
+```
+
+Then type:
+
+```
+/supervaizer-integrate
+```
+
+The AI begins by scanning your project and presents a summary of what it found.
+
+## Interactive Requirements Gathering
+
+The AI asks six sets of questions, pre-filling answers based on your code:
+
+### Agent Identity
+
+- Agent name and description (inferred from your code)
+- Author name and email
+- Version string
+- Tags for discoverability
+
+### Cases & Steps
+
+- What constitutes a single "case" in your workflow (e.g., "processing one phone call", "handling one email")
+- What are the distinct steps within each case (e.g., "1. Confirm action, 2. Execute, 3. Deliver result")
+- Whether the agent can process multiple cases in a single job
+
+### Data Reporting
+
+- What data to report at each step (input data, LLM tokens, intermediate results, final output, errors, custom metrics)
+- How costs should be calculated (LLM API costs, fixed per case, custom, or none)
+
+### Human-in-the-Loop
+
+- Whether any step requires human approval before proceeding
+- At which step(s) human approval should be requested
+- What form fields the human should see (Approved/Rejected, free text feedback, choice selection)
+- What information to show the human for their decision
+
+### Parameters & Secrets
+
+- API keys and secrets the agent needs (auto-detected from code: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.)
+- Configuration parameters settable from the Supervaize UI
+
+### Job Input Fields
+
+- What inputs users provide when starting a job (detected from your agent's function parameters)
+- For each field: name, type (`CharField`, `IntegerField`, `BooleanField`, `ChoiceField`, `MultipleChoiceField`, `JSONField`), required, description
+
+## Generated Files
+
+The skill generates files customized to your agent. It does **not** generate a `main.py` — your project's existing entry point is preserved.
+
+### `supervaizer_control.py` — Controller Configuration
+
+The central hub that defines the agent, its methods, parameters, step nodes, account, and server:
+
+```python
+from supervaizer import (
+    Agent, AgentMethods, Server, Account,
+    AgentMethod, CaseNode, CaseNodes, CaseNodeType,
+    ParametersSetup, Parameter,
+)
+
+# Step node declarations
+all_steps_start_method = CaseNodes(nodes=[
+    CaseNode(name="Step 1", node_type=CaseNodeType.STATUS_UPDATE, description="..."),
+    CaseNode(name="Step 2", node_type=CaseNodeType.DELIVERABLE, description="..."),
+    # CaseNode(name="Human Review", node_type=CaseNodeType.HITL, description="..."),
+])
+
+# Agent methods — targets point to the workflow adapter
+job_start_method = AgentMethod(
+    name="start",
+    method="agent_impl.job_start",  # <module>.<function>
+    nodes=all_steps_start_method,
+    fields=[...],  # Job input fields from Question Set 6
+)
+```
+
+The `method` string references `<module>.<function>` and should match your project structure:
+- `"agent_impl.job_start"` — flat adapter file
+- `"sv_main.process_email_workflow"` — alternative naming
+- `"callagen.call_agent.call_agent_start"` — function inside a package
+
+### Workflow Adapter — Job/Case/Step Logic
+
+This file bridges Supervaizer's calling convention to your existing agent logic. For **multi-case agents** (e.g., one case per phone number, per email):
+
+```python
+from supervaizer import Case, CaseNodeUpdate, JobContext, JobInstructions, JobResponse
+
+def process_case(case_id, job_id, item, **kwargs):
+    case = Case.start(job_id=job_id, account=supervaize_account, name=f"Case {case_id}")
+    case.update(CaseNodeUpdate(name="Step Name", cost=0.0, payload={...}, is_final=False))
+    # Call your existing agent logic here
+    case.close(case_result={...})
+    return case
+
+def job_start(**kwargs):
+    job_context: JobContext = kwargs.get("context", {})
+    job_instructions: JobInstructions | None = job_context.job_instructions
+    # job_instructions.check(cases=N, cost=X) enforces limits
+    for i, item in enumerate(items):
+        process_case(case_id=f"C{i+1}", job_id=job_context.job_id, item=item)
+```
+
+For **single-case agents** (e.g., one email per job):
+
+```python
+def job_start(fields=None, context=None, agent_parameters=None, **kwargs):
+    user_input = fields.get("input_text", "")
+    # Call your existing agent logic directly
+    return {"status": "completed", "result": result}
+```
+
+### `steps.py` — Step Definitions (Optional)
+
+For agents with complex step workflows, define step node factory functions in a separate file:
+
+```python
+from supervaizer import CaseNodeUpdate
+
+def confirm_action(item, **kwargs) -> CaseNodeUpdate:
+    return CaseNodeUpdate(
+        name=f"Confirm action for {item}",
+        cost=0.0,
+        payload={"item": item, "supervaizer_form": {...}},
+        is_final=False,
+    )
+```
+
+### `.envrc_template` — Environment Variables
+
+```bash
+# Supervaize platform credentials
+export SUPERVAIZE_API_URL=https://app.supervaize.com
+export SUPERVAIZE_API_KEY=GET_FROM_APP.SUPERVAIZE.COM
+export SUPERVAIZE_WORKSPACE_ID=your_workspace_slug
+
+# Controller server settings
+export SUPERVAIZER_HOST=localhost
+export SUPERVAIZER_PORT=8000
+export SUPERVAIZER_SCHEME=http
+export SUPERVAIZER_PUBLIC_URL=http://localhost:8000
+export SUPERVAIZER_SERVER_ID=TBD
+export SUPERVAIZER_PRIVATE_KEY=TBD
+
+# Agent-specific secrets (auto-detected from your code)
+# export OPENAI_API_KEY=...
+```
+
+## Reference Integrations
+
+These real-world projects show different integration patterns:
+
+| Project | Pattern | Highlights |
+|---|---|---|
+| [<i className="bi bi-github"></i> Callagen](https://github.com/alain-sv/callagen) | Multi-case with HITL | One Case per phone number; steps: confirm, call, monitor, validate, retry |
+| [<i className="bi bi-github"></i> Email AI Agent](https://github.com/alain-sv/Email-AI-Agent) | Single case, LangGraph | One Case per email; steps: filter, summarize, respond |
+
+## Helper CLI
+
+The skill includes an optional Typer-based CLI helper for automated analysis and scaffolding:
+
+```bash
+# Print discovery questions
+python scripts/supervaize_cli_helper.py questions --pretty
+
+# Analyze agent for entrypoints and loops
+python scripts/supervaize_cli_helper.py analyze-agent \
+  --project-root /path/to/your-agent --pretty
+
+# Interactive wizard to create an integration spec
+python scripts/supervaize_cli_helper.py wizard \
+  --output-file integration_spec.json --pretty
+
+# Generate spec template
+python scripts/supervaize_cli_helper.py spec-template \
+  --output-file integration_spec.json --pretty
+
+# Scaffold controller files from spec
+python scripts/supervaize_cli_helper.py scaffold-integration \
+  --spec-file integration_spec.json \
+  --output-dir /path/to/your-agent --force --pretty
+
+# Check env vars
+python scripts/supervaize_cli_helper.py env-status --pretty
+
+# Discover controller routes
+python scripts/supervaize_cli_helper.py discover-controller \
+  --controller-url http://127.0.0.1:8000 --pretty
+
+# Trigger a test job (dry-run)
+python scripts/supervaize_cli_helper.py trigger-job \
+  --controller-url http://127.0.0.1:8000 \
+  --agent-name my_agent --agent-method start \
+  --user-id local-test \
+  --params-json '{"fields":{"input_text":"hello"}}' \
+  --dry-run --pretty
+```
+
+## Human-in-the-Loop Support
+
+If you enable HITL during setup, the skill generates:
+
+- A `human_answer` agent method in `supervaizer_control.py`
+- Step nodes with `CaseNodeType.HITL` type
+- A `handle_human_input()` function in the workflow adapter
+- Form field definitions for the Supervaize UI
+- Case pause/resume logic that waits for human input
+
+The HITL pattern uses `supervaizer_form` payloads:
+
+```python
+case.request_human_input(
+    CaseNodeUpdate(
+        name="Human Review",
+        cost=0.0,
+        payload={
+            "supervaizer_form": {
+                "question": "Review and approve this case",
+                "answer": {
+                    "fields": [
+                        {"name": "Approved", "type": bool, "field_type": "BooleanField", "required": False},
+                        {"name": "Feedback", "type": str, "field_type": "CharField", "required": False},
+                    ]
+                }
+            }
+        },
+        is_final=False,
+    ),
+    "Please review and approve.",
+)
+# Later: response = case.receive_human_input()
+```
+
+The workflow:
+
+1. Agent reaches a HITL step and pauses the case
+2. Supervaize shows a form to the human operator
+3. The operator submits their decision
+4. The agent resumes and processes the response
+
+## After Integration
+
+Once the files are generated:
+
+1. [Create your developer account](/docs/supervaize-fleet/developer-account#getting_started) on Supervaize
+2. Generate an API key and get your workspace ID
+3. Copy `.envrc_template` to `.envrc` and fill in your credentials
+4. Start the server:
+
+```bash
+supervaizer start
+# or: python supervaizer_control.py
+```
+
+5. Verify the endpoints:
+   - **API docs**: `http://localhost:8000/docs`
+   - **A2A discovery**: `http://localhost:8000/.well-known/agents.json`
+   - **Admin interface**: `http://localhost:8000/admin`
+
+6. For production deployment: `supervaizer deploy up` or see the [Cloud Deployment Guide](/docs/supervaizer-controller/deploy)
+
+## Supported Agent Frameworks
+
+The skill works with any Python AI agent, including:
+
+- **LangChain** / **LangGraph**
+- **CrewAI**
+- **AutoGen**
+- **OpenAI SDK**
+- **Anthropic SDK**
+- Custom Python agents
+
+The AI analyzes your specific code and adapts the generated files accordingly.
+
+## Best Practices
+
+- Run the skill on a **clean branch** so you can review the generated files before merging
+- Start with the **simplest configuration** (no HITL, single case) and add complexity later
+- Keep your original agent code **unchanged** — the generated files wrap it, they don't modify it
+- Use **uv** for faster dependency management
+- The generated scaffolds are a **structured starting point** — you must still customize the case processing logic, field parsing, HITL steps, and case payloads
+
+## Troubleshooting
+
+### Skill does not appear in Claude Code
+
+Check that the skill file exists at `.claude/skills/supervaizer-integrate.md`.
+
+### Import errors after generation
+
+```bash
+python -c "import supervaizer_control"
+```
+
+Common fixes:
+- Activate your virtual environment
+- Run `pip list | grep supervaizer` to confirm installation
+
+### Agent does not register with Supervaize
+
+1. Verify environment variables in `.envrc` are set (`SUPERVAIZE_API_KEY`, `SUPERVAIZE_WORKSPACE_ID`)
+2. For local development, set up [tunneling](/docs/supervaizer-controller/tunneling-setup) so Supervaize can reach your agent
+3. Check the server logs for registration errors
+
+## Reference
+
+- [<i className="bi bi-github"></i> runwaize_skills](https://github.com/runwaize/runwaize_skills) — all skills repository
+- [<i className="bi bi-github"></i> Supervaizer package](https://github.com/supervaize/supervaizer) — the Python SDK
+- [Controller Setup Guide](/docs/supervaizer-controller/controller-setup) — manual setup reference
+- [Application Flow Control](/docs/supervaizer-controller/application-flow-control) — cases, steps, and HITL details
+- [Core Concepts](/docs/supervaizer-controller/core-concepts) — entity hierarchy and mental model
+- [Skills Cookbook: Supervaizer Integration Skill](/docs/skills-cookbook/claude-code-skill) — detailed skill architecture and phase breakdown

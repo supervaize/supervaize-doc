@@ -1,0 +1,143 @@
+---
+id: supervaize-access
+title: Supervaize Access
+displayed_sidebar: integrationsSidebar
+---
+
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Supervaize Access
+
+**Repository**: [<i className="bi bi-github"></i> runwaize_skills/supervaize_access](https://github.com/runwaize/runwaize_skills/tree/main/supervaize_access)
+
+This skill lets a chatbot or CLI agent **operate against an existing Supervaize workspace**. It maps natural-language commands to REST / MCP / controller calls.
+
+:::info When to use
+Use this skill when your workspace is live and you want to call or query it from a chatbot — registering agents, creating missions, starting jobs, or inspecting cases and steps.
+:::
+
+## Supported Commands
+
+| Phrase | Command |
+|---|---|
+| "Register to supervaize" | `register-to-supervaize` |
+| "Create a mission" | `create-mission` |
+| "Start a job" | `start-job` |
+| "View cases / steps" | `view-cases-steps` |
+| "Show missions for this agent" | `show-missions-for-agent` |
+| "Job status for this agent" | `job-status-for-agent` |
+
+## Backends
+
+The skill supports **three backends** because no single surface exposes everything:
+
+| Backend | Best for |
+|---|---|
+| **Supervaize SaaS REST API** | Teams, agents, missions, controller events |
+| **Supervaize MCP endpoint** | MCP tools like `get_case_status`, `report_case_start`, `report_case_step` |
+| **Supervaizer controller** | Actual job starts (`POST /job/start`) |
+
+## Setup
+
+### 1. Add the skill files to your project
+
+```bash
+# Clone the skills repository
+git clone https://github.com/runwaize/runwaize_skills.git /tmp/runwaize_skills
+
+# Copy skill files into your project
+mkdir -p .claude/skills
+cp /tmp/runwaize_skills/supervaize_access/SKILL.md .claude/skills/supervaize-access.md
+```
+
+### 2. Set environment variables
+
+```bash
+export SUPERVAIZE_API_KEY=...
+export SUPERVAIZE_WORKSPACE_ID=team_1
+export SUPERVAIZE_API_URL=https://app.supervaize.com
+
+# Optional — for MCP / controller flows
+export SUPERVAIZE_MCP_URL=https://app.supervaize.com/w/team_1/api/mcp
+export SUPERVAIZE_CONTROLLER_URL=http://127.0.0.1:8000
+export CONTROLLER_AUTH_KEY=...
+```
+
+### 3. Register the chatbot session
+
+Before running commands, register with your workspace:
+
+```bash
+python scripts/supervaize_access_helper.py register-to-supervaize --pretty
+```
+
+This validates your credentials and stores a local profile for later commands.
+
+## Command Details
+
+### `register-to-supervaize`
+
+Use first. Validates API key + workspace and saves a local profile.
+
+### `create-mission`
+
+Creates a mission through the SaaS REST API.
+
+```bash
+python scripts/supervaize_access_helper.py create-mission \
+  --name "Outbound Follow-up" \
+  --description "Q1 sales follow-up campaign" \
+  --status draft --pretty
+```
+
+### `start-job`
+
+Use `--backend controller` for real job starts. The current public API/MCP surfaces do not expose a generic job-start endpoint.
+
+```bash
+python scripts/supervaize_access_helper.py start-job \
+  --backend controller \
+  --agent-name my_agent \
+  --agent-method start \
+  --user-id cli-user \
+  --params-json '{"fields":{"prompt":"Hello"}}' --pretty
+```
+
+### `view-cases-steps`
+
+View case and step details using one of these modes:
+
+```bash
+# Via REST API — reads ctrl-events and reconstructs case/step activity
+python scripts/supervaize_access_helper.py view-cases-steps \
+  --backend api --job-id 01H... --pretty
+
+# Via MCP — calls get_case_status for a known execution_id
+python scripts/supervaize_access_helper.py view-cases-steps \
+  --backend mcp --execution-id n8n-exec-123 --pretty
+```
+
+### `show-missions-for-agent`
+
+Queries missions linked to a specific agent. If the mission-agent relation is not included in API responses, the helper returns a structured explanation.
+
+### `job-status-for-agent`
+
+Uses `ctrl-events` to aggregate job lifecycle events. Accuracy depends on agent identifiers being present in event source/details.
+
+## Troubleshooting
+
+### Skill does not appear in Claude Code
+
+Check that the skill file exists at `.claude/skills/supervaize-access.md`.
+
+### Authentication errors
+
+1. Verify `SUPERVAIZE_API_KEY` is set and valid
+2. Verify `SUPERVAIZE_WORKSPACE_ID` matches your workspace slug
+3. Re-run `register-to-supervaize` to refresh the local profile
+
+## Reference
+
+- [<i className="bi bi-github"></i> runwaize_skills](https://github.com/runwaize/runwaize_skills) — all skills repository
+- [<i className="bi bi-github"></i> Supervaizer package](https://github.com/supervaize/supervaizer) — the Python SDK
