@@ -40,7 +40,7 @@ Clone the Hello World repository to get the skill files, then copy them into you
 
 ```bash title="Copy skill files from hello_world"
 # Clone the reference project (if you haven't already)
-git clone https://github.com/supervaize/supervaize_hello_world.git /tmp/supervaize_hello_world
+git clone https://github.com/runwaize/supervaize_hello_world.git /tmp/supervaize_hello_world
 
 # Copy the skill files into your project
 mkdir -p .claude/skills .claude/commands
@@ -49,6 +49,7 @@ cp /tmp/supervaize_hello_world/.claude/commands/supervaizer-integrate.md .claude
 ```
 
 You should now have:
+
 ```
 your-project/
 ├── .claude/
@@ -85,6 +86,7 @@ The skill runs through **five phases** — each one builds on the previous:
 ### Phase 1 — Project Discovery
 
 Claude scans your project to understand:
+
 - **Package manager** — uv, pip, or poetry
 - **Web framework** — FastAPI, Flask, or none
 - **Agent type** — LangChain, CrewAI, OpenAI SDK, Anthropic SDK, or custom
@@ -109,14 +111,14 @@ Project Analysis:
 
 Claude asks targeted questions with pre-filled suggestions based on your code:
 
-| Question Set | What It Covers | Example |
-|---|---|---|
-| **Agent Identity** | Name, description, author, version, tags | `"Support Ticket Agent"`, `v1.0.0` |
-| **Cases & Steps** | What constitutes a "case" and its steps | `"One case = one ticket"` with 3 steps |
-| **Data Reporting** | What data to report at each step | Token usage, intermediate results, costs |
-| **Human-in-the-Loop** | Whether any step needs human approval | `"Step 3: Review response before sending"` |
-| **Parameters & Secrets** | API keys and configuration variables | `OPENAI_API_KEY`, `SUPPORT_DB_URL` |
-| **Job Input Fields** | User-facing inputs when starting a job | `ticket_id (CharField)`, `priority (ChoiceField)` |
+| Question Set             | What It Covers                           | Example                                           |
+| ------------------------ | ---------------------------------------- | ------------------------------------------------- |
+| **Agent Identity**       | Name, description, author, version, tags | `"Support Ticket Agent"`, `v1.0.0`                |
+| **Cases & Steps**        | What constitutes a "case" and its steps  | `"One case = one ticket"` with 3 steps            |
+| **Data Reporting**       | What data to report at each step         | Token usage, intermediate results, costs          |
+| **Human-in-the-Loop**    | Whether any step needs human approval    | `"Step 3: Review response before sending"`        |
+| **Parameters & Secrets** | API keys and configuration variables     | `OPENAI_API_KEY`, `SUPPORT_DB_URL`                |
+| **Job Input Fields**     | User-facing inputs when starting a job   | `ticket_id (CharField)`, `priority (ChoiceField)` |
 
 :::info Smart defaults
 Claude infers most answers from your code. You only need to confirm or adjust — not start from scratch.
@@ -155,15 +157,16 @@ poetry add supervaizer fastapi loguru shortuuid
 
 Claude generates five files, fully customized to your agent:
 
-| File | Purpose |
-|---|---|
+| File                     | Purpose                                                             |
+| ------------------------ | ------------------------------------------------------------------- |
 | `supervaizer_control.py` | Central controller — parameters, methods, agent declaration, server |
-| `agent_impl.py` | Job/case/step lifecycle — wraps your existing agent logic |
-| `__init__.py` | Shared account export |
-| `.envrc_template` | Environment variable template |
-| `main.py` | FastAPI entry point |
+| `agent_impl.py`          | Job/case/step lifecycle — wraps your existing agent logic           |
+| `__init__.py`            | Shared account export                                               |
+| `.envrc_template`        | Environment variable template                                       |
+| `main.py`                | FastAPI entry point                                                 |
 
 Each file is generated with your specific:
+
 - Agent name, description, and metadata
 - Cases and steps mapped to your workflow
 - Data reporting payloads for each step
@@ -251,6 +254,7 @@ If your project already has a `CLAUDE.md`, add the skill reference so Claude Cod
 ## Skills
 
 ### Supervaizer-integrate
+
 - **Trigger**: When user wants to integrate the Supervaizer Controller
 - **Command**: `/supervaizer-integrate`
 - **Location**: `.claude/skills/supervaizer-integrate.md`
@@ -261,17 +265,20 @@ If your project already has a `CLAUDE.md`, add the skill reference so Claude Cod
 ### The skill doesn't appear in Claude Code
 
 Ensure the files are in the correct locations:
+
 - `.claude/skills/supervaizer-integrate.md` — the full skill instructions
 - `.claude/commands/supervaizer-integrate.md` — the slash command trigger
 
 ### Import errors after generation
 
 Run the validation step manually:
+
 ```bash
 python -c "import supervaizer_control"
 ```
 
 Common fixes:
+
 - Ensure your virtual environment is activated
 - Check that all dependencies are installed: `pip list | grep supervaizer`
 - Verify the `__init__.py` exports the account object correctly
@@ -296,7 +303,7 @@ Common fixes:
 
 ## Reference
 
-- **Skill source**: [supervaize_hello_world/.claude/skills](https://github.com/supervaize/supervaize_hello_world/tree/main/.claude/skills)
-- **Hello World example**: [supervaize/supervaize_hello_world](https://github.com/supervaize/supervaize_hello_world)
-- **Supervaizer package**: [supervaize/supervaizer](https://github.com/supervaize/supervaizer)
+- **Skill source**: [supervaize_hello_world/.claude/skills](https://github.com/runwaize/supervaize_hello_world/tree/main/.claude/skills)
+- **Hello World example**: [supervaize/supervaize_hello_world](https://github.com/runwaize/supervaize_hello_world)
+- **Supervaizer package**: [supervaize/supervaizer](https://github.com/runwaize/supervaizer)
 - **Claude Code docs**: [docs.anthropic.com/claude-code](https://docs.anthropic.com/en/docs/claude-code/overview)

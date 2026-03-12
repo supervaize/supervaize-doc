@@ -9,23 +9,23 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 # Supervaize Access
 
-**Repository**: [<i className="bi bi-github"></i> runwaize_skills/supervaize_access](https://github.com/supervaize/runwaize_skills/tree/main/supervaize_access)
+**Repository**: [<i className="bi bi-github"></i> runwaize_skills/supervaize_access](https://github.com/runwaize/runwaize_skills/tree/main/supervaize_access)
 
 This skill is for **Supervaize users** (customers). Install it so your AI assistant (Cursor, Claude CLI, Codex, etc.) can manage your Supervaize workspace with your API key: list and edit agents, create and manage missions, and use case/step and human-in-the-loop (HITL) via the REST API and MCP server. Permissions follow your team membership and role (read-only users cannot perform write operations).
 
 :::info When to use
-Use this skill when the user wants a chatbot or IDE agent to **operate against an existing Supervaize workspace** — registering with an API key, creating missions, starting jobs (via controller when available), or inspecting cases and steps.
+Use this skill when the user wants a chatbot or IDE agent to **operate against an existing Supervaize workspace** — registering with an API key, creating missions, or inspecting cases and steps via the REST API and MCP.
 :::
 
-This is a **separate skill** from **Supervaizer Integration** (which adds controller instrumentation to a custom Python agent). Supervaize Access = use Supervaize APIs/MCP from a chatbot/IDE after credentials and workspace are known.
+This is a **separate skill** from **Supervaizer Integration** (which adds Supervaizer instrumentation to a custom agent). Supervaize Access uses **REST API and MCP only** from a chatbot/IDE after credentials and workspace are known.
 
 ---
 
 ## Overview (REST + MCP)
 
-| Surface | URL / scope | Capabilities |
-|--------|-------------|--------------|
-| **REST API** | `{base_url}/w/{team_slug}/api/v1/` | Full CRUD for **agents** and **missions**. Auth: `Api-Key: <key>`. |
+| Surface        | URL / scope                                                     | Capabilities                                                                                                                                                                                                                                        |
+| -------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **REST API**   | `{base_url}/w/{team_slug}/api/v1/`                              | Full CRUD for **agents** and **missions**. Auth: `Api-Key: <key>`.                                                                                                                                                                                  |
 | **MCP server** | `{base_url}/api/mcp/` (root-level; not under `/w/{team_slug}/`) | Case/step reporting and HITL. Same API key or Bearer (e.g. n8n). Tools: `report_case_start`, `report_case_step`, `request_human_input`, `get_case_status`, `report_case_status`, `register_agent_parameters`. All require `team_slug` in arguments. |
 
 **Permissions**: The key’s user must be a **member** of the workspace. **Read-only** members can call read-only endpoints/tools only; write operations return a permission error.
@@ -61,22 +61,22 @@ For request/response fields, see the OpenAPI schema at `{base_url}/api/doc` or `
 - **Endpoint**: `https://<your-studio>/api/mcp/` (root-level; no `/w/...` in path).
 - **Authentication**: Same `Api-Key` header, or Bearer token for n8n-linked workflows.
 
-| Tool | Purpose |
-|------|---------|
-| `report_case_start` | Create a case for a job (job_id, execution_id, team_slug) |
-| `report_case_step` | Create or update a case step |
-| `request_human_input` | Create a human-in-the-loop step (case set to awaiting) |
-| `get_case_status` | Get case status by execution_id |
-| `report_case_status` | Update case status (e.g. completed, failed) |
-| `register_agent_parameters` | Register n8n workflow parameters for an agent |
+| Tool                        | Purpose                                                   |
+| --------------------------- | --------------------------------------------------------- |
+| `report_case_start`         | Create a case for a job (job_id, execution_id, team_slug) |
+| `report_case_step`          | Create or update a case step                              |
+| `request_human_input`       | Create a human-in-the-loop step (case set to awaiting)    |
+| `get_case_status`           | Get case status by execution_id                           |
+| `report_case_status`        | Update case status (e.g. completed, failed)               |
+| `register_agent_parameters` | Register n8n workflow parameters for an agent             |
 
-Use the MCP protocol (initialize, tools/list, tools/call) over HTTP. For full tool schemas and required arguments, see `reference.md` in the [supervaize_access](https://github.com/supervaize/runwaize_skills/tree/main/supervaize_access) skill in runwaize_skills.
+Use the MCP protocol (initialize, tools/list, tools/call) over HTTP. For full tool schemas and required arguments, see `reference.md` in the [supervaize_access](https://github.com/runwaize/runwaize_skills/tree/main/supervaize_access) skill in runwaize_skills.
 
 ---
 
 ## Install
 
-Install the skill from the [runwaize_skills](https://github.com/supervaize/runwaize_skills) repo so your AI agent can operate against your workspace.
+Install the skill from the [runwaize_skills](https://github.com/runwaize/runwaize_skills) repo so your AI agent can operate against your workspace.
 
 - **Cursor**: Copy the `supervaize_access` folder into your project `.cursor/skills/` or user skills folder.
 - **Claude Code**: Copy or symlink the same folder to `~/.claude/skills/supervaize_access/` (or your project’s `.claude/skills/`).
@@ -91,15 +91,6 @@ Install the skill from the [runwaize_skills](https://github.com/supervaize/runwa
 export SUPERVAIZE_API_KEY=...
 export SUPERVAIZE_WORKSPACE_ID=team_1
 export SUPERVAIZE_API_URL=https://app.supervaize.com
-```
-
-### Optional (MCP / controller flows)
-
-```bash
-# MCP is at root; no /w/team_slug in path
-export SUPERVAIZE_MCP_URL=https://app.supervaize.com/api/mcp
-export SUPERVAIZE_CONTROLLER_URL=http://127.0.0.1:8000
-export CONTROLLER_AUTH_KEY=...
 ```
 
 ### Register the session first
@@ -118,28 +109,27 @@ This stores a local profile for later commands.
 
 The skill maps natural-language phrases to helper commands:
 
-| Phrase | Command |
-|--------|---------|
-| "Register to supervaize" | `register-to-supervaize` |
-| "Create a mission" | `create-mission` |
-| "Start a job" | `start-job` |
-| "View case(s) / step(s)" | `view-cases-steps` |
-| "Show the missions for this agent" | `show-missions-for-agent` |
-| "What is the status of the jobs for this agent" | `job-status-for-agent` |
+| Phrase                                          | Command                                     |
+| ----------------------------------------------- | ------------------------------------------- |
+| "Register to supervaize"                        | `register-to-supervaize`                    |
+| "Create a mission"                              | `create-mission`                            |
+| "Start a job"                                   | `start-job` (returns limitation; see below) |
+| "View case(s) / step(s)"                        | `view-cases-steps`                          |
+| "Show the missions for this agent"              | `show-missions-for-agent`                   |
+| "What is the status of the jobs for this agent" | `job-status-for-agent`                      |
 
 ---
 
 ## Backends and limits
 
-The helper supports **three backends** because no single surface exposes everything:
+The helper uses **REST API and MCP only**:
 
-| Backend | Use for |
-|---------|---------|
-| **Supervaize SaaS REST API** | Teams, agents, missions, controller events (`ctrl-events`) |
+| Backend                                             | Use for                                                                                                                                         |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Supervaize SaaS REST API**                        | Teams, agents, missions, controller events (`ctrl-events`)                                                                                      |
 | **Supervaize MCP endpoint** (`{base_url}/api/mcp/`) | MCP tools: `get_case_status`, `report_case_start`, `report_case_step`, `request_human_input`, `report_case_status`, `register_agent_parameters` |
-| **Supervaizer controller** | Actual job start (`POST /job/start`) when available |
 
-Current public API limitation: no public generic `/jobs` or `/cases`/`/steps` REST endpoints in the spec. When a command cannot be fulfilled from the current REST/MCP surfaces, the helper returns a **structured explanation** instead of guessing.
+Current public API limitation: no public generic `/jobs` or `/cases`/`/steps` REST endpoints in the spec. Job start is not exposed via REST or MCP. When a command cannot be fulfilled from the current surfaces, the helper returns a **structured explanation** (e.g. for `start-job`) with suggestions.
 
 ---
 
@@ -163,16 +153,10 @@ python scripts/supervaize_access_helper.py create-mission \
 
 ### `start-job`
 
-Use `--backend controller` for real job starts. The current public OpenAPI and MCP do not expose a generic job-start endpoint.
+Job start is **not exposed** via the public REST API or MCP. The command returns a structured limitation and suggestions (e.g. use the Studio UI or the **Supervaizer Integration** skill for agent-side job starts).
 
 ```bash
-python scripts/supervaize_access_helper.py start-job \
-  --backend controller \
-  --agent-name my_agent \
-  --agent-method start \
-  --user-id cli-user \
-  --params-json '{"fields":{"prompt":"Hello"}}' \
-  --pretty
+python scripts/supervaize_access_helper.py start-job --pretty
 ```
 
 ### `view-cases-steps`
@@ -197,8 +181,6 @@ Uses `ctrl-events` to aggregate job lifecycle events (best effort). Accuracy dep
 
 ## References
 
-- **REST paths and MCP tool args**: [reference.md](https://github.com/supervaize/runwaize_skills/blob/main/supervaize_access/reference.md) in the supervaize_access skill.
-- **Studio Workspace API**: [Workspace API](https://github.com/supervaize/studio/blob/main/Documentation/workspace_api.md) in the Supervaize Studio repo.
-- **OpenAPI**: `{base_url}/api/doc`, `{base_url}/api/doc/swagger-ui/`, `{base_url}/api/doc/redoc/`
+- **REST paths and MCP tool args**: [reference.md](https://github.com/runwaize/runwaize_skills/blob/main/supervaize_access/reference.md) in the supervaize_access skill.
 - [Supervaizer Integration](/docs/integrations/skills/supervaizer-integration) — add controller instrumentation to a custom Python agent.
 - [n8n Integration](/docs/integrations/n8n-integration) — use n8n workflows as agents.

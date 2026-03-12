@@ -49,7 +49,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/supervaize/supervaize-doc/blob/main/",
+          editUrl: "https://github.com/runwaize/supervaize-doc/blob/main/",
         },
         blog: false,
         theme: {
@@ -83,7 +83,7 @@ const config: Config = {
         url: "https://runwaize.com",
         logo: "https://doc.supervaize.com/img/supervaize-black-green.png",
         sameAs: [
-          "https://github.com/supervaize",
+          "https://github.com/runwaize",
           "https://www.linkedin.com/company/supervaize",
         ],
       }),
@@ -134,7 +134,7 @@ const config: Config = {
           position: "left",
         },
         {
-          href: "https://github.com/supervaize",
+          href: "https://github.com/runwaize",
           label: "GitHub",
           position: "right",
         },
@@ -167,7 +167,7 @@ const config: Config = {
             },
             {
               label: "Supervaizer controller",
-              href: "https://github.com/supervaize/supervaizer",
+              href: "https://github.com/runwaize/supervaizer",
               icon: "github",
             },
             {
@@ -192,12 +192,12 @@ const config: Config = {
             },
             {
               label: "GitHub",
-              href: "https://github.com/supervaize",
+              href: "https://github.com/runwaize",
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Runwaize.<br> <i>Built with Docusaurus - v${require('./package.json').version} - ${new Date().toISOString()}</i>`,
+      copyright: `Copyright © ${new Date().getFullYear()} Runwaize.<br> <i>Built with Docusaurus - v${require("./package.json").version} - ${new Date().toISOString()}</i>`,
     },
     prism: {
       theme: prismThemes.github,

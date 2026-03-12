@@ -12,11 +12,11 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 This skill integrates an **existing Python agent** with the Supervaizer Controller and Supervaize SaaS. The primary goal is to correctly map your agent's workflow to the Supervaizer model:
 
-| Concept | Meaning |
-|---|---|
-| **Job** | One end-to-end agent run |
+| Concept  | Meaning                                                                     |
+| -------- | --------------------------------------------------------------------------- |
+| **Job**  | One end-to-end agent run                                                    |
 | **Case** | One repeated unit inside the job (email, phone number, document, lead, ...) |
-| **Step** | A meaningful stage inside a case — with or without human-in-the-loop |
+| **Step** | A meaningful stage inside a case — with or without human-in-the-loop        |
 
 Once the mapping is defined, the skill generates and helps customize:
 
@@ -33,13 +33,13 @@ The most important integration decision is **semantic mapping**, not syntax. If 
 
 The skill guides the AI through five phases:
 
-| Phase | What Happens |
-|---|---|
-| **1. Discovery** | Scans your project structure, analyzes agent code, identifies inputs/outputs/stages |
+| Phase               | What Happens                                                                                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Discovery**    | Scans your project structure, analyzes agent code, identifies inputs/outputs/stages                                                                               |
 | **2. Requirements** | Asks 6 question sets covering agent identity, cases & steps, data reporting, HITL, parameters, and job input fields — with smart defaults inferred from your code |
-| **3. Install** | Detects your package manager and installs `supervaizer` with dependencies (`fastapi`, `loguru`, `shortuuid`) |
-| **4. Generate** | Creates `supervaizer_control.py`, the workflow adapter, `.envrc_template`, and optionally `steps.py` — all customized to your agent |
-| **5. Validate** | Verifies the generated files compile and presents next steps |
+| **3. Install**      | Detects your package manager and installs `supervaizer` with dependencies (`fastapi`, `loguru`, `shortuuid`)                                                      |
+| **4. Generate**     | Creates `supervaizer_control.py`, the workflow adapter, `.envrc_template`, and optionally `steps.py` — all customized to your agent                               |
+| **5. Validate**     | Verifies the generated files compile and presents next steps                                                                                                      |
 
 ## Before You Start
 
@@ -157,6 +157,7 @@ job_start_method = AgentMethod(
 ```
 
 The `method` string references `<module>.<function>` and should match your project structure:
+
 - `"agent_impl.job_start"` — flat adapter file
 - `"sv_main.process_email_workflow"` — alternative naming
 - `"callagen.call_agent.call_agent_start"` — function inside a package
@@ -232,10 +233,10 @@ export SUPERVAIZER_PRIVATE_KEY=TBD
 
 These real-world projects show different integration patterns:
 
-| Project | Pattern | Highlights |
-|---|---|---|
-| [<i className="bi bi-github"></i> Callagen](https://github.com/alain-sv/callagen) | Multi-case with HITL | One Case per phone number; steps: confirm, call, monitor, validate, retry |
-| [<i className="bi bi-github"></i> Email AI Agent](https://github.com/alain-sv/Email-AI-Agent) | Single case, LangGraph | One Case per email; steps: filter, summarize, respond |
+| Project                                                                                       | Pattern                | Highlights                                                                |
+| --------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------- |
+| [<i className="bi bi-github"></i> Callagen](https://github.com/alain-sv/callagen)             | Multi-case with HITL   | One Case per phone number; steps: confirm, call, monitor, validate, retry |
+| [<i className="bi bi-github"></i> Email AI Agent](https://github.com/alain-sv/Email-AI-Agent) | Single case, LangGraph | One Case per email; steps: filter, summarize, respond                     |
 
 ## Helper CLI
 
@@ -386,6 +387,7 @@ python -c "import supervaizer_control"
 ```
 
 Common fixes:
+
 - Activate your virtual environment
 - Run `pip list | grep supervaizer` to confirm installation
 
@@ -398,7 +400,7 @@ Common fixes:
 ## Reference
 
 - [<i className="bi bi-github"></i> runwaize_skills](https://github.com/runwaize/runwaize_skills) — all skills repository
-- [<i className="bi bi-github"></i> Supervaizer package](https://github.com/supervaize/supervaizer) — the Python SDK
+- [<i className="bi bi-github"></i> Supervaizer package](https://github.com/runwaize/supervaizer) — the Python SDK
 - [Controller Setup Guide](/docs/supervaizer-controller/controller-setup) — manual setup reference
 - [Application Flow Control](/docs/supervaizer-controller/application-flow-control) — cases, steps, and HITL details
 - [Core Concepts](/docs/supervaizer-controller/core-concepts) — entity hierarchy and mental model

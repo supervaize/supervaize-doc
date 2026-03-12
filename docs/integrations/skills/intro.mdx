@@ -11,7 +11,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 Agent skills for the [Runwaize](https://runwaize.com) ecosystem. Each skill is a self-contained instruction set that a coding agent (Claude Code, Cursor, Codex, Gemini CLI, etc.) can load and follow to interact with the Supervaize platform.
 
-All skills are hosted in the [<i className="bi bi-github"></i> runwaize_skills](https://github.com/supervaize/runwaize_skills) repository.
+All skills are hosted in the [<i className="bi bi-github"></i> runwaize_skills](https://github.com/runwaize/runwaize_skills) repository.
 
 ## Install
 
@@ -31,34 +31,12 @@ Then install the skill you need:
 Alternatively, you can clone the repository manually and point your coding agent to the relevant `SKILL.md`:
 
 ```bash
-git clone https://github.com/supervaize/runwaize_skills.git
+git clone https://github.com/runwaize/runwaize_skills.git
 ```
 
 ## Available Skills
 
-| Skill | Purpose | When to use |
-|---|---|---|
-| [**Supervaizer Integration**](/docs/integrations/skills/supervaizer-integration) | Integrate an existing Python agent with the Supervaizer Controller | You have agent code and need Supervaizer instrumentation |
-| [**Supervaize Access**](/docs/integrations/skills/supervaize-access) | Operate against a Supervaize workspace from a chatbot or IDE (REST + MCP, API key) | Your workspace is live; you want to manage agents, missions, case/step/HITL from your AI assistant or CLI |
-
-## When to Use Which Skill
-
-```
-Agent code exists and needs Supervaizer instrumentation  →  supervaizer_integration
-Workspace is live; manage it from chatbot/IDE (REST + MCP) →  supervaize_access
-```
-
-## Common Environment Variables
-
-Both skills use these environment variables to connect to Supervaize:
-
-```bash
-export SUPERVAIZE_API_KEY=...
-export SUPERVAIZE_WORKSPACE_ID=team_1
-export SUPERVAIZE_API_URL=https://app.supervaize.com
-
-# Optional — for MCP / controller flows (MCP is at root, no /w/team in path)
-export SUPERVAIZE_MCP_URL=https://app.supervaize.com/api/mcp
-export SUPERVAIZE_CONTROLLER_URL=http://127.0.0.1:8000
-export CONTROLLER_AUTH_KEY=...
-```
+| Skill                                                                            | Purpose                                                                            | When to use                                                                                               |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| [**Supervaizer Integration**](/docs/integrations/skills/supervaizer-integration) | Integrate an existing Python agent with the Supervaizer Controller                 | You want your AI Coding tool to integrate Supervaizer into your agent project.                            |
+| [**Supervaize Access**](/docs/integrations/skills/supervaize-access)             | Operate against a Supervaize workspace from a chatbot or IDE (REST + MCP, API key) | Your workspace is live; you want to manage agents, missions, case/step/HITL from your AI assistant or CLI |
