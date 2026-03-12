@@ -122,16 +122,16 @@ const config: Config = {
           activeBasePath: "/docs/supervaize-fleet",
         },
         {
-          href: "https://skills.runwaize.com/getting-started",
-          label: "The Skills Cookbook",
-          position: "left",
-        },
-        {
           type: "docSidebar",
           sidebarId: "integrationsSidebar",
           position: "left",
           label: "Integrations",
           activeBasePath: "/docs/integrations",
+        },
+        {
+          href: "https://skills.runwaize.com/getting-started",
+          label: "The Skills Cookbook",
+          position: "left",
         },
         {
           href: "https://github.com/supervaize",
