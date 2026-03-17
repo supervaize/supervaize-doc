@@ -110,7 +110,7 @@ The **Supervaizer Controller** is the runtime that deploys and exposes your agen
 
 | Aspect           | Description                                                                                                                |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| **Role**         | Hosts the agent; exposes endpoints (e.g. job_start, job_stop, job_status) and optional A2A discovery                       |
+| **Role**         | Hosts the agent; exposes endpoints (e.g. job_start, job_stop, job_status, job_poll) and optional A2A discovery              |
 | **Deployment**   | Deployed by the developer; the agent is reachable at **SUPERVAIZER_PUBLIC_URL** (or equivalent)                            |
 | **Registration** | When the controller starts, it **registers the agent and its server** with Supervaize so the platform can route Jobs to it |
 
@@ -122,7 +122,7 @@ An **Agent** is a discoverable, executable capability that performs work on beha
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Role**          | Runs Jobs; assigned to Missions                                                                                                        |
 | **Identity**      | Has a unique agent ID; registered with Supervaize (e.g. via the Supervaizer Controller)                                                |
-| **Configuration** | Parameters, secrets, and methods (e.g. `job_start`, `job_stop`, `job_status`) are managed in Supervaize                                |
+| **Configuration** | Parameters, secrets, and methods (e.g. `job_start`, `job_stop`, `job_status`, `job_poll`) are managed in Supervaize                     |
 | **Deployment**    | Deployed by the developer; reachable at **SUPERVAIZER_PUBLIC_URL**; with the Controller, registers itself and its server to Supervaize |
 
 ### Mission

@@ -58,7 +58,22 @@ supervaizer start --debug --reload
 
 # Set log level
 supervaizer start --log-level=DEBUG
+
+# Local mode: run without Studio credentials
+supervaizer start --local
+
+# Local mode with your own agents
+supervaizer start --local my_config.py
 ```
+
+#### Local mode (`--local`)
+
+Runs the server without Supervaize Studio registration. Your agents from `supervaizer_control.py` run alongside a built-in Hello World agent.
+
+- If no `supervaizer_control.py` exists, falls back to Hello World only
+- API key defaults to `local-dev` (override with `SUPERVAIZER_API_KEY`)
+- Set `SUPERVAIZER_DISABLE_HELLO_WORLD=true` to deactivate the Hello World agent
+- Admin workbench available at `/admin/`
 
 ### deploy
 
@@ -243,7 +258,9 @@ All CLI options can also be configured through environment variables:
 | SUPERVAIZER_RELOAD        | Enable auto-reload (true/false)  | false                        |
 | SUPERVAIZER_SCRIPT_PATH   | Path to configuration script     | -                            |
 | SUPERVAIZER_OUTPUT_PATH   | Path for install command output  | supervaizer_control.py       |
-| SUPERVAIZER_FORCE_INSTALL | Force overwrite existing file    | false                        |
+| SUPERVAIZER_FORCE_INSTALL       | Force overwrite existing file     | false                        |
+| SUPERVAIZER_LOCAL_MODE          | Enable local mode (set by --local) | false                      |
+| SUPERVAIZER_DISABLE_HELLO_WORLD | Disable Hello World agent in local mode | false                 |
 
 ### Deployment Configuration
 

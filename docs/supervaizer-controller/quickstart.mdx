@@ -195,6 +195,18 @@ supervaizer start
 ```
 
   </TabItem>
+  <TabItem value="local" label="Local mode (no Studio)">
+
+```bash
+# Run your agents locally without Studio credentials
+supervaizer start --local
+```
+
+:::tip
+Local mode runs your agents alongside a built-in Hello World agent — no Studio account needed. Set `SUPERVAIZER_DISABLE_HELLO_WORLD=true` to hide the Hello World agent. API key defaults to `local-dev`.
+:::
+
+  </TabItem>
   <TabItem value="direct" label="direct">
 
 :::info Debug

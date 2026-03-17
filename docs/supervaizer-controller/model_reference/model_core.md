@@ -85,6 +85,7 @@ _No additional fields beyond parent class._
         job_start=process_email_method, # Job start method
         job_stop=job_stop, # Job stop method
         job_status=job_status, # Job status method
+        job_poll=None, # Optional: poll method for manual update checking
         chat=None,
         custom=None,
     ),
@@ -118,7 +119,7 @@ _No additional fields beyond parent class._
 | `version` | `str` | '' | Version string |
 | `description` | `str` | '' | Description of what the agent does |
 | `tags` | `list[str]` | `None` | Tags for categorizing the agent |
-| `methods` | `AgentMethods` | `None` | Methods supported by this agent |
+| `methods` | `AgentMethods` | `None` | Methods supported by this agent (job_start, job_stop, job_status, job_poll, human_answer, chat, custom) |
 | `parameters_setup` | `ParametersSetup` | `None` | Parameter configuration |
 | `server_agent_id` | `str` | `None` | ID assigned by server - Do not set this manually |
 | `server_agent_status` | `str` | `None` | Current status on server - Do not set this manually |

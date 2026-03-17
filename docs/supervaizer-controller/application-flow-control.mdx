@@ -291,6 +291,7 @@ Agent(
         start=job_start,
         stop=job_stop,
         status=job_status,
+        job_poll=poll_method,  # Optional: for manual polling
         human_answer= receive_human_input,
     )
 )
@@ -486,7 +487,7 @@ Closes a case with final results and cost information. This should be called whe
 
 ## JobResponse
 
-`JobResponse` is the return type for all agent methods (`job_start`, `job_stop`, `job_status`, and custom methods). It provides structured information about the overall job execution status.
+`JobResponse` is the return type for all agent methods (`job_start`, `job_stop`, `job_status`, `job_poll`, and custom methods). It provides structured information about the overall job execution status.
 
 ### Fields
 
@@ -579,6 +580,44 @@ Closes a case with final results and cost information. This should be called whe
 **📖 See the model reference**
 
 [JobResponse Documentation](/docs/supervaizer-controller/model_reference/model_extra#jobjobresponse)
+
+## Manual Polling (job_poll)
+
+Agents that depend on external events (webhooks from email services, telephony providers, etc.) can implement a `job_poll` method for manual status checking. This is especially useful for local development where webhooks aren't available.
+
+When defined, the workbench shows a **"Check for updates"** button on active jobs. Clicking it calls the agent's poll handler, which checks external services and updates cases accordingly.
+
+```python
+def my_agent_poll(**kwargs) -> JobResponse:
+    """Check external services for updates."""
+    job_id = kwargs.get("job_id", "")
+    # Check your external service (email inbox, call status, etc.)
+    # Update relevant cases with new information
+    return JobResponse(
+        job_id=job_id,
+        status=EntityStatus.AWAITING,
+        message="Found 2 new replies",
+    )
+```
+
+Register it in your agent methods:
+
+```python
+methods=AgentMethods(
+    job_start=start_method,
+    job_stop=stop_method,
+    job_poll=AgentMethod(
+        name="poll",
+        method="my_module.my_agent_poll",
+        description="Check for external updates",
+    ),
+    human_answer=answer_method,
+)
+```
+
+The poll method receives `{"job_id": job_id}` as kwargs and returns a `JobResponse`. The workbench refreshes the monitor after each poll.
+
+**Webhook + Poll Pattern:** In production, use webhooks for real-time updates. In local/dev mode, the poll button provides the same functionality without needing a public URL. Your agent code should handle both paths.
 
 ## Complete Example Flow
 
