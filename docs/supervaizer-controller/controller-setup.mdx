@@ -102,6 +102,19 @@ job_status = AgentMethod(
 )
 ```
 
+```python title="Optional: poll method for manual update checking"
+job_poll = AgentMethod(
+    name="poll",  # Optional
+    method="agent_simple.job_poll",
+    description="Check external services for updates",
+    is_async=False,
+)
+```
+
+:::tip
+The `job_poll` method is optional. Define it when your agent depends on external events (webhooks, email replies, etc.) and you want a manual "Check for updates" button in the workbench. See [Manual Polling](application-flow-control#manual-polling-job_poll) for details.
+:::
+
 **📖 See the model reference**
 
 [ParameterModel Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentmethodabstract)
@@ -184,7 +197,7 @@ Use the following metadata:
 - tags: [list of tags for discovery, e.g. "automation", "data processing"]
 
 Generate a deterministic ID using shortuuid.uuid(name).
-Wire the previously defined methods using AgentMethods(job_start=..., job_stop=..., job_status=...).
+Wire the previously defined methods using AgentMethods(job_start=..., job_stop=..., job_status=..., job_poll=... (optional)).
 Attach the parameters_setup defined in step 1.
 ```
 

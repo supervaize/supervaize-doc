@@ -13,6 +13,15 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Added
+
+- **🔄 Manual Polling (job_poll)** - New optional `job_poll` method in `AgentMethods` for manual status checking
+  - Agents that depend on external events (webhooks, email services, telephony) can implement a poll handler
+  - Workbench shows a **"Check for updates"** button on active jobs when `job_poll` is defined
+  - New endpoint: `POST /admin/agents/{slug}/workbench/jobs/{job_id}/poll`
+  - Useful for local development where webhooks are not available
+  - Receives `{"job_id": job_id}` as kwargs and returns a `JobResponse`
+
 ## [0.10.1]
 
 ### Changed
