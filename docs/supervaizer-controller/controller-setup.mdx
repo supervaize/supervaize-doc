@@ -173,6 +173,44 @@ Each field needs: name, type, field_type, and required.
 
 </details>
 
+### Dynamic choices
+
+For fields whose options are determined at runtime (e.g., a list of projects fetched from a database), use `dynamic_choices` instead of static `choices`:
+
+```python
+AgentMethodField(
+    name="List of projects",
+    type=str,
+    field_type="ChoiceField",
+    dynamic_choices="projects",  # key name — resolved at runtime
+    required=True,
+)
+```
+
+Then define a callback function and pass it to your Agent:
+
+```python
+def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+    if method_name == "start":
+        # Fetch from database, API, or any source
+        return {
+            "projects": [("P1", "Project 1"), ("P2", "Project 2"), ("P3", "Project 3")],
+        }
+    return {}
+
+agent = Agent(
+    name="my_agent",
+    # ... other fields ...
+    dynamic_choices_callback=get_dynamic_choices,
+)
+```
+
+:::info
+`choices` and `dynamic_choices` are mutually exclusive on a field. Use `choices` for fixed options known at definition time, and `dynamic_choices` for options that change at runtime.
+:::
+
+See the full [Dynamic Choices guide](/docs/supervaizer-controller/dynamic-choices) for details.
+
 ## 4. Declare the agent {#4}
 
 The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
@@ -204,6 +242,10 @@ Attach the parameters_setup defined in step 1.
 ```
 
 </details>
+
+:::tip
+If your agent uses dynamic choice fields, pass the `dynamic_choices_callback` parameter to the Agent constructor. See [Dynamic Choices](/docs/supervaizer-controller/dynamic-choices).
+:::
 
 ## 5.Setup the Supervaize Account and configure your Environment variables {#5}
 
