@@ -31,6 +31,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaizer-controller/dynamic-choices",
+          label: "Dynamic Choices",
+        },
+        {
+          type: "doc",
           id: "supervaizer-controller/application-flow-control",
           label: "Application Flow Control",
         },

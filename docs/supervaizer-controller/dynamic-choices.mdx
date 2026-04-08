@@ -1,0 +1,191 @@
+---
+id: dynamic-choices
+title: Dynamic Choices
+displayed_sidebar: supervaizerControllerSidebar
+slug: dynamic-choices
+---
+
+# Dynamic Choices
+
+Dynamic choices allow your agent's form fields to display options that are resolved at runtime rather than being hardcoded in the field definition. This is useful when the available options depend on external data sources like databases, APIs, or configuration files.
+
+## When to use
+
+Use dynamic choices when:
+- The list of options changes over time (e.g., active projects, team members, available models)
+- The options come from an external source (database, API)
+- The options are environment-specific (dev vs. prod)
+
+Use static `choices` when the options are fixed and known at definition time (e.g., country codes, status values).
+
+## Setup
+
+### 1. Define the field with `dynamic_choices`
+
+Instead of providing a `choices` list, set `dynamic_choices` to a key name:
+
+```python
+from supervaizer import AgentMethodField
+
+field = AgentMethodField(
+    name="List of projects",
+    type=str,
+    field_type="ChoiceField",
+    dynamic_choices="projects",  # key name
+    required=True,
+)
+```
+
+:::warning
+`choices` and `dynamic_choices` are mutually exclusive. Setting both will raise a validation error.
+:::
+
+### 2. Define the callback function
+
+Create a function that takes a method name and returns a dictionary mapping choice keys to their value/label pairs:
+
+```python
+def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+    """Return dynamic choices for the given method.
+
+    Args:
+        method_name: The method requesting choices (e.g., "start")
+
+    Returns:
+        Dict mapping choice key names to lists of (value, label) tuples
+    """
+    if method_name == "start":
+        # Fetch from your data source
+        projects = fetch_projects_from_db()
+        return {
+            "projects": [(p.id, p.name) for p in projects],
+        }
+    return {}
+```
+
+The return format is `dict[str, list[tuple[str, str]]]`:
+- **Keys** match the `dynamic_choices` values on your fields
+- **Values** are lists of `(value, label)` tuples — same format as static `choices`
+
+You can return multiple keys if multiple fields use dynamic choices:
+
+```python
+def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+    return {
+        "projects": [("P1", "Project 1"), ("P2", "Project 2")],
+        "teams": [("T1", "Team Alpha"), ("T2", "Team Beta")],
+    }
+```
+
+### 3. Pass the callback to the Agent
+
+```python
+from supervaizer import Agent
+
+agent = Agent(
+    name="my_agent",
+    author="Your Name",
+    version="1.0",
+    description="My agent with dynamic choices",
+    methods=AgentMethods(job_start=job_start_method),
+    dynamic_choices_callback=get_dynamic_choices,
+)
+```
+
+## How it works
+
+When Supervaize Studio renders the job start form:
+
+1. Studio checks if any field has `dynamic_choices` set
+2. If so, it calls `GET /supervaizer/agents/{agent_slug}/start/dynamic_choices`
+3. The endpoint invokes your callback with `"start"` as the method name
+4. The returned choices are used to populate the form dropdowns
+
+```
+┌──────────────┐     GET /start/dynamic_choices     ┌───────────────┐
+│   Supervaize │ ──────────────────────────────────► │  Supervaizer  │
+│    Studio    │                                     │   Controller  │
+│              │ ◄────────────────────────────────── │               │
+│  (renders    │     {"choices": {"projects": ...}}  │  (calls your  │
+│   the form)  │                                     │   callback)   │
+└──────────────┘                                     └───────────────┘
+```
+
+## API Reference
+
+### Endpoint
+
+```
+GET /supervaizer/agents/{agent_slug}/start/dynamic_choices
+```
+
+**Headers:** `X-API-Key: {your_api_key}`
+
+### Response
+
+```json
+{
+    "choices": {
+        "projects": [
+            ["P1", "Project 1"],
+            ["P2", "Project 2"],
+            ["P3", "Project 3"]
+        ]
+    }
+}
+```
+
+### Error responses
+
+| Status | Meaning |
+|--------|---------|
+| 200 | Choices returned successfully |
+| 404 | Agent has no `dynamic_choices_callback` configured |
+| 500 | Callback raised an error |
+
+## Complete example
+
+```python
+from supervaizer import Agent, AgentMethod, AgentMethodField, AgentMethods, Server
+
+
+def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+    if method_name == "start":
+        return {
+            "projects": [("P1", "Project 1"), ("P2", "Project 2"), ("P3", "Project 3")],
+        }
+    return {}
+
+
+job_start = AgentMethod(
+    name="start",
+    method="my_agent.start_job",
+    fields=[
+        AgentMethodField(
+            name="Company name",
+            type=str,
+            field_type="CharField",
+            required=True,
+        ),
+        AgentMethodField(
+            name="Project",
+            type=str,
+            field_type="ChoiceField",
+            dynamic_choices="projects",
+            required=True,
+        ),
+    ],
+    description="Start a new research job",
+)
+
+agent = Agent(
+    name="research_agent",
+    author="Your Name",
+    version="1.0",
+    description="Research agent with dynamic project selection",
+    methods=AgentMethods(job_start=job_start),
+    dynamic_choices_callback=get_dynamic_choices,
+)
+
+server = Server(agents=[agent])
+```
