@@ -42,20 +42,22 @@ field = AgentMethodField(
 
 ### 2. Define the callback function
 
-Create a function that takes a method name and returns a dictionary mapping choice keys to their value/label pairs:
+Create a function that takes a method name and a context dictionary, and returns a dictionary mapping choice keys to their value/label pairs:
 
 ```python
-def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+def get_dynamic_choices(method_name: str, context: dict) -> dict[str, list[tuple[str, str]]]:
     """Return dynamic choices for the given method.
 
     Args:
         method_name: The method requesting choices (e.g., "start")
+        context: Dict with workspace_id and mission_id from the request
 
     Returns:
         Dict mapping choice key names to lists of (value, label) tuples
     """
     if method_name == "start":
         # Fetch from your data source
+        # context contains workspace_id and mission_id
         projects = fetch_projects_from_db()
         return {
             "projects": [(p.id, p.name) for p in projects],
@@ -70,7 +72,7 @@ The return format is `dict[str, list[tuple[str, str]]]`:
 You can return multiple keys if multiple fields use dynamic choices:
 
 ```python
-def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+def get_dynamic_choices(method_name: str, context: dict) -> dict[str, list[tuple[str, str]]]:
     return {
         "projects": [("P1", "Project 1"), ("P2", "Project 2")],
         "teams": [("T1", "Team Alpha"), ("T2", "Team Beta")],
@@ -97,14 +99,14 @@ agent = Agent(
 When Supervaize Studio renders the job start form:
 
 1. Studio checks if any field has `dynamic_choices` set
-2. If so, it calls `GET /supervaizer/agents/{agent_slug}/start/dynamic_choices`
-3. The endpoint invokes your callback with `"start"` as the method name
+2. If so, it calls `POST /supervaizer/agents/{agent_slug}/start/dynamic_choices` with `workspace_id` and `mission_id`
+3. The endpoint invokes your callback with `"start"` as the method name and the context dict
 4. The returned choices are used to populate the form dropdowns
 
 ```
-┌──────────────┐     GET /start/dynamic_choices     ┌───────────────┐
+┌──────────────┐     POST /start/dynamic_choices    ┌───────────────┐
 │   Supervaize │ ──────────────────────────────────► │  Supervaizer  │
-│    Studio    │                                     │   Controller  │
+│    Studio    │  {workspace_id, mission_id}         │   Controller  │
 │              │ ◄────────────────────────────────── │               │
 │  (renders    │     {"choices": {"projects": ...}}  │  (calls your  │
 │   the form)  │                                     │   callback)   │
@@ -116,10 +118,21 @@ When Supervaize Studio renders the job start form:
 ### Endpoint
 
 ```
-GET /supervaizer/agents/{agent_slug}/start/dynamic_choices
+POST /supervaizer/agents/{agent_slug}/start/dynamic_choices
 ```
 
 **Headers:** `X-API-Key: {your_api_key}`
+
+**Request body:**
+
+```json
+{
+    "workspace_id": "your-workspace-id",
+    "mission_id": "your-mission-id"
+}
+```
+
+The `workspace_id` and `mission_id` are passed to the callback as a `context` dict, allowing the callback to return choices specific to the current workspace and mission.
 
 ### Response
 
@@ -149,7 +162,7 @@ GET /supervaizer/agents/{agent_slug}/start/dynamic_choices
 from supervaizer import Agent, AgentMethod, AgentMethodField, AgentMethods, Server
 
 
-def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+def get_dynamic_choices(method_name: str, context: dict) -> dict[str, list[tuple[str, str]]]:
     if method_name == "start":
         return {
             "projects": [("P1", "Project 1"), ("P2", "Project 2"), ("P3", "Project 3")],

@@ -198,7 +198,7 @@ supervaizer deploy clean
    ```bash
    export SUPERVAIZE_API_KEY="your-api-key"
    export SUPERVAIZE_WORKSPACE_ID="your-workspace-id"
-   export SUPERVAIZE_API_URL="https://api.supervaize.com"
+   export SUPERVAIZE_API_URL="https://app.supervaize.com"
    export SUPERVAIZER_PUBLIC_URL="https://your-app.com"
    ```
 
@@ -331,4 +331,4 @@ After successful local testing:
 4. Clean up when done: `supervaizer deploy down --platform cloud-run`
 
 
-*Uploaded on 2026-01-25 14:28:59*
+*Uploaded on 2026-03-23 22:47:03*

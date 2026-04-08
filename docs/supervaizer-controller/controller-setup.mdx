@@ -190,9 +190,10 @@ AgentMethodField(
 Then define a callback function and pass it to your Agent:
 
 ```python
-def get_dynamic_choices(method_name: str) -> dict[str, list[tuple[str, str]]]:
+def get_dynamic_choices(method_name: str, context: dict) -> dict[str, list[tuple[str, str]]]:
     if method_name == "start":
         # Fetch from database, API, or any source
+        # context contains workspace_id and mission_id
         return {
             "projects": [("P1", "Project 1"), ("P2", "Project 2"), ("P3", "Project 3")],
         }

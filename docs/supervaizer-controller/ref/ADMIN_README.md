@@ -19,6 +19,7 @@ A lightweight web-based admin interface for managing WorkflowEntity objects (Job
 - **API Key Required**: Admin interface requires a valid API key
 - **Authentication**: Add `X-API-Key` header to requests
 - **Secure Access**: All admin endpoints are protected
+- **IP allowlist (deployment)**: Set environment variable `ADMIN_ALLOWED_IPS` to restrict which client IPs may access the `/admin` web UI (including static assets and WebSocket upgrades). Comma-separated IPv4/IPv6 addresses and optional CIDR ranges (e.g. `10.0.0.0/8, 203.0.113.4`). If unset or empty, all IPs are allowed. The effective client IP is taken from the first value in `X-Forwarded-For` when present (typical behind a reverse proxy); otherwise the direct peer address is used. Ensure your proxy sets or overwrites `X-Forwarded-For` correctly so the allowlist matches real clients.
 
 ### 📊 **Dashboard**
 
@@ -304,4 +305,4 @@ Then visit `http://127.0.0.1:8000/admin/` with API key `test-admin-key-123` in t
 _For more information, see the main project documentation and API reference._
 
 
-*Uploaded on 2026-01-25 14:28:59*
+*Uploaded on 2026-03-23 22:47:03*

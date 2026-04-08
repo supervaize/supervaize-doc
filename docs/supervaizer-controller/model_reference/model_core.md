@@ -128,7 +128,7 @@ _No additional fields beyond parent class._
 | `supervaize_instructions_template_path` | `str` | `None` | Optional path to a custom template file for supervaize_instructions.html page |
 | `instructions_path` | `str` | 'supervaize_instructions.html' | Path where the supervaize instructions page is served (relative to agent path) |
 | `custom_routes` | `Any` | `None` | Optional FastAPI APIRouter with custom routes for this agent |
-| `dynamic_choices_callback` | `Callable` | `None` | Callback that returns dynamic choices for method fields. Signature: `(method_name: str) -> dict[str, list[tuple[str, str]]]`. Excluded from serialization. |
+| `dynamic_choices_callback` | `Callable` | `None` | Callback that returns dynamic choices for method fields. Signature: `(method_name: str, context: dict) -> dict[str, list[tuple[str, str]]]`. Excluded from serialization. |
 
 ### `agent.AgentMethod`
 
@@ -301,7 +301,7 @@ field definitions for consistency.
 }
 ```
 
-> When `dynamic_choices` is set, choices are not embedded in the field definition. Instead, Supervaize Studio fetches them at runtime from the `GET /agents/{slug}/start/dynamic_choices` endpoint. See [Dynamic Choices](/docs/supervaizer-controller/dynamic-choices) for setup instructions.
+> When `dynamic_choices` is set, choices are not embedded in the field definition. Instead, Supervaize Studio fetches them at runtime from the `POST /agents/{slug}/start/dynamic_choices` endpoint. See [Dynamic Choices](/docs/supervaizer-controller/dynamic-choices) for setup instructions.
 
 ### `parameter.ParametersSetup`
 
