@@ -33,6 +33,8 @@ After running `supervaizer scaffold`, you'll have a template file to customize. 
 
 [<i className="bi bi-6-circle-fill"></i> Setup the server: Server()](#6)
 
+[<i className="bi bi-7-circle-fill"></i> (Optional) Custom Routes: APIRouter()](#7)
+
 :::note
 Open `supervaizer_control_example.py` and adapt the content to your agent.
 :::
@@ -287,6 +289,44 @@ Add the main entry point:
 ```
 
 </details>
+
+## 7. Custom Routes (optional) {#7}
+
+Agents can mount their own FastAPI routers to expose custom HTTP endpoints alongside the workbench. This is useful for tool endpoints, webhooks, or any agent-specific API.
+
+```python title="Define custom routes"
+from fastapi import APIRouter
+
+agent_api = APIRouter()
+
+@agent_api.post("/webhook")
+async def handle_webhook(payload: dict):
+    """Receive webhooks from an external service."""
+    # Process the webhook payload
+    return {"status": "received"}
+
+@agent_api.get("/status")
+async def custom_status():
+    """Custom status endpoint for this agent."""
+    return {"healthy": True, "pending_tasks": 0}
+```
+
+Then pass the router to your `Agent` definition:
+
+```python title="Attach custom routes to the agent"
+agent = Agent(
+    # ... other config from step 4 ...
+    custom_routes=agent_api,
+)
+```
+
+Supervaizer mounts the router at `/agents/{agent_slug}/api/`, so the endpoints above become:
+- `POST /agents/my-agent/api/webhook`
+- `GET /agents/my-agent/api/status`
+
+:::tip
+Custom routes are mounted without any additional authentication by Supervaizer. If your endpoints need auth, handle it within the router itself.
+:::
 
 ## What's next?
 

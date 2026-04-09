@@ -15,12 +15,34 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **🔄 Manual Polling (job_poll)** - New optional `job_poll` method in `AgentMethods` for manual status checking
-  - Agents that depend on external events (webhooks, email services, telephony) can implement a poll handler
-  - Workbench shows a **"Check for updates"** button on active jobs when `job_poll` is defined
-  - New endpoint: `POST /admin/agents/{slug}/workbench/jobs/{job_id}/poll`
-  - Useful for local development where webhooks are not available
-  - Receives `{"job_id": job_id}` as kwargs and returns a `JobResponse`
+- **Custom routes** — Agents can mount their own FastAPI `APIRouter` via the `custom_routes` field on `Agent`. Supervaizer mounts them at `/agents/{slug}/api/`. Enables tool endpoints, webhooks, or any HTTP API alongside the workbench.
+
+- **Scheduled steps** — `CaseNodeUpdate` gains `scheduled_at`, `scheduled_method`, `scheduled_params`, `scheduled_status` fields for deferred execution. Background executor polls every 60s and calls the agent method automatically. Workbench shows countdown, "Execute now", and "Cancel" controls.
+  - Routes: `POST .../execute`, `POST .../cancel`, `PATCH .../schedule`
+  - `Case.cancel_scheduled_steps()` for job stop cascading
+  - `Cases.get_due_scheduled_steps()` for executor polling
+
+- **`AgentResponse` export** — Now available from `supervaizer.__init__` for typed response models.
+
+### Fixed
+
+- **OpenAPI / JSON Schema (Pydantic 2.12+)** — Fixed `PydanticInvalidForJsonSchema` errors from `AgentMethodAbstract` example dict, `AgentResponse` nested schemas, and `CaseNode.factory` callable type.
+
+## v0.11.0
+
+- **Job Poll mechanism** — Optional `job_poll` method in `AgentMethods` for manual external service polling. Workbench shows "Check for updates" button.
+- **HITL double-click guard** — Buttons disabled during submission.
+- **Monitor reply & duration display** — Step payloads with `reply`/`approved_content` render as styled cards.
+- **WebSocket terminal signal** — Prevents reconnect loops on terminal job state.
+- **`is_local_mode()` helper** — Centralized in `supervaizer.common`.
+- **`deque` for log buffer** — Circular buffer (maxlen=500) replaces manual trim.
+- **Dialog HITL** — Interactive content review via chat interface (`supervaizer_dialog` payload).
+- **Local mode fixes** — Correct localhost URLs, event skipping, agent parameter env pre-fill, HTMX polling guard.
+
+## v0.10.27
+
+- **Agent Workbench** — Full-featured testing interface for agents from the admin panel.
+- **Local test mode (`--local`)** — Run without Studio credentials, with built-in Hello World agent.
 
 ## [0.10.1]
 

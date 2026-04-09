@@ -388,14 +388,18 @@ Closes a case with final results and cost information. This should be called whe
 
 ### Fields
 
-| Field      | Type             | Default | Description                                        |
-| ---------- | ---------------- | ------- | -------------------------------------------------- |
-| `index`    | `int`            | `None`  | ** to verify** - Usage unclear from examples       |
-| `cost`     | `float`          | `None`  | Cost incurred for this specific update             |
-| `name`     | `str`            | `None`  | Descriptive name for this update (displayed in UI) |
-| `payload`  | `dict[str, Any]` | `None`  | Arbitrary data associated with this update         |
-| `is_final` | `bool`           | `False` | Whether this is a final update before case closure |
-| `error`    | `str`            | `None`  | Error message if this update represents a failure  |
+| Field               | Type             | Default | Description                                              |
+| ------------------- | ---------------- | ------- | -------------------------------------------------------- |
+| `index`             | `int`            | `None`  | Step index within the case                               |
+| `cost`              | `float`          | `None`  | Cost incurred for this specific update                   |
+| `name`              | `str`            | `None`  | Descriptive name for this update (displayed in UI)       |
+| `payload`           | `dict[str, Any]` | `None`  | Arbitrary data associated with this update               |
+| `is_final`          | `bool`           | `False` | Whether this is a final update before case closure       |
+| `error`             | `str`            | `None`  | Error message if this update represents a failure        |
+| `scheduled_at`      | `datetime`       | `None`  | When to execute this step (UTC). Defers execution.       |
+| `scheduled_method`  | `str`            | `None`  | Dotted path to the agent method to call (e.g. `module.func`) |
+| `scheduled_params`  | `dict[str, Any]` | `None`  | Parameters to pass to the scheduled method               |
+| `scheduled_status`  | `str`            | `None`  | Execution state: `pending`, `executing`, `completed`, `failed`, `cancelled` |
 
 ### Usage Examples
 
@@ -618,6 +622,78 @@ methods=AgentMethods(
 The poll method receives `{"job_id": job_id}` as kwargs and returns a `JobResponse`. The workbench refreshes the monitor after each poll.
 
 **Webhook + Poll Pattern:** In production, use webhooks for real-time updates. In local/dev mode, the poll button provides the same functionality without needing a public URL. Your agent code should handle both paths.
+
+## Scheduled Steps
+
+Scheduled steps let you defer execution of a case update to a future time. When a step has `scheduled_at` set, the background executor holds it until the scheduled time, then automatically calls the specified agent method.
+
+This is useful for:
+- **Time-based orchestration** — schedule a follow-up call in 30 minutes
+- **Retry with backoff** — retry a failed operation after a delay
+- **Workflow delays** — insert a waiting period between steps
+
+### Scheduling a step
+
+Add the `scheduled_*` fields to a `CaseNodeUpdate`:
+
+```python
+from datetime import datetime, timedelta, timezone
+
+case.update(
+    CaseNodeUpdate(
+        name="Follow-up call scheduled",
+        scheduled_at=datetime.now(timezone.utc) + timedelta(minutes=30),
+        scheduled_method="my_agent.follow_up_call",
+        scheduled_params={"phone_number": "+1234567890", "case_id": case.case_id},
+        is_final=False,
+    )
+)
+```
+
+- `scheduled_at`: UTC datetime when the step should execute
+- `scheduled_method`: Dotted path to a callable (must be importable by the server)
+- `scheduled_params`: Dict of keyword arguments passed to the method
+- `scheduled_status`: Automatically set to `pending` — do not set this manually
+
+### How the executor works
+
+The server starts a background asyncio loop on startup that:
+
+1. Polls every 60 seconds for due steps (`scheduled_at <= now()` and `scheduled_status == "pending"`)
+2. Sets `scheduled_status` to `executing`
+3. Dynamically imports and calls the `scheduled_method` with `scheduled_params`
+4. Updates `scheduled_status` to `completed` on success or `failed` on error
+
+### Workbench controls
+
+The workbench shows scheduled steps with visual status badges:
+
+| Status       | Badge     | Description                                |
+| ------------ | --------- | ------------------------------------------ |
+| `pending`    | Blue      | Waiting for scheduled time, shows countdown |
+| `executing`  | Amber ⚡  | Currently running                          |
+| `completed`  | Green ✅  | Finished successfully                      |
+| `failed`     | Red ❌    | Execution failed                           |
+| `cancelled`  | Gray      | Cancelled by user or job stop              |
+
+For `pending` steps, the workbench displays:
+- A **countdown timer** showing time until execution
+- An **"Execute now"** button to trigger immediately
+- A **"Cancel"** button to cancel the scheduled step
+
+### Cancellation on job stop
+
+When a job is stopped, `Case.cancel_scheduled_steps()` automatically sets all pending scheduled steps to `cancelled`, preventing orphaned executions.
+
+### REST API for scheduled steps
+
+Three endpoints are available for programmatic control:
+
+| Method  | Endpoint                                                    | Description              |
+| ------- | ----------------------------------------------------------- | ------------------------ |
+| `POST`  | `/agents/{slug}/workbench/jobs/{job_id}/steps/{case_id}/{step_index}/execute` | Execute a pending step immediately |
+| `POST`  | `/agents/{slug}/workbench/jobs/{job_id}/steps/{case_id}/{step_index}/cancel`  | Cancel a pending step    |
+| `PATCH` | `/agents/{slug}/workbench/jobs/{job_id}/steps/{case_id}/{step_index}/schedule` | Reschedule to a new time (body: `{"scheduled_at": "ISO8601"}`) |
 
 ## Complete Example Flow
 
