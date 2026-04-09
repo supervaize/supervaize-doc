@@ -39,7 +39,9 @@ After running `supervaizer scaffold`, you'll have a template file to customize. 
 Open `supervaizer_control_example.py` and adapt the content to your agent.
 :::
 
-## 1. Define agent parameters \{#1\}
+<a id="1"></a>
+
+## 1. Define agent parameters
 
 Use **Parameter** / **ParametersSetup** to declare what the agent needs. These show up in Supervaize UI and can be marked as env or secret.
 
@@ -68,7 +70,9 @@ Set is_environment=True for env variables and is_secret=True for secrets.
 
 </details>
 
-## 2. Define agent methods \{#2\}
+<a id="2"></a>
+
+## 2. Define agent methods
 
 Point Supervaizer to your agent's functions.
 
@@ -142,7 +146,9 @@ The "start" and "stop" and "status" method names are required by Supervaizer.
 
 </details>
 
-## 3. Define the fields of the AgentMethods \{#3\}
+<a id="3"></a>
+
+## 3. Define the fields of the AgentMethods
 
 The `fields` parameter defines the user input form that will be displayed in the Supervaize UI. Each field specifies what data users need to provide when calling your agent method.
 
@@ -212,7 +218,9 @@ agent = Agent(
 
 See the full [Dynamic Choices guide](/docs/supervaizer-controller/dynamic-choices) for details.
 
-## 4. Declare the agent \{#4\}
+<a id="4"></a>
+
+## 4. Declare the agent
 
 The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
 
@@ -248,7 +256,9 @@ Attach the parameters_setup defined in step 1.
 If your agent uses dynamic choice fields, pass the `dynamic_choices_callback` parameter to the Agent constructor. See [Dynamic Choices](/docs/supervaizer-controller/dynamic-choices).
 :::
 
-## 5.Setup the Supervaize Account and configure your Environment variables \{#5\}
+<a id="5"></a>
+
+## 5.Setup the Supervaize Account and configure your Environment variables
 
 :::info
 This step is not needed to run the supervaizer as an A2A server only. See [Protocol support](/docs/supervaizer-controller/ref/PROTOCOLS)
@@ -284,7 +294,9 @@ Use os.getenv() with fallback defaults to prevent errors when env vars are missi
 
 </details>
 
-## 6. Setup the Server \{#6\}
+<a id="6"></a>
+
+## 6. Setup the Server
 
 ### Config
 
@@ -333,7 +345,9 @@ Add the main entry point:
 
 </details>
 
-## 7. Custom Routes (optional) \{#7\}
+<a id="7"></a>
+
+## 7. Custom Routes (optional)
 
 Agents can mount their own FastAPI routers to expose custom HTTP endpoints alongside the workbench. This is useful for tool endpoints, webhooks, or any agent-specific API.
 

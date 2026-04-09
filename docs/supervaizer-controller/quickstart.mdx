@@ -22,7 +22,9 @@ Kickstart a **Python** agent with the **Supervaizer Controller** so it's discove
 
 [<i className="bi bi-3-circle"></i> **Configure secrets & env**, then **start** the server 🚀](#3)
 
-## <i className="bi bi-1-circle"></i> Clone the Hello World Example \{#1\}
+<a id="1"></a>
+
+## <i className="bi bi-1-circle"></i> Clone the Hello World Example
 
 :::info
 The Supervaizer Controller currently supports **Python-based** agents.
@@ -36,7 +38,9 @@ git clone https://github.com/runwaize/supervaize_hello_world.git
 cd supervaize_hello_world
 ```
 
-## <i className="bi bi-2-circle"></i> Setup the Environment \{#2\}
+<a id="2"></a>
+
+## <i className="bi bi-2-circle"></i> Setup the Environment
 
 :::tip
 We recommend using **uv** for faster dependency management
@@ -135,7 +139,9 @@ supervaizer scaffold
 
 For detailed instructions on customizing your controller, see the **[Controller Setup Guide](controller-setup)**.
 
-## <i className="bi bi-3-circle"></i> Configure your Supervaize account & environment \{#3\}
+<a id="3"></a>
+
+## <i className="bi bi-3-circle"></i> Configure your Supervaize account & environment
 
 ### Supervaize account and credentials
 
@@ -171,7 +177,9 @@ SUPERVAIZE_API_URL=https://app.supervaize.com
 
 </Tabs>
 
-### For local development only \{#localdev\}
+<a id="localdev"></a>
+
+### For local development only
 
 :::warning Local development
 If the agent is not deployed to a publicly accessible server, you need to install a **Tunneling** solution so that `supervaize` can operate your agent.
@@ -184,7 +192,9 @@ Store your public hostname in `SUPERVAIZER_HOST` environment variable.
 export SUPERVAIZER_HOST=silly-peaches-chapter.loca.lt
 ```
 
-### Start the server 🚀 \{#start\}
+<a id="start"></a>
+
+### Start the server 🚀
 
 <Tabs groupId="pm" queryString>
   <TabItem value="SupervaizerCLI" label="CLI">
