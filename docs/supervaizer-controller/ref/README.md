@@ -211,7 +211,6 @@ supervaizer deploy up --platform do-app-platform --region nyc
 
 ### Documentation
 
-- [RFC-001: Cloud Deployment CLI](rfc/001-cloud-deployment-cli.md) - Complete specification
 - [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
 
 ## Using the CLI
@@ -277,4 +276,4 @@ Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to 
 This project is licensed under the [Mozilla Public License 2.0](LICENSE.md) License.
 
 
-*Uploaded on 2026-03-23 22:47:03*
+*Uploaded on 2026-04-09 00:25:26*
