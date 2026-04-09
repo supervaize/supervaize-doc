@@ -61,6 +61,22 @@ if job.status == EntityStatus.COMPLETED:
     print("Job completed successfully!")
 ```
 
+### Job Polling
+
+The optional `job_poll` method enables manual polling for agents that depend on external events (webhooks, email services, telephony). When defined, the workbench shows a **"Check for updates"** button on active jobs.
+
+```python
+from supervaizer import AgentMethod
+
+poll_method = AgentMethod(
+    name="poll",
+    method="my_module.poll_external",
+    description="Check external services for updates",
+)
+```
+
+The poll handler receives `{"job_id": job_id}` as kwargs and returns a `JobResponse`. See [Manual Polling](/docs/supervaizer-controller/application-flow-control#manual-polling-job_poll) for details.
+
 ## A2A Protocol API
 
 ### Agent Discovery
@@ -156,6 +172,11 @@ methods = AgentMethods(
         name="check_status",
         method="get_status",
         description="Check processing status"
+    ),
+    job_poll=AgentMethod(  # Optional
+        name="poll",
+        method="poll_external",
+        description="Check external services for updates"
     )
 )
 

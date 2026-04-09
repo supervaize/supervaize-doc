@@ -30,6 +30,9 @@ const config: Config = {
   onBrokenAnchors: "warn",
   markdown: {
     mermaid: true,
+    mdx1Compat: {
+      headingIds: true, // v4: true disables this, but {#id} syntax is used across docs
+    },
     hooks: {
       onBrokenMarkdownLinks: "warn",
     },
