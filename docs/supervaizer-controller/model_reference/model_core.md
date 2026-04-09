@@ -1,6 +1,6 @@
 # Model Reference Core
 
-**Version:** 0.10.1
+**Version:** 0.13.0
 
 ### `account.Account`
 
@@ -47,7 +47,7 @@ Attributes:
 {
   "workspace_id": "ws_1234567890abcdef",
   "api_key": "sk_1234567890abcdef",
-  "api_url": "https://api.supervaize.com"
+  "api_url": "https://app.supervaize.com"
 }
 
 ```
@@ -85,7 +85,6 @@ _No additional fields beyond parent class._
         job_start=process_email_method, # Job start method
         job_stop=job_stop, # Job stop method
         job_status=job_status, # Job status method
-        job_poll=None, # Optional: poll method for manual update checking
         chat=None,
         custom=None,
     ),
@@ -119,7 +118,7 @@ _No additional fields beyond parent class._
 | `version` | `str` | '' | Version string |
 | `description` | `str` | '' | Description of what the agent does |
 | `tags` | `list[str]` | `None` | Tags for categorizing the agent |
-| `methods` | `AgentMethods` | `None` | Methods supported by this agent (job_start, job_stop, job_status, job_poll, human_answer, chat, custom) |
+| `methods` | `AgentMethods` | `None` | Methods supported by this agent |
 | `parameters_setup` | `ParametersSetup` | `None` | Parameter configuration |
 | `server_agent_id` | `str` | `None` | ID assigned by server - Do not set this manually |
 | `server_agent_status` | `str` | `None` | Current status on server - Do not set this manually |
@@ -128,6 +127,8 @@ _No additional fields beyond parent class._
 | `max_execution_time` | `int` | 3600 | Maximum execution time in seconds, defaults to 1 hour |
 | `supervaize_instructions_template_path` | `str` | `None` | Optional path to a custom template file for supervaize_instructions.html page |
 | `instructions_path` | `str` | 'supervaize_instructions.html' | Path where the supervaize instructions page is served (relative to agent path) |
+| `custom_routes` | `Any` | `None` | Optional FastAPI APIRouter with custom routes for this agent |
+| `dynamic_choices_callback` | `Any` | `None` | Callable that returns dynamic choices for method fields. Signature: (method_name: str, context: dict) -> dict[str, list[tuple[str, str]]] |
 
 ### `agent.AgentMethod`
 
@@ -235,12 +236,13 @@ field definitions for consistency.
 |---|---|---|---|
 | `name` | `str` | **required** | The name of the field - displayed in the UI |
 | `type` | `Any` | **required** | Python type of the field for pydantic validation - note , ChoiceField and MultipleChoiceField are a list[str] |
-| `field_type` | `<enum 'FieldTypeEnum'>` | `CharField` | Field type for persistence |
+| `field_type` | `FieldTypeEnum` \| `str` | `CharField` | Field type for persistence |
 | `description` | `str` | `None` | Description of the field - displayed in the UI |
 | `choices` | `list[tuple[str, str]]` \| `list[str]` | `None` | For choice fields, list of [value, label] pairs |
 | `default` | `Any` | `None` | Default value for the field - displayed in the UI |
 | `widget` | `str` | `None` | UI widget to use (e.g. RadioSelect, TextInput) - as a django widget name |
 | `required` | `bool` | False | Whether field is required for form submission |
+| `dynamic_choices` | `str` | `None` | Key name for dynamic choices resolved at runtime via Agent.dynamic_choices_callback. Mutually exclusive with 'choices'. |
 
 #### Examples
 
@@ -369,7 +371,7 @@ This represents the main server instance that manages agents and provides
 the API endpoints for the Supervaize Control API. It handles agent registration,
 job execution, and communication with the Supervaize platform.
 
-The server can be configured with various endpoints (A2A, admin interface)
+The server can be configured with various endpoints (A2A, ACP, admin interface)
 and supports encryption/decryption of parameters using RSA keys.
 
 Note that when the supervisor ccount is set, the A2A protocol is automatically activated to provide HEALTH CHECK endpoints.
@@ -388,6 +390,7 @@ public_url: full url (including scheme and port) to use for outbound connections
 
 | Field | Type | Default | Description |
 |---|---|---|---|
+| `server_id` | `str` | — | Unique server id (SUPERVAIZER_SERVER_ID env or persisted uuid) |
 | `scheme` | `str` | **required** | URL scheme (http or https) |
 | `host` | `str` | **required** | Host to bind the server to (e.g., 0.0.0.0 for all interfaces) |
 | `port` | `int` | **required** | Port to bind the server to |
@@ -437,4 +440,4 @@ public_url: full url (including scheme and port) to use for outbound connections
 ```
 
 
-*Uploaded on 2026-01-25 14:28:59*
+*Uploaded on 2026-04-09 00:25:26*

@@ -61,6 +61,22 @@ if job.status == EntityStatus.COMPLETED:
     print("Job completed successfully!")
 ```
 
+### Job Polling
+
+The optional `job_poll` method enables manual polling for agents that depend on external events (webhooks, email services, telephony). When defined, the workbench shows a **"Check for updates"** button on active jobs.
+
+```python
+from supervaizer import AgentMethod
+
+poll_method = AgentMethod(
+    name="poll",
+    method="my_module.poll_external",
+    description="Check external services for updates",
+)
+```
+
+The poll handler receives `{"job_id": job_id}` as kwargs and returns a `JobResponse`. See [Manual Polling](/docs/supervaizer-controller/application-flow-control#manual-polling-job_poll) for details.
+
 ## A2A Protocol API
 
 ### Agent Discovery
@@ -127,38 +143,6 @@ telemetry = Telemetry(
 )
 ```
 
-## Workbench Endpoints
-
-### Job Poll
-
-Manually trigger the agent's poll handler for a specific job. This is used by the workbench "Check for updates" button to check external services for new data when webhooks are not available.
-
-```
-POST /admin/agents/{slug}/workbench/jobs/{job_id}/poll
-```
-
-**Path Parameters:**
-- `slug` (str): The agent slug identifier
-- `job_id` (str): The job ID to poll for updates
-
-**Response:** Returns a `JobResponse` with the poll result.
-
-**Example:**
-
-```python
-import requests
-
-response = requests.post(
-    "https://your-server/admin/agents/my-agent/workbench/jobs/job-123/poll",
-    headers={"X-API-Key": "your-api-key"}
-)
-poll_result = response.json()
-```
-
-:::note
-The poll endpoint is only available when the agent has a `job_poll` method defined in its `AgentMethods`.
-:::
-
 ## Advanced Usage
 
 ### Creating Custom Agents
@@ -189,11 +173,11 @@ methods = AgentMethods(
         method="get_status",
         description="Check processing status"
     ),
-    job_poll=AgentMethod(
+    job_poll=AgentMethod(  # Optional
         name="poll",
-        method="poll_updates",
+        method="poll_external",
         description="Check external services for updates"
-    ),
+    )
 )
 
 # Create agent
@@ -206,4 +190,4 @@ agent = Agent(
 ```
 
 
-*Uploaded on 2026-01-25 14:28:59*
+*Uploaded on 2026-04-09 00:25:26*

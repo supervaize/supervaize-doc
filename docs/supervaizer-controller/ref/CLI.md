@@ -59,21 +59,17 @@ supervaizer start --debug --reload
 # Set log level
 supervaizer start --log-level=DEBUG
 
-# Local mode: run without Studio credentials
+# Run in local mode (no Studio registration)
 supervaizer start --local
-
-# Local mode with your own agents
-supervaizer start --local my_config.py
 ```
 
-#### Local mode (`--local`)
+**Local mode (`--local`):**
 
-Runs the server without Supervaize Studio registration. Your agents from `supervaizer_control.py` run alongside a built-in Hello World agent.
+Starts the server without connecting to Studio. Your agents from `supervaizer_control.py` run alongside a built-in Hello World agent. If no `supervaizer_control.py` exists, only Hello World is loaded.
 
-- If no `supervaizer_control.py` exists, falls back to Hello World only
+- `SUPERVAIZER_LOCAL_MODE=true` is set automatically
 - API key defaults to `local-dev` (override with `SUPERVAIZER_API_KEY`)
 - Set `SUPERVAIZER_DISABLE_HELLO_WORLD=true` to deactivate the Hello World agent
-- Admin workbench available at `/admin/`
 
 ### deploy
 
@@ -238,7 +234,6 @@ supervaizer deploy clean --verbose
 
 For detailed deployment documentation, see:
 
-- [RFC-001: Cloud Deployment CLI](../rfc/001-cloud-deployment-cli.md) - Complete specification
 - [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
 
 ## Environment Variables
@@ -247,20 +242,24 @@ All CLI options can also be configured through environment variables:
 
 ### Server Configuration
 
-| Environment Variable      | Description                      | Default Value                |
-| ------------------------- | -------------------------------- | ---------------------------- |
-| SUPERVAIZER_PUBLIC_URL    | Url used for inbound connections | defaults to scheme+host+port |
-| SUPERVAIZER_HOST          | Host to bind the server to       | 0.0.0.0                      |
-| SUPERVAIZER_PORT          | Port to bind the server to       | 8000                         |
-| SUPERVAIZER_ENVIRONMENT   | Environment name                 | dev                          |
-| SUPERVAIZER_LOG_LEVEL     | Log level (DEBUG, INFO, etc.)    | INFO                         |
-| SUPERVAIZER_DEBUG         | Enable debug mode (true/false)   | false                        |
-| SUPERVAIZER_RELOAD        | Enable auto-reload (true/false)  | false                        |
-| SUPERVAIZER_SCRIPT_PATH   | Path to configuration script     | -                            |
-| SUPERVAIZER_OUTPUT_PATH   | Path for install command output  | supervaizer_control.py       |
-| SUPERVAIZER_FORCE_INSTALL       | Force overwrite existing file     | false                        |
-| SUPERVAIZER_LOCAL_MODE          | Enable local mode (set by --local) | false                      |
-| SUPERVAIZER_DISABLE_HELLO_WORLD | Disable Hello World agent in local mode | false                 |
+| Environment Variable      | Description                      | Default Value                 |
+| ------------------------- | -------------------------------- | ----------------------------- |
+| SUPERVAIZER_PUBLIC_URL    | Url used for inbound connections | defaults to scheme+host+port  |
+| SUPERVAIZER_HOST          | Host to bind the server to       | 0.0.0.0                       |
+| SUPERVAIZER_PORT          | Port to bind the server to       | 8000                          |
+| SUPERVAIZER_ENVIRONMENT   | Environment name                 | dev                           |
+| SUPERVAIZER_LOG_LEVEL     | Log level (DEBUG, INFO, etc.)    | INFO                          |
+| SUPERVAIZER_DEBUG         | Enable debug mode (true/false)   | false                         |
+| SUPERVAIZER_RELOAD        | Enable auto-reload (true/false)  | false                         |
+| SUPERVAIZER_SCRIPT_PATH   | Path to configuration script     | -                             |
+| SUPERVAIZER_OUTPUT_PATH   | Path for install command output  | supervaizer_control.py        |
+| SUPERVAIZER_FORCE_INSTALL | Force overwrite existing file    | false                         |
+| SUPERVAIZER_PRIVATE_KEY   | RSA private key (PEM string)     | generated at runtime if unset |
+| SUPERVAIZER_SERVER_ID     | Stable server instance ID (UUID) | generated at runtime if unset |
+| SUPERVAIZER_LOCAL_MODE    | Enable local mode (true/false)   | false                         |
+| SUPERVAIZER_DISABLE_HELLO_WORLD | Disable built-in Hello World agent in local mode | false |
+
+**Serverless (e.g. Vercel):** On serverless platforms, each instance may be a new process. Set `SUPERVAIZER_PRIVATE_KEY` and `SUPERVAIZER_SERVER_ID` in the platform's environment variables so the same key and ID are used across instances. Otherwise every cold start generates a new key and server ID.
 
 ### Deployment Configuration
 
@@ -278,4 +277,5 @@ These environment variables are used during cloud deployment:
 
 **Note:** Deployment secrets (API keys, RSA keys) are securely stored in cloud provider secret stores and not exposed in environment variables or logs.
 
-_Uploaded on 2026-01-25 14:28:59_
+
+*Uploaded on 2026-04-09 00:25:26*

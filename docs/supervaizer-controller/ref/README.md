@@ -1,4 +1,4 @@
-## SUPERVAIZER {#supervaizer}
+# SUPERVAIZER
 
 [Operate AI Agents with confidence]
 
@@ -6,19 +6,19 @@ A Python toolkit for building, managing, and connecting AI agents with full [Age
 
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/downloads/)
 [![A2A Protocol](https://img.shields.io/badge/A2A-Protocol-orange.svg)](https://a2a-protocol.org/)
-[![Test Coverage](https://img.shields.io/badge/Coverage-81%25-brightgreen.svg)](https://github.com/runwaize/supervaizer)
+[![Test Coverage](https://img.shields.io/badge/Coverage-81%25-brightgreen.svg)](https://github.com/supervaize/supervaizer)
 
 > **⚠️ Beta Disclaimer**: SUPERVAIZER is currently in beta mode. Not everything works as expected yet. Please report any issues you encounter.
 
-- [SUPERVAIZER](#supervaizer)
-  - [Description](#description)
+- [Description](#description)
   - [Quick Start](#quick-start)
     - [What we'll do](#what-well-do)
     - [1. Install Supervaizer](#1-install-supervaizer)
     - [3. Scaffold the controller](#3-scaffold-the-controller)
     - [(Optional) 4. Configure your Supervaize account \& environment](#optional-4-configure-your-supervaize-account--environment)
     - [5. Start the server 🚀](#5-start-the-server-)
-    - [6. Optional parameters](#6-optional-parameters)
+    - [6. Local mode](#6-local-mode)
+    - [7. Optional parameters](#7-optional-parameters)
     - [What's next?](#whats-next)
   - [Features](#features)
   - [Protocol Support](#protocol-support)
@@ -115,9 +115,24 @@ Once the server is running, you'll have:
 
 - **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`
 - **A2A discovery**: `/.well-known/agents.json`
-- **Admin interface**: `/admin`
+- **ACP discovery**: `/agents`
 
-### 6. Optional parameters
+### 6. Local mode
+
+Run the server locally without connecting to Studio:
+
+```bash
+supervaizer start --local
+```
+
+This starts the server with your agents from `supervaizer_control.py` alongside a built-in Hello World agent. If no `supervaizer_control.py` exists, only the Hello World agent is loaded.
+
+- **No Studio registration** — the server runs fully offline
+- **`SUPERVAIZER_LOCAL_MODE=true`** is set automatically
+- **API key** defaults to `local-dev` (override with `SUPERVAIZER_API_KEY`)
+- **Disable Hello World** by setting `SUPERVAIZER_DISABLE_HELLO_WORLD=true`
+
+### 7. Optional parameters
 
 Configure retry behavior for HTTP requests to the Supervaize API:
 
@@ -140,6 +155,10 @@ For detailed instructions on customizing your controller, see the [Controller Se
 - **Agent Management**: Register, update, and control agents
 - **Job Control**: Create, track, and manage jobs
 - **Event Handling**: Process and respond to system events
+- **Custom Routes**: Agents can mount their own FastAPI routers at `/agents/{slug}/api/` for tool endpoints, webhooks, or custom APIs
+- **Scheduled Steps**: Defer step execution to a future time with automatic background polling and workbench controls (execute now, cancel, reschedule)
+- **Human-in-the-Loop (HITL)**: Form-based and dialog-based interactive content review with chat interface
+- **Agent Workbench**: Built-in testing interface with real-time monitoring, job control, HITL forms, and live console
 - **🚀 Cloud Deployment**: Automated deployment to GCP Cloud Run, AWS App Runner, and DigitalOcean App Platform
 - **A2A Protocol Support**: Full integration with the Agent-to-Agent protocol for standardized agent discovery and interaction
 - **Server Communication**: Interact with SUPERVAIZE servers (see [supervaize.com](https://www.supervaize.com) for more info)
@@ -191,7 +210,6 @@ supervaizer deploy up --platform do-app-platform --region nyc
 
 ### Documentation
 
-- [RFC-001: Cloud Deployment CLI](../rfc/001-cloud-deployment-cli.md) - Complete specification
 - [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
 
 ## Using the CLI
@@ -225,7 +243,7 @@ server.launch()
 print(f"Admin Interface: http://localhost:8000/admin/")
 ```
 
-## Calculating costs {#calculating-costs}
+## Calculating costs
 
 Developers are free to define the cost of the transaction the way they want when updating the cases.
 Here is a way to easily get an estimate of the cost of an LLM transaction (note that litellm also supports custom pricing. )
@@ -256,4 +274,5 @@ Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to 
 
 This project is licensed under the [Mozilla Public License 2.0](LICENSE.md) License.
 
-_Uploaded on 2026-01-25 14:28:59_
+
+*Uploaded on 2026-04-09 00:25:26*
