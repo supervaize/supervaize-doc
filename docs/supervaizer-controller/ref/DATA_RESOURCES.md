@@ -7,7 +7,7 @@ Data Resources allow agents to expose their own domain data (contacts, records, 
 Declare `DataResource` objects on your agent and pass them in `Agent(data_resources=[...])`. The SDK auto-generates FastAPI routes. Studio discovers them at registration time and renders generic CRUD views.
 
 ```python
-from supervaizer import Agent, DataResource, DataResourceField, Editable
+from supervaizer import Agent, DataResource, DataResourceField, Editable, FieldType
 
 contacts_resource = DataResource(
     name="contacts",
@@ -16,7 +16,7 @@ contacts_resource = DataResource(
     fields=[
         DataResourceField(name="id", editable=Editable.NEVER, visible_on=["list", "detail"]),
         DataResourceField(name="first_name", required=True),
-        DataResourceField(name="email", field_type="email"),
+        DataResourceField(name="email", field_type=FieldType.EMAIL),
     ],
     on_list=lambda: contacts_repo.list_all(),
     on_get=lambda item_id: contacts_repo.get(item_id),
