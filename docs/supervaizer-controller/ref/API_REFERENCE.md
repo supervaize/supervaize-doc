@@ -61,6 +61,34 @@ if job.status == EntityStatus.COMPLETED:
     print("Job completed successfully!")
 ```
 
+### DataResource
+
+Declares a named CRUD data endpoint that the SDK auto-generates as FastAPI routes.
+
+```python
+from supervaizer import DataResource, DataResourceField, Editable
+from uuid import uuid4
+
+resource = DataResource(
+    name="contacts",
+    fields=[DataResourceField(name="email", field_type="email", required=True)],
+    on_list=lambda: [],
+    on_create=lambda data: {**data, "id": str(uuid4())},
+)
+```
+
+See [Data Resources](./DATA_RESOURCES.md) for full reference.
+
+### Editable (enum)
+
+Controls Studio form behaviour for a field.
+
+| Value | Meaning |
+|-------|---------|
+| `Editable.ALWAYS` | Editable on both create and update |
+| `Editable.CREATE_ONLY` | Writable on create; read-only on edit |
+| `Editable.NEVER` | Never shown in a form input |
+
 ### Job Polling
 
 The optional `job_poll` method enables manual polling for agents that depend on external events (webhooks, email services, telephony). When defined, the workbench shows a **"Check for updates"** button on active jobs.

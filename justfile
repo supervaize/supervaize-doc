@@ -9,21 +9,21 @@ default:
     @just --list
 
 
-start_local:
+dev:
     npx docusaurus start
 
 build:
     npm run build
 
-upgrade_packages:
+upgrade:
     npx npm-check-updates -u
     npm install
 
-release_patch:
+release-patch:
     npm run release:patch
 
-release_minor:
+release-minor:
     npm run release:minor
 
-release_major:
+release-major:
     npm run release:major

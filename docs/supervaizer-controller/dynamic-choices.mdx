@@ -12,6 +12,7 @@ Dynamic choices allow your agent's form fields to display options that are resol
 ## When to use
 
 Use dynamic choices when:
+
 - The list of options changes over time (e.g., active projects, team members, available models)
 - The options come from an external source (database, API)
 - The options are environment-specific (dev vs. prod)
@@ -66,6 +67,7 @@ def get_dynamic_choices(method_name: str, context: dict) -> dict[str, list[tuple
 ```
 
 The return format is `dict[str, list[tuple[str, str]]]`:
+
 - **Keys** match the `dynamic_choices` values on your fields
 - **Values** are lists of `(value, label)` tuples — same format as static `choices`
 
@@ -104,7 +106,7 @@ When Supervaize Studio renders the job start form:
 4. The returned choices are used to populate the form dropdowns
 
 ```
-┌──────────────┐     POST /start/dynamic_choices    ┌───────────────┐
+┌──────────────┐     POST /start/dynamic_choices     ┌───────────────┐
 │   Supervaize │ ──────────────────────────────────► │  Supervaizer  │
 │    Studio    │  {workspace_id, mission_id}         │   Controller  │
 │              │ ◄────────────────────────────────── │               │
@@ -127,8 +129,8 @@ POST /supervaizer/agents/{agent_slug}/start/dynamic_choices
 
 ```json
 {
-    "workspace_id": "your-workspace-id",
-    "mission_id": "your-mission-id"
+  "workspace_id": "your-workspace-id",
+  "mission_id": "your-mission-id"
 }
 ```
 
@@ -138,23 +140,23 @@ The `workspace_id` and `mission_id` are passed to the callback as a `context` di
 
 ```json
 {
-    "choices": {
-        "projects": [
-            ["P1", "Project 1"],
-            ["P2", "Project 2"],
-            ["P3", "Project 3"]
-        ]
-    }
+  "choices": {
+    "projects": [
+      ["P1", "Project 1"],
+      ["P2", "Project 2"],
+      ["P3", "Project 3"]
+    ]
+  }
 }
 ```
 
 ### Error responses
 
-| Status | Meaning |
-|--------|---------|
-| 200 | Choices returned successfully |
-| 404 | Agent has no `dynamic_choices_callback` configured |
-| 500 | Callback raised an error |
+| Status | Meaning                                            |
+| ------ | -------------------------------------------------- |
+| 200    | Choices returned successfully                      |
+| 404    | Agent has no `dynamic_choices_callback` configured |
+| 500    | Callback raised an error                           |
 
 ## Complete example
 

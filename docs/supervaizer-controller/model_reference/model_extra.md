@@ -222,6 +222,7 @@ Returns:
 | `name` | `str` | `None` |  |
 | `payload` | `typing.Dict[str, typing.Any]` | `None` |  |
 | `is_final` | `bool` | False |  |
+| `upsert` | `bool` | False | If `True`, Studio updates the existing step at the same index instead of creating a new one. Set automatically by `Case.patch_step()`. |
 | `error` | `str` | `None` |  |
 | `scheduled_at` | `datetime` | `None` |  |
 | `scheduled_method` | `str` | `None` |  |

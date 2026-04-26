@@ -199,6 +199,58 @@ Updates a case with progress information, status changes, or intermediate result
 - Set to `True` for final updates before closing the case
 - When `True`, this update represents the final state before case closure
 
+### case.patch_step()
+
+Updates an existing step in-place instead of appending a new one. Use this when a later event should enrich or complete a step that was already sent — for example, adding an end time to a step that recorded a start time.
+
+**Parameters:**
+
+- `index` (int, required): The index of the step to update. Must match the `index` of a previously sent step.
+- `update` (CaseNodeUpdate, required): The replacement update. Its `index` and `upsert` fields are set automatically.
+
+**How it works:**
+
+`patch_step()` sets `upsert=True` on the update before sending it to Studio. Studio then performs an update-or-create lookup by `(case, index)`: if a step at that index already exists it is updated in-place; if not (e.g. the first call), it is created normally.
+
+**Example — recording both start and end time in a single step:**
+
+```python
+# On interview start — create the step
+case.update(
+    CaseNodeUpdate(
+        name="Interview started",
+        payload={"started_at": started_at},
+        is_final=False,
+    )
+)
+# index is auto-assigned, e.g. 5
+
+# On interview end — patch the same step with the full session window
+case.patch_step(
+    index=5,
+    update=CaseNodeUpdate(
+        name="Interview session",
+        payload={
+            "started_at": started_at,
+            "ended_at": ended_at,
+            "duration_secs": duration_secs,
+        },
+        is_final=False,
+    ),
+)
+```
+
+**When to use:**
+
+- A step represents a time window (start + end), and you only want one step in the UI instead of two
+- A later event adds material information to an earlier step (e.g. a cost or result that wasn't known yet)
+- You want to avoid cluttering the step list with intermediate in-flight states
+
+**When NOT to use:**
+
+- For independent progress updates — use `case.update()` to append a new step instead
+- When the new information is unrelated to the original step
+
 ### case.request_human_input()
 
 Requests human input during case execution. This pauses the case and waits for a human operator to provide input through the Supervaize UI.
@@ -395,6 +447,7 @@ Closes a case with final results and cost information. This should be called whe
 | `name`              | `str`            | `None`  | Descriptive name for this update (displayed in UI)       |
 | `payload`           | `dict[str, Any]` | `None`  | Arbitrary data associated with this update               |
 | `is_final`          | `bool`           | `False` | Whether this is a final update before case closure       |
+| `upsert`            | `bool`           | `False` | If `True`, Studio updates the existing step at the same index instead of creating a new one. Set automatically by `case.patch_step()`. |
 | `error`             | `str`            | `None`  | Error message if this update represents a failure        |
 | `scheduled_at`      | `datetime`       | `None`  | When to execute this step (UTC). Defers execution.       |
 | `scheduled_method`  | `str`            | `None`  | Dotted path to the agent method to call (e.g. `module.func`) |
