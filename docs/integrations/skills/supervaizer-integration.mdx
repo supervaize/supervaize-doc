@@ -167,11 +167,13 @@ The `method` string references `<module>.<function>` and should match your proje
 This file bridges Supervaizer's calling convention to your existing agent logic. For **multi-case agents** (e.g., one case per phone number, per email):
 
 ```python
-from supervaizer import Case, CaseNodeUpdate, JobContext, JobInstructions, JobResponse
+from supervaizer import Case, JobContext, JobInstructions, JobResponse
+
+from .supervaizer_control import all_steps_start_method
 
 def process_case(case_id, job_id, item, **kwargs):
     case = Case.start(job_id=job_id, account=supervaize_account, name=f"Case {case_id}")
-    case.update(CaseNodeUpdate(name="Step Name", cost=0.0, payload={...}, is_final=False))
+    case.update(all_steps_start_method.make_update("step_name", payload={...}, cost=0.0))
     # Call your existing agent logic here
     case.close(case_result={...})
     return case
@@ -200,9 +202,11 @@ For agents with complex step workflows, define step node factory functions in a 
 ```python
 from supervaizer import CaseNodeUpdate
 
+from .supervaizer_control import all_steps_start_method
+
 def confirm_action(item, **kwargs) -> CaseNodeUpdate:
-    return CaseNodeUpdate(
-        name=f"Confirm action for {item}",
+    return all_steps_start_method.make_update(
+        "confirm_action",
         cost=0.0,
         payload={"item": item, "supervaizer_form": {...}},
         is_final=False,
