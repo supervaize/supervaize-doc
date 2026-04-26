@@ -87,6 +87,12 @@ h2::before {
   margin-bottom: 1rem;
 }
 
+/* Category/index cards use h2 for titles; hide decorative heading line there */
+.card h2::before {
+  content: none;
+  display: none;
+}
+
 h3 {
   font-size: 1.8rem;
 }
