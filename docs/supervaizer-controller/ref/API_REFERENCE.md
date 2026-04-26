@@ -37,6 +37,22 @@ account = Account(server=server)
 account.login(username="username", password="password")
 ```
 
+Event-reporting methods are async so asyncio-based agents do not block the event loop:
+
+```python
+case = await Case.start(job_id=job_id, account=account, name="Case", description="Work")
+await case.update(CaseNodeUpdate(name="Step", payload={"status": "running"}))
+await case.close(case_result={"status": "done"})
+```
+
+Synchronous controller methods can use the explicit compatibility shims:
+
+```python
+case = Case.start_sync(job_id=job_id, account=account, name="Case", description="Work")
+case.update_sync(CaseNodeUpdate(name="Step", payload={"status": "running"}))
+case.close_sync(case_result={"status": "done"})
+```
+
 ### Events
 
 The event system enables communication between components.

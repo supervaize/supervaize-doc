@@ -166,16 +166,18 @@ The `method` string references `<module>.<function>` and should match your proje
 
 This file bridges Supervaizer's calling convention to your existing agent logic. For **multi-case agents** (e.g., one case per phone number, per email):
 
+If your adapter runs in an async framework, prefer `await Case.start(...)`, `await case.update(...)`, and `await case.close(...)`. The example below uses the explicit sync shims because `job_start` is a synchronous adapter.
+
 ```python
 from supervaizer import Case, JobContext, JobInstructions, JobResponse
 
 from .supervaizer_control import all_steps_start_method
 
 def process_case(case_id, job_id, item, **kwargs):
-    case = Case.start(job_id=job_id, account=supervaize_account, name=f"Case {case_id}")
-    case.update(all_steps_start_method.make_update("step_name", payload={...}, cost=0.0))
+    case = Case.start_sync(job_id=job_id, account=supervaize_account, name=f"Case {case_id}")
+    case.update_sync(all_steps_start_method.make_update("step_name", payload={...}, cost=0.0))
     # Call your existing agent logic here
-    case.close(case_result={...})
+    case.close_sync(case_result={...})
     return case
 
 def job_start(**kwargs):
