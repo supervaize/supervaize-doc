@@ -37,6 +37,22 @@ account = Account(server=server)
 account.login(username="username", password="password")
 ```
 
+Event-reporting methods are async so asyncio-based agents do not block the event loop:
+
+```python
+case = await Case.start(job_id=job_id, account=account, name="Case", description="Work")
+await case.update(CaseNodeUpdate(name="Step", payload={"status": "running"}))
+await case.close(case_result={"status": "done"})
+```
+
+Synchronous controller methods can use the explicit compatibility shims:
+
+```python
+case = Case.start_sync(job_id=job_id, account=account, name="Case", description="Work")
+case.update_sync(CaseNodeUpdate(name="Step", payload={"status": "running"}))
+case.close_sync(case_result={"status": "done"})
+```
+
 ### Events
 
 The event system enables communication between components.
@@ -60,6 +76,50 @@ job = agent.get_job(job_id="job-123")
 if job.status == EntityStatus.COMPLETED:
     print("Job completed successfully!")
 ```
+
+### DataResource
+
+Declares a named CRUD data endpoint that the SDK auto-generates as FastAPI routes.
+
+```python
+from supervaizer import DataResource, DataResourceField, Editable
+from uuid import uuid4
+
+resource = DataResource(
+    name="contacts",
+    fields=[DataResourceField(name="email", field_type="email", required=True)],
+    on_list=lambda: [],
+    on_create=lambda data: {**data, "id": str(uuid4())},
+)
+```
+
+See [Data Resources](./DATA_RESOURCES.md) for full reference.
+
+### Editable (enum)
+
+Controls Studio form behaviour for a field.
+
+| Value | Meaning |
+|-------|---------|
+| `Editable.ALWAYS` | Editable on both create and update |
+| `Editable.CREATE_ONLY` | Writable on create; read-only on edit |
+| `Editable.NEVER` | Never shown in a form input |
+
+### Job Polling
+
+The optional `job_poll` method enables manual polling for agents that depend on external events (webhooks, email services, telephony). When defined, the workbench shows a **"Check for updates"** button on active jobs.
+
+```python
+from supervaizer import AgentMethod
+
+poll_method = AgentMethod(
+    name="poll",
+    method="my_module.poll_external",
+    description="Check external services for updates",
+)
+```
+
+The poll handler receives `{"job_id": job_id}` as kwargs and returns a `JobResponse`. See [Manual Polling](/docs/supervaizer-controller/application-flow-control#manual-polling-job_poll) for details.
 
 ## A2A Protocol API
 
@@ -156,6 +216,11 @@ methods = AgentMethods(
         name="check_status",
         method="get_status",
         description="Check processing status"
+    ),
+    job_poll=AgentMethod(  # Optional
+        name="poll",
+        method="poll_external",
+        description="Check external services for updates"
     )
 )
 
@@ -169,4 +234,4 @@ agent = Agent(
 ```
 
 
-*Uploaded on 2026-01-25 14:28:59*
+*Uploaded on 2026-04-09 00:25:26*

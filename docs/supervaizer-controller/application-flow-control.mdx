@@ -35,6 +35,12 @@ Application flow control allows you to:
 
 The `Case` class represents an individual task or unit of work within a job. Each case can track its own progress, costs, and results.
 
+:::info Async event reporting
+Case and account methods that report to Supervaize are async. In async agents, use `await Case.start(...)`, `await case.update(...)`, `await case.request_human_input(...)`, and `await case.close(...)`.
+
+For synchronous controller methods declared with `is_async=False`, use the explicit sync shims: `Case.start_sync(...)`, `case.update_sync(...)`, `case.request_human_input_sync(...)`, and `case.close_sync(...)`.
+:::
+
 ### Case.start()
 
 Creates a new case for tracking a specific task. This is a static method that returns a `Case` instance.
@@ -83,7 +89,7 @@ The `context` parameter is automatically provided by Supervaizer when your agent
 **Example:**
 
 ```159:165:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
-        case = Case.start(
+        case = await Case.start(
             job_id=job_id,
             account=account,
             name=f"Call to {phone_number}",
@@ -109,7 +115,7 @@ Updates a case with progress information, status changes, or intermediate result
 **Example - Initial progress update:**
 
 ```196:206:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/callagen/callagen/call_agent.py
-                case.update(
+                await case.update(
                     CaseNodeUpdate(
                         name=f"📞 Starting Outgoing Call (Try #{attempt})",
                         cost=0.0,
@@ -211,7 +217,7 @@ Requests human input during case execution. This pauses the case and waits for a
 **Example:**
 
 ```387:417:/Volumes/SSDext1TB/Documents/GitRepo/SUPERVAIZE/9agents/ai-toolbox/packages/todosyncer/src/todosyncer/supervaize_config.py
-            human_pr_review_case.request_human_input(
+            await human_pr_review_case.request_human_input(
                 CaseNodeUpdate(
                     name="Human PR review",
                     cost=0.0,
@@ -353,7 +359,7 @@ Closes a case with final results and cost information. This should be called whe
                         "duration_seconds": duration_seconds,
                         "cost": call.cost,
                     }
-                    case.close(case_result=case_result_dict, final_cost=call.cost)
+                    await case.close(case_result=case_result_dict, final_cost=call.cost)
 ```
 
 **Example - Failure case:**
@@ -364,7 +370,7 @@ Closes a case with final results and cost information. This should be called whe
                     "error": str(e),
                     "attempt": attempt,
                 }
-                case.close(case_result=case_result_dict, final_cost=call_cost)
+                await case.close(case_result=case_result_dict, final_cost=call_cost)
 ```
 
 **What to include in `case_result`:**
@@ -704,8 +710,8 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
 
 1. **Job-level**: Start with job context, return `JobResponse`
 2. **Case-level**: Create a `Case` for each independent task
-3. **Progress**: Use `case.update()` with `CaseNodeUpdate` throughout execution
-4. **Completion**: Always `case.close()` with results, even on failure
+3. **Progress**: Use `await case.update()` with `CaseNodeUpdate` throughout execution
+4. **Completion**: Always `await case.close()` with results, even on failure
 5. **Aggregation**: Final `JobResponse` summarizes all cases
 
 ## Best Practices
@@ -738,11 +744,11 @@ def call_agent_start(**kwargs: Any) -> JobResponse:
 
 ```python
 # Track cost per update
-case.update(CaseNodeUpdate(name="API call", cost=0.05, ...))
+await case.update(CaseNodeUpdate(name="API call", cost=0.05, ...))
 
 # Track total cost when closing
 total_case_cost = sum(update.cost for update in case.updates)
-case.close(case_result={...}, final_cost=total_case_cost)
+await case.close(case_result={...}, final_cost=total_case_cost)
 ```
 
 ### Error Handling Patterns
@@ -752,10 +758,10 @@ case.close(case_result={...}, final_cost=total_case_cost)
 ```python
 try:
     # ... execute task ...
-    case.close(case_result={"status": "success", ...}, final_cost=cost)
+    await case.close(case_result={"status": "success", ...}, final_cost=cost)
 except Exception as e:
-    case.update(CaseNodeUpdate(name="Error", error=str(e), ...))
-    case.close(case_result={"status": "failed", "error": str(e)}, final_cost=cost)
+    await case.update(CaseNodeUpdate(name="Error", error=str(e), ...))
+    await case.close(case_result={"status": "failed", "error": str(e)}, final_cost=cost)
 ```
 
 **Provide context in error updates:**
