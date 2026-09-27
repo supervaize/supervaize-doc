@@ -27,6 +27,14 @@ ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' f
 
 The `workspace` request header and `/w/<slug>/` URL path come from `SUPERVAIZE_WORKSPACE_ID`. Confirm it is the exact slug of an active Studio workspace, and that the user who owns `SUPERVAIZE_API_KEY` belongs to that workspace and still has Developer access. Also confirm the workspace subscription is active and that `SUPERVAIZE_API_URL` matches the environment where the key was created. If Studio's response body says `Subscription required`, ask a workspace administrator to check the subscription. Never send the API key in a support message.
 
+### **HTTP 500 while sending SERVER_REGISTER**
+
+HTTP 500 means Studio failed while processing the registration. The controller log alone does not identify the server-side cause. Include the UTC timestamp, workspace slug, environment, and Studio response's `X-Request-ID` header in a support report. Do not share the authorization header, event payload, or API keys.
+
+Studio returns `X-Request-ID` on production API responses and includes that ID in its logs. Supervaizer logs the remote HTTP status and request ID for HTTP errors. If the response header was not captured, provide the timestamp and workspace so support can search the corresponding Studio logs.
+
+If an API key appeared in logs or a support message, rotate both the Studio workspace API key and the controller API key, update the agent's secret configuration, and redeploy. Remove or restrict access to copies of the exposed logs where possible.
+
 ### **Port already in use**
 
 Change the port: `sv_server.launch(host="0.0.0.0", port=8010)`.
