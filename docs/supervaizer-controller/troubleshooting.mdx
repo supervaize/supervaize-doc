@@ -23,7 +23,7 @@ Make sure you virtual environment is active.
 ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' for url 'https://stage.supervaize.com/w/team_1/api/v1/ctrl-events/'
 ```
 
-Check at https://stage.supervaize.com/users/developer/ that the API key you are using is active.
+The `workspace` request header and `/w/<slug>/` URL path come from `SUPERVAIZE_WORKSPACE_ID`. Confirm it is the exact slug of an active Studio workspace, and that the user who owns `SUPERVAIZE_API_KEY` belongs to that workspace and still has Developer access. Also confirm the workspace subscription is active and that `SUPERVAIZE_API_URL` matches the environment where the key was created. If Studio's response body says `Subscription required`, ask a workspace administrator to check the subscription. Never send the API key in a support message.
 
 ### **Port already in use**
 
