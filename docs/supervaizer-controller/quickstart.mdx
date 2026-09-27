@@ -154,7 +154,7 @@ Or setup [python-dotenv](https://github.com/theskumar/python-dotenv) in your pyt
 
 ```bash title="Export Environment variables in for .envrc"
 export SUPERVAIZE_API_KEY=...
-export SUPERVAIZE_WORKSPACE_ID=team_1
+export SUPERVAIZE_WORKSPACE_ID=your-workspace-slug
 export SUPERVAIZE_API_URL=https://app.supervaize.com
 ```
 
@@ -163,7 +163,7 @@ export SUPERVAIZE_API_URL=https://app.supervaize.com
 
 ```bash title="Setup Environment variables for dotenv"
 SUPERVAIZE_API_KEY=...
-SUPERVAIZE_WORKSPACE_ID=team_1
+SUPERVAIZE_WORKSPACE_ID=your-workspace-slug
 SUPERVAIZE_API_URL=https://app.supervaize.com
 ```
 
@@ -171,6 +171,16 @@ SUPERVAIZE_API_URL=https://app.supervaize.com
 
 </Tabs>
 
+`SUPERVAIZE_WORKSPACE_ID` must be the exact Studio workspace slug. The Studio user who owns the API key must belong to this workspace and retain Developer access.
+
+### Workspace authorization for Studio-managed v2 agents
+When your controller registers with Studio and A2A is enabled, set the workspace authorization variables in addition to the API credentials above. In Studio, open **Developer → Environment variables** and copy the generated values for your workspace:
+```bash
+export SUPERVAIZER_WORKSPACE_AUTH_REQUIRED=true
+export SUPERVAIZER_WORKSPACE_AUTH_ISSUER=https://studio.supervaize.com
+export SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL=https://app.supervaize.com/w/your-workspace-slug/api/v1/workspace-agent-grants/jwks/
+```
+The issuer must match the issuer used to sign Studio's authorization tokens. The JWKS URL is public and provides the verification key; use the workspace slug from Studio's generated configuration. This is separate from `SUPERVAIZE_API_KEY` (agent → Studio) and `SUPERVAIZER_API_KEY` (Studio → controller). If using a different Studio deployment, copy its generated values instead of these production examples.
 ### For local development only {#localdev}
 
 :::warning Local development
