@@ -13,6 +13,8 @@ Common issues and solutions when setting up and running the Supervaizer Controll
 ### Studio-registered A2A requires workspace authorization
 If startup reports `Studio-registered Supervaizer v2 A2A requires workspace authorization`, the Studio API key alone is not enough. In Studio, open **Developer → Environment variables** and copy `SUPERVAIZER_WORKSPACE_AUTH_REQUIRED`, `SUPERVAIZER_WORKSPACE_AUTH_ISSUER`, and `SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL` into the agent server's environment. The issuer and JWKS endpoint are public verification settings, not API secrets. See the [Quickstart](quickstart#workspace-authorization-for-studio-managed-v2-agents).
 
+If fetching the JWKS URL returns `404`, use the Django API origin and the `/w/<workspace-slug>/api/v1/workspace-agent-grants/jwks/` route. The production issuer is `https://studio.supervaize.com`; the production API origin is `https://app.supervaize.com`. The JWKS route and controller-event route share the workspace prefix but have separate endpoints.
+
 ### **Unknown command: supervaizer **
 
 Make sure you virtual environment is active.
@@ -24,6 +26,20 @@ ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' f
 ```
 
 The `workspace` request header and `/w/<slug>/` URL path come from `SUPERVAIZE_WORKSPACE_ID`. Confirm it is the exact slug of an active Studio workspace, and that the user who owns `SUPERVAIZE_API_KEY` belongs to that workspace and still has Developer access. Also confirm the workspace subscription is active and that `SUPERVAIZE_API_URL` matches the environment where the key was created. If Studio's response body says `Subscription required`, ask a workspace administrator to check the subscription. Never send the API key in a support message.
+
+### **HTTP 400: invalid server.register details**
+
+If the response identifies `details.agents[n].parameters_setup`, that field must be a JSON array of parameter definitions. Omit it or send `[]` when the agent has no parameters; explicit `null` is invalid.
+
+Example: `Invalid server.register details: details.agents[0].parameters_setup: must be a list of parameter definitions; omit it or send [] when none exist`.
+
+### **HTTP 500 while sending SERVER_REGISTER**
+
+HTTP 500 means Studio failed while processing the registration. The controller log alone does not identify the server-side cause. Include the UTC timestamp, workspace slug, environment, and Studio response's `X-Request-ID` header in a support report. Do not share the authorization header, event payload, or API keys.
+
+Studio returns `X-Request-ID` on production API responses and includes that ID in its logs. Supervaizer logs the remote HTTP status and request ID for HTTP errors. If the response header was not captured, provide the timestamp and workspace so support can search the corresponding Studio logs.
+
+If an API key appeared in logs or a support message, rotate both the Studio workspace API key and the controller API key, update the agent's secret configuration, and redeploy. Remove or restrict access to copies of the exposed logs where possible.
 
 ### **Port already in use**
 
