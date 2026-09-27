@@ -10,6 +10,8 @@ slug: troubleshooting
 Common issues and solutions when setting up and running the Supervaizer Controller.
 
 ## Server Launch Issues
+### Studio-registered A2A requires workspace authorization
+If startup reports `Studio-registered Supervaizer v2 A2A requires workspace authorization`, the Studio API key alone is not enough. In Studio, open **Developer → Environment variables** and copy `SUPERVAIZER_WORKSPACE_AUTH_REQUIRED`, `SUPERVAIZER_WORKSPACE_AUTH_ISSUER`, and `SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL` into the agent server's environment. The issuer and JWKS endpoint are public verification settings, not API secrets. See the [Quickstart](quickstart#workspace-authorization-for-studio-managed-v2-agents).
 
 ### **Unknown command: supervaizer **
 
