@@ -9,6 +9,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  margin-bottom: clamp(2rem, 5vw, 2.5rem);
 }
 
 /* Runwaize hero: dark background, grid, green ambient glow */
@@ -38,17 +39,54 @@
   pointer-events: none;
 }
 
-.heroRunwaize .container {
+.heroContainer {
   position: relative;
   z-index: 1;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px))
+    max(16px, env(safe-area-inset-right, 0px));
 }
 
-.heroRunwaize .hero__title {
+@media screen and (min-width: 480px) {
+  .heroContainer {
+    padding-inline: max(20px, env(safe-area-inset-left, 0px))
+      max(20px, env(safe-area-inset-right, 0px));
+  }
+}
+
+.heroTitle {
   color: #fff !important;
   font-weight: 700;
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  line-height: 1.15;
   letter-spacing: -0.02em;
   margin-bottom: 0.5rem;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+}
+
+.heroTitleMobile,
+.heroTitleDesktop {
+  display: inline;
+}
+
+.heroTitleMobile {
+  white-space: nowrap;
+}
+
+.heroTitleDesktop {
+  display: none;
+  white-space: nowrap;
+}
+
+@media screen and (min-width: 768px) {
+  .heroTitleMobile {
+    display: none;
+  }
+
+  .heroTitleDesktop {
+    display: inline;
+  }
 }
 
 .heroRunwaize .heroTitleGreen {
@@ -68,6 +106,33 @@
   padding: 0.75rem 1.5rem;
 }
 
+.gettingStartedButton {
+  white-space: normal;
+  height: auto;
+  max-width: 100%;
+  overflow: visible;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.gettingStartedLabelMobile {
+  display: inline;
+}
+
+.gettingStartedLabelDesktop {
+  display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .gettingStartedLabelMobile {
+    display: none;
+  }
+
+  .gettingStartedLabelDesktop {
+    display: inline;
+  }
+}
+
 .heroRunwaize .buttons .button--secondary {
   background: #fff;
   color: #080808;
@@ -81,7 +146,7 @@
 
 @media screen and (max-width: 996px) {
   .heroBanner {
-    padding: 2rem;
+    padding: 2rem 0;
   }
 }
 
@@ -89,4 +154,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.homeMain {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
 }

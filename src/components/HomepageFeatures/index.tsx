@@ -10,6 +10,10 @@ type FeatureItem = {
   description: ReactNode;
   link: string;
   linkText: string;
+  githubMobileFallback?: {
+    href: string;
+    sub: string;
+  };
 };
 
 const FeatureList: FeatureItem[] = [
@@ -22,6 +26,10 @@ const FeatureList: FeatureItem[] = [
         className={styles.featureSvg}
       />
     ),
+    githubMobileFallback: {
+      href: "https://github.com/runwaize/supervaize_hello_world",
+      sub: "runwaize/supervaize_hello_world",
+    },
     description: (
       <>
         The Supervaizer Controller is a Python-based runtime that lets you
@@ -73,11 +81,35 @@ const FeatureList: FeatureItem[] = [
   },
 ];
 
-function Feature({ title, Svg, description, link, linkText }: FeatureItem) {
+function Feature({
+  title,
+  Svg,
+  description,
+  link,
+  linkText,
+  githubMobileFallback,
+}: FeatureItem) {
   return (
     <div className={clsx("col col--4")}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        {githubMobileFallback ? (
+          <>
+            <Link
+              className={styles.githubMobileCard}
+              href={githubMobileFallback.href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className={styles.githubMobileCardTitle}>View on GitHub →</span>
+              <span className={styles.githubMobileCardSub}>{githubMobileFallback.sub}</span>
+            </Link>
+            <div className={styles.featureDesktopImage}>
+              <Svg className={styles.featureSvg} role="img" />
+            </div>
+          </>
+        ) : (
+          <Svg className={styles.featureSvg} role="img" />
+        )}
       </div>
       <div className="text--center padding-horiz--md">
         <Heading as="h3">{title}</Heading>
