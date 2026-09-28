@@ -27,8 +27,8 @@ const FeatureList: FeatureItem[] = [
       />
     ),
     githubMobileFallback: {
-      href: "https://github.com/runwaize/supervaize_hello_world",
-      sub: "runwaize/supervaize_hello_world",
+      href: "https://github.com/supervaize/supervaizer",
+      sub: "supervaize/supervaizer",
     },
     description: (
       <>
