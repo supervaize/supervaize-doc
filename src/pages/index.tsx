@@ -4,7 +4,6 @@ import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
-import HomepageGitHubPreview from "@site/src/components/HomepageGitHubPreview";
 import Heading from "@theme/Heading";
 import JsonLd from "@site/src/components/JsonLd";
 
@@ -66,7 +65,6 @@ export default function Home(): ReactNode {
       <JsonLd data={jsonLd} />
       <HomepageHeader />
       <main className={styles.homeMain}>
-        <HomepageGitHubPreview />
         <HomepageFeatures />
       </main>
     </Layout>
