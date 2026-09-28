@@ -5,6 +5,18 @@
   width: 100%;
 }
 
+.features :global(.container) {
+  padding-inline: max(16px, env(safe-area-inset-left, 0px))
+    max(16px, env(safe-area-inset-right, 0px));
+}
+
+@media screen and (min-width: 480px) {
+  .features :global(.container) {
+    padding-inline: max(20px, env(safe-area-inset-left, 0px))
+      max(20px, env(safe-area-inset-right, 0px));
+  }
+}
+
 .featureSvg {
   height: 200px;
   width: 200px;
