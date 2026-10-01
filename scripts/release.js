@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Release script that creates a commit with appropriate message and pushes to main.
- * CI/CD will automatically detect the commit message and bump the version.
+ * Release script (GitButler workflow).
+ * Creates an empty release commit on a fresh branch, opens a PR with `but pr new`,
+ * then squash-merges it so the commit landing on main carries the PR title
+ * (e.g. "feat: version bump (#14)"). CI reads that message to pick the bump type.
  */
 
 import { execSync } from "child_process";
@@ -20,48 +22,31 @@ if (!["patch", "minor", "major"].includes(versionType)) {
   process.exit(1);
 }
 
-// Map version type to commit message prefix
+// Map version type to commit message prefix (matched by .github/workflows/deploy.yml)
 const commitMessages = {
   patch: "fix: version bump",
   minor: "feat: version bump",
   major: "feat!: version bump [BREAKING CHANGE]",
 };
 
+const run = (cmd) => execSync(cmd, { cwd: rootDir, stdio: "inherit" });
+
 try {
   const commitMessage = commitMessages[versionType];
-  
-  console.log(`Creating release commit for ${versionType} version bump...`);
-  console.log(`Commit message: ${commitMessage}`);
-  
-  // Check if there are any changes to commit
-  const status = execSync("git status --porcelain", {
-    cwd: rootDir,
-    encoding: "utf-8",
-  }).trim();
+  const branch = `release-${versionType}-${Date.now()}`;
 
-  if (status) {
-    // Commit any existing changes
-    execSync(`git add -A`, { cwd: rootDir, stdio: "inherit" });
-    execSync(`git commit -m "${commitMessage}"`, {
-      cwd: rootDir,
-      stdio: "inherit",
-    });
-  } else {
-    // Create an empty commit if there are no changes
-    execSync(`git commit --allow-empty -m "${commitMessage}"`, {
-      cwd: rootDir,
-      stdio: "inherit",
-    });
-  }
+  console.log(`Creating ${versionType} release on branch ${branch}...`);
 
-  // Push to main
-  console.log("\nPushing to main...");
-  execSync("git push origin main", {
-    cwd: rootDir,
-    stdio: "inherit",
-  });
+  // Uncommitted changes are left alone; commit them separately before releasing.
+  run("but pull");
+  run(`but commit --empty -b ${branch} -m "${commitMessage}"`);
+  run(`but pr new ${branch} -m "${commitMessage}"`);
 
-  console.log(`\n✓ Release commit pushed to main!`);
+  // Squash merge: a merge commit would hide the bump type from CI.
+  run(`gh pr merge ${branch} --squash --delete-branch`);
+  run("but pull");
+
+  console.log(`\n✓ Release merged to main!`);
   console.log(`CI/CD will automatically bump the ${versionType} version.`);
 } catch (error) {
   console.error("\n✗ Release failed:", error.message);
