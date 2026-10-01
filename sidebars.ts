@@ -200,6 +200,24 @@ const sidebars: SidebarsConfig = {
           ],
         },
         {
+          type: "category",
+          label: "Supervaize MCP (Claude / ChatGPT)",
+          collapsible: true,
+          collapsed: false,
+          items: [
+            {
+              type: "doc",
+              id: "supervaize-fleet/mcp-connector/install",
+              label: "Installation",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/mcp-connector/examples",
+              label: "Example Usage",
+            },
+          ],
+        },
+        {
           type: "doc",
           id: "supervaize-fleet/developer-account",
           label: "Setup Development Environment",
