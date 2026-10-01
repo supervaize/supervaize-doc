@@ -1,0 +1,235 @@
+/* Shared styles for the MCP connector demos (ConnectFlow, ChatReplay). */
+
+.demo {
+  --demo-accent: #1f9d3a;
+  --demo-accent-soft: rgba(79, 255, 63, 0.14);
+  margin-bottom: var(--ifm-leading);
+}
+
+[data-theme="dark"] .demo {
+  --demo-accent: #4fff3f;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tab {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: transparent;
+  color: var(--ifm-font-color-base);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  border-color: var(--demo-accent);
+}
+
+.tabActive {
+  background: var(--demo-accent-soft);
+  border-color: var(--demo-accent);
+  font-weight: 600;
+}
+
+.screen {
+  min-height: 300px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  background: var(--ifm-background-surface-color);
+  animation: rise 0.35s ease-out;
+}
+
+.cardTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.muted {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.85rem;
+}
+
+.urlRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.url {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  color: var(--demo-accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 10px;
+  padding: 0.45rem 0.7rem;
+  margin: 0.25rem 0 0.6rem;
+  font: inherit;
+  font-size: 0.85rem;
+  background: transparent;
+  color: inherit;
+}
+
+.check {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.btn {
+  border: 1px solid var(--ifm-color-emphasis-400);
+  background: transparent;
+  color: inherit;
+  border-radius: 10px;
+  padding: 0.35rem 0.9rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background: var(--ifm-color-emphasis-900);
+  border-color: var(--ifm-color-emphasis-900);
+  color: var(--ifm-background-color);
+}
+
+.caption {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-top: -0.5rem;
+}
+
+/* Chat replay */
+
+.chat {
+  min-height: 340px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.user {
+  align-self: flex-end;
+  max-width: 80%;
+  background: var(--ifm-color-emphasis-200);
+  border-radius: 16px 16px 4px 16px;
+  padding: 0.55rem 0.9rem;
+  animation: rise 0.35s ease-out;
+}
+
+.tool {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--demo-accent);
+  background: var(--demo-accent-soft);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.75rem;
+  animation: rise 0.35s ease-out;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--demo-accent);
+}
+
+.assistant {
+  align-self: flex-start;
+  max-width: 92%;
+  animation: rise 0.35s ease-out;
+}
+
+.assistant table {
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.assistant p:last-child,
+.assistant ul:last-child {
+  margin-bottom: 0;
+}
+
+.typing {
+  align-self: flex-start;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.85rem;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .user,
+  .tool,
+  .assistant,
+  .typing {
+    animation: none;
+  }
+}
