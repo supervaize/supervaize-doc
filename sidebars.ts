@@ -170,7 +170,7 @@ const sidebars: SidebarsConfig = {
             {
               type: "doc",
               id: "supervaize-fleet/features/mission-management",
-              label: "Mission Management",
+              label: "Create a Mission",
             },
             {
               type: "doc",
@@ -180,7 +180,12 @@ const sidebars: SidebarsConfig = {
             {
               type: "doc",
               id: "supervaize-fleet/features/job-management",
-              label: "Job Management",
+              label: "Create a Job",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/features/job-navigation",
+              label: "Navigate a Job",
             },
             {
               type: "doc",
