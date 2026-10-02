@@ -1,0 +1,187 @@
+---
+id: setup
+title: Set up an Aidan campaign
+description: Prepare the content of an Aidan interview campaign, then create, configure and launch it from Supervaize Studio.
+displayed_sidebar: supervaizeFleetSidebar
+slug: setup
+---
+
+# Set up an Aidan interview campaign
+
+**Aidan** is the Runwaize AI interviewer. A campaign enrols participants, Aidan interviews each of them by voice or on the web, and every interview becomes a transcript and a summary that roll up into one campaign synthesis.
+
+You run the whole campaign from a Studio job:
+
+- **One job is one campaign.** The job page is where you configure, launch, follow and close it.
+- **Setup is locked at launch.** Parameters and the scenario become read-only once the campaign is live. Participants stay editable.
+- **Studio sends no e-mails.** You share one registration link, or export each participant's personal link and send the invitations yourself.
+
+:::info Availability
+Aidan must be registered in your workspace and added to a mission. Campaign templates are prepared with Runwaize. If Aidan is missing from your agents, contact Runwaize.
+:::
+
+## Before you start: prepare the content
+
+Collect these before you open Studio. Runwaize uses the first three to prepare your campaign template.
+
+| What | What to provide |
+| --- | --- |
+| **Campaign context** | A short overview of the organisation the campaign concerns: what it does, the terminology and abbreviations participants use, and anything Aidan needs to interpret answers. Keep it separate from the objectives. |
+| **Audience** | Who the participants are (employees, external users, another group), their relationship to the organisation, and what they can be expected to know. |
+| **Disclaimer** | The exact terms participants see and must accept before the interview starts. The campaign owner supplies and approves the wording. |
+| **Campaign name and description** | The name is the campaign's reference. The description is a couple of sentences that introduce the campaign to participants. |
+| **Campaign owner** | The name and e-mail of the person in charge. Both are displayed on the registration and interview pages. |
+| **Dates** | The end date, after which interviews are no longer accepted. The start date is the day the campaign is created. |
+| **Registration mode** | Open registration, individual invitations, or both. See [Enrol participants](#3-enrol-participants). |
+| **Anonymity** | Whether interviews are attributed to participants or anonymised. See [Anonymity](#anonymity). |
+| **Scenario** | The questions, themes and sequence of the conversation, as a Markdown file. See [Write a scenario](./scenario). |
+
+<details>
+<summary>Example disclaimer</summary>
+
+```md
+## Before You Begin
+
+You are about to have a conversation with an AI interviewer, not a human.
+
+### Recording & Data Use
+
+The conversation will be **recorded and transcribed**. This data will be used to:
+
+- Establish a baseline for understanding your organisation's current context, priorities and challenges
+- Identify relevant themes, opportunities and areas for further discussion
+- Support us in preparing analysis, insights and possible follow-up recommendations
+
+### Your Participation
+
+Your participation is **voluntary**.
+
+- You can stop the conversation at any time
+- You are not obliged to answer every question
+- Please avoid sharing confidential, sensitive or personal information unless it is necessary for the discussion
+```
+
+State where recordings and transcripts are stored if your organisation requires it.
+
+</details>
+
+## Set up in five steps
+
+### 1. Create the job
+
+Open the mission that holds Aidan and click **New Job**. Aidan asks which campaign the job manages:
+
+| Field | What to enter |
+| --- | --- |
+| **Campaign** | **Create new from template** starts a new campaign. **Use existing campaign** connects the job to a campaign you already have. |
+| **Campaign template** | The template the new campaign starts from. It brings the interview script and settings. |
+| **Campaign name** | The name your team sees. It must be unique in your workspace. |
+| **Description** | A short note on what the campaign is for. |
+
+The same form holds the four settings described in the next step.
+
+:::note Existing campaigns
+Campaigns that another job already manages are not listed. Connecting a campaign that is already running puts the job straight into the live state: there is no launch step, and the [monitoring sections](./monitor) are available at once.
+:::
+
+The job opens on its **Configure** tab, with one section per step below.
+
+### 2. Check the parameters
+
+Open **Parameters**, adjust the settings and click **Save parameters**.
+
+| Setting | Effect | Default |
+| --- | --- | --- |
+| **Allow contact registration** | People can sign up themselves through a public registration link, in addition to the participants you add. | Off |
+| **Anonymized** | Participants appear as "Participant 1", "Participant 2" and transcripts are not shown. | Off |
+| **Session links expire after use** | When on, each interview link works once. When off, participants can reopen their link after the interview. | On |
+| **End date** | The campaign closes automatically when this date is reached (midnight UTC). Leave it empty to close the campaign yourself. | Empty |
+
+**Name**, **Description**, **Created (start date)** and **Campaign owner** are shown read-only.
+
+### 3. Enrol participants
+
+Open **Participants**. There are three ways to bring people in, and you can combine them.
+
+| Method | How | Use it when |
+| --- | --- | --- |
+| **Enrol contact** | Search your workspace contacts by name or e-mail and pick one. | You are adding a few people who are already contacts. |
+| **Import contacts** | Paste CSV text with a header line. New e-mails become workspace contacts, and every row is enrolled. | You have a defined participant list. |
+| **Open registration** | Turn on **Allow contact registration** and share the registration link. Participants register with their first name, last name and e-mail address. | You want to distribute one common link. |
+
+CSV columns: `email` is required. `first_name`, `last_name`, `phone_number`, `language`, `timezone`, `city`, `country` and `title` are optional.
+
+```csv
+email,first_name,last_name,language,timezone,country,title
+jordan.lee@example.com,Jordan,Lee,en,Europe/Paris,FR,Operations Lead
+sam.rivera@example.com,Sam,Rivera,es,America/Bogota,CO,Analyst
+```
+
+Use IANA names for `timezone`, such as `Europe/Paris`.
+
+### 4. Write the scenario
+
+Open **Scenario**. The editor holds the campaign-specific part of the conversation. Aidan's tone, safety and conversation handling are already built in.
+
+- **Edit and save.** Clicking **Save** on a changed text creates a new version, and the campaign uses it.
+- **Go back to an earlier version.** Pick it in the **Version** list and save. The list marks the version that is **latest** and the one **in use**.
+- **Read the compiled preview.** It shows your scenario inside the full interview frame.
+- **Fix every blocked line.** Validation shows **Scenario ready**, or **Scenario not ready** with one line per reason, such as an empty text or a placeholder that resolves to nothing.
+
+[Write a scenario](./scenario) explains what to put in it and how long it can be.
+
+### 5. Review and launch
+
+Open **Review & launch**. The checklist must be fully green:
+
+1. **Enrol at least one participant** (Participants)
+2. **Save a scenario** (Scenario)
+3. **Campaign is ready to launch**
+
+Click **Launch campaign** and confirm.
+
+:::warning Launching is one-way
+After launch, **Parameters** and **Scenario** are read-only. Test before you launch a campaign with real participants.
+:::
+
+## Invite participants
+
+Open **Links & exports**.
+
+| Item | What you get |
+| --- | --- |
+| **Registration link** | The shared sign-up page. Listed only when **Allow contact registration** is on. |
+| **Invite links (CSV)** | One row per participant: `first_name`, `last_name`, `email`, `status`, `interview_url`. |
+
+Send the invitations from your own mail tool, using the registration link or each participant's `interview_url`. Decide beforehand who sends them and what the message says.
+
+## Anonymity
+
+| Mode | What it means | How to set it |
+| --- | --- | --- |
+| **Identified** | Every interview is attached to its participant. | Leave **Anonymized** off. |
+| **Fully anonymised** | Participants are numbered. Transcripts, the prompt used and the campaign data export are never available in Studio. Only summaries are. | Turn **Anonymized** on before launch. |
+| **On request** | Aidan tells the participant they can ask for confidentiality during the interview. For those interviews, the transcript, the summary and the prompt are withheld. | Include the confidentiality wording in the scenario introduction. |
+
+## Test before you go live
+
+Run the whole participant journey on a test campaign first.
+
+1. Open the registration link, or one personal interview link.
+2. Check the registration details and the terms shown before the interview.
+3. Complete an interview. Judge relevance, clarity, flow and duration.
+4. Try each path of the scenario, with short, typical and long answers.
+5. Revise the scenario and test again.
+6. Confirm the approved version, the launch date and who sends the invitations.
+
+## Checklist
+
+- [ ] Campaign context, audience and end date
+- [ ] Campaign name, description and disclaimer
+- [ ] Campaign owner name and e-mail
+- [ ] Registration mode, and the participant CSV for individual invitations
+- [ ] Anonymity choice
+- [ ] Scenario (Markdown file)
+- [ ] Invitation message and sender
+
+Next: [monitor the campaign once it is live](./monitor).
