@@ -8,6 +8,10 @@ slug: run-and-review
 
 # Run and review jobs with rules
 
+:::caution[Beta - Preview]
+Rules with Jev are in preview. The feature is enabled per workspace on request, and its behaviour and screens may change.
+:::
+
 Once [rules are set up](./setup), every new job picks up the active rules of its workspace, its mission and itself. This page covers what you see when the job starts, while it runs, and afterwards.
 
 ## When a job starts
@@ -55,7 +59,7 @@ Which result you get depends on the rule's severity and the job's rule controls:
 
 When several apply at once, **Stop** wins over **Pause**.
 
-:::info What Jev receives
+:::info[What Jev receives]
 Studio sends the job, case and step data plus the context the agent supplied, up to 256 KB. API keys, encrypted parameters and any field the agent declares as secret are removed before the data leaves Studio.
 :::
 
@@ -75,7 +79,7 @@ Every action needs a written reason, which is stored with the decision.
 - **Deny** stops the job.
 - **Re-evaluate** runs the same step again with the reason you typed as additional context. Use it to supply what Jev was missing.
 
-:::warning Must-pass violations cannot be approved
+:::warning[Must-pass violations cannot be approved]
 A violated **Must pass** rule only clears with a passing re-evaluation. Approval is also unavailable when the job was started with **Stop** for approval-required violations.
 :::
 

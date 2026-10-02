@@ -10,7 +10,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 This guide explains how to manage application flow and track progress using the `Case` class and related objects in your Supervaizer agent.
 
-:::tip Mental model
+:::tip[Mental model]
 For the core concepts (Job, Case, Step) and how Supervaize relates to execution engines like n8n, see [Core concepts](core-concepts).
 :::
 
@@ -35,7 +35,7 @@ Application flow control allows you to:
 
 The `Case` class represents an individual task or unit of work within a job. Each case can track its own progress, costs, and results.
 
-:::info Async event reporting
+:::info[Async event reporting]
 Case and account methods that report to Supervaize are async. In async agents, use `await Case.start(...)`, `await case.update(...)`, `await case.request_human_input(...)`, and `await case.close(...)`.
 
 For synchronous controller methods declared with `is_async=False`, use the explicit sync shims: `Case.start_sync(...)`, `case.update_sync(...)`, `case.request_human_input_sync(...)`, and `case.close_sync(...)`.
