@@ -1,0 +1,115 @@
+---
+id: setup
+title: Set up rules
+description: Configure the Rule Controller, set the workspace rule policy and write rules that Jev evaluates before or after each agent step.
+displayed_sidebar: supervaizeFleetSidebar
+slug: setup
+---
+
+# Rules: check agent work before and after each step
+
+A rule is a check written in plain language, such as "Do not disclose restricted information". Studio asks **Jev**, an evaluation model by TypeSafe, whether each agent step respects it, then lets the work continue, pauses it for a person, or stops it.
+
+- **You decide what happens.** Each rule is a warning, an approval gate or a hard stop.
+- **Jobs keep the rules they started with.** Editing a rule never changes a running job.
+- **Everything is recorded.** Every evaluation, approval and rule change lands in an audit trail.
+
+:::info Availability
+Rules are enabled per workspace. If **Rules** is missing from the **Advanced** section of the sidebar, ask Runwaize to enable it for your workspace.
+:::
+
+## Who can do what
+
+| Task | Role needed |
+| --- | --- |
+| Choose the Rule Controller credential | Workspace Manager or Settings Manager |
+| Set the rule policy, create and edit rules | Workspace Manager or Policy Maker |
+| Read rules, rule activity and the audit trail | Workspace Manager, Policy Maker, Policy Auditor or Auditor |
+| Pick rule controls when starting a job | Anyone who can run jobs |
+| Approve, deny or re-evaluate a paused checkpoint | Workspace Manager or Policy Maker who can see the mission |
+
+## Set up in three steps
+
+### 1. Configure the Rule Controller
+
+The Rule Controller is the Jev credential Studio uses to evaluate rules. Jobs with active rules cannot start until it is configured.
+
+1. Open **LLM Integrations** and find the **Rule Controller** card.
+2. Choose a **Credential source**:
+   - **Runwaize-managed credential**: nothing else to enter.
+   - **Workspace Jev key**: first add an LLM integration with the provider **Jev (TypeSafe)** on the same page, then select it here.
+3. Click **Save controller**, then **Test connection**.
+
+The card shows **Ready** when the live test succeeds, and **Unavailable** with the reason when it fails.
+
+:::warning Changing the source resets readiness
+Saving a different source, key or model clears the last test result. Run **Test connection** again.
+:::
+
+### 2. Set the rule policy
+
+Open **Rules** and find **Rule policy**. For each situation, choose the default outcome and which alternatives a job starter may pick instead.
+
+| Situation | Choices | Default |
+| --- | --- | --- |
+| **Must-pass violation** | Stop, Pause | Stop |
+| **Approval-required violation** | Stop, Pause for approval | Pause for approval |
+| **Controller failure** (Jev unreachable, or an uncertain result) | Stop, Pause for retry | Pause for retry |
+| **Unsupported controller** (the agent cannot run checkpoints) | Refuse, Wait for readiness | Refuse |
+
+Click **Save policy**. Policy Makers can change the policy without access to the controller credential.
+
+### 3. Create a rule
+
+On **Rules**, create a rule and fill in two sections.
+
+**Basics**
+
+| Field | What to enter |
+| --- | --- |
+| **Rule name** | A short statement of the rule, for example "Do not disclose restricted information". |
+| **When to evaluate** | **Before a step**, **After a step**, or **Before and after each step**. |
+| Severity | **Warning** records the result and lets work continue. **Approval required** pauses for an authorized decision. **Must pass** prevents work until it passes. |
+
+**What to evaluate**
+
+Describe the condition under **What should be checked?**, then pick how Jev answers:
+
+| Type | Use it for | How the verdict is decided |
+| --- | --- | --- |
+| **Check a condition** | A yes/no question. Jev returns a probability of violation. | Passes at or below **Pass ≤** (default 30%), is a violation at or above **Violation ≥** (default 70%). In between, the result is uncertain. |
+| **Rate** | An ordered rubric of 2 to 10 levels. | You set a **Cutoff** and whether a pass is at or above it, or at or below it. |
+| **Choose a category** | Named categories, each mapped to pass, violation or uncertain. | The chosen category's outcome is the verdict. |
+
+**Rate** and **Choose a category** also take a **Minimum confidence** (default 70%). Below it, the result is uncertain. Every level and category needs a name and criteria before you can save.
+
+Then choose:
+
+- **Save draft** to keep working. Drafts are never evaluated.
+- **Activate rule** to apply it to jobs started from now on.
+
+Add a **Change note** when you edit a rule. It appears in the rule's revision history.
+
+## Where a rule applies
+
+A rule belongs to one scope, and applies to everything below it:
+
+| Created in | Applies to |
+| --- | --- |
+| **Rules** (workspace) | Every job in the workspace |
+| The **Rules** tab of a mission | Every job of that mission |
+| The **Rules** tab of a job | That job only |
+
+On a mission or job, rules from a higher scope are listed as **Inherited** and are read-only there. Edit them where they were created.
+
+## Test a rule before activating it
+
+In the rule form, the **Optional test** box lets you paste a sample step context, choose **Before** or **After** and click **Run test**. Studio shows the verdict, or **Needs more context** when the result is uncertain.
+
+The test calls Jev but runs no agent action, and it is never required to activate a rule.
+
+## Deleting and deactivating
+
+Deleting a rule deactivates it. The rule and its revisions are kept so that jobs which ran under it stay explainable.
+
+Next: [see what happens when a job runs with rules](./run-and-review).

@@ -201,6 +201,24 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "category",
+          label: "Rules (Jev)",
+          collapsible: true,
+          collapsed: false,
+          items: [
+            {
+              type: "doc",
+              id: "supervaize-fleet/rules/setup",
+              label: "Set Up Rules",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/rules/run-and-review",
+              label: "Run and Review",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "Supervaize MCP (Claude / ChatGPT)",
           collapsible: true,
           collapsed: false,

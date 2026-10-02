@@ -1,0 +1,121 @@
+---
+id: run-and-review
+title: Run and review jobs with rules
+description: What happens when a job starts with active rules, how to approve or re-evaluate a paused checkpoint, and how to read the rule audit trail.
+displayed_sidebar: supervaizeFleetSidebar
+slug: run-and-review
+---
+
+# Run and review jobs with rules
+
+Once [rules are set up](./setup), every new job picks up the active rules of its workspace, its mission and itself. This page covers what you see when the job starts, while it runs, and afterwards.
+
+## When a job starts
+
+Studio freezes the applicable rules and the chosen rule controls into the job. That frozen copy is what the job is evaluated against, for its whole life.
+
+- **Later rule edits do not affect it.** Only jobs started after the edit use the new revision.
+- **Its rule controls cannot be changed.** Start a new job to use different ones.
+- **Its inputs cannot change after the start check.** If they do, Studio refuses to continue and asks for a new job.
+
+### Choose the rule controls
+
+The job form shows a **Rule controls** section with the four situations from the [rule policy](./setup#2-set-the-rule-policy). Each list only offers what the workspace policy permits, and starts on the workspace default.
+
+### Why a start can be blocked
+
+| Message | What to do |
+| --- | --- |
+| Set up the Rule Controller before starting a job with rules. | A Workspace Manager [configures the Rule Controller](./setup#1-configure-the-rule-controller). |
+| Agent must support the required before/after rule checkpoints before this job can start. | The agent does not declare checkpoint support. See [Agent requirements](#agent-requirements). |
+| Rule control … is not permitted by this workspace. | Pick a value the rule policy allows. |
+| Rules or controller settings changed during admission. Retry the start. | Someone edited rules while the job was starting. Start it again. |
+| Job is waiting for Rule Controller readiness. | Jev or the agent was not ready and the job was set to wait. Fix the cause, then start again. |
+
+A job with no applicable rules starts as usual, with no controller needed.
+
+## While the job runs
+
+Before and after each step, the agent calls a checkpoint. Studio sends the step context to Jev with every rule that applies to that moment, and returns one of three results.
+
+| Result | Meaning |
+| --- | --- |
+| **Allow** | Every rule passed, or only **Warning** rules were violated. Work continues. |
+| **Pause** | The job waits for a person. |
+| **Stop** | The job is stopped. |
+
+Which result you get depends on the rule's severity and the job's rule controls:
+
+| What happened | Result |
+| --- | --- |
+| A **Warning** rule is violated | Recorded, work continues |
+| An **Approval required** rule is violated | Pause for approval, or Stop |
+| A **Must pass** rule is violated | Stop, or Pause |
+| Jev is unreachable, or a non-warning rule is uncertain | Pause for retry, or Stop |
+
+When several apply at once, **Stop** wins over **Pause**.
+
+:::info What Jev receives
+Studio sends the job, case and step data plus the context the agent supplied, up to 256 KB. API keys, encrypted parameters and any field the agent declares as secret are removed before the data leaves Studio.
+:::
+
+## Decide a paused checkpoint
+
+Open the job. The **Rule activity** panel lists each checkpoint with its phase, the rules evaluated, each verdict and the model that produced it. It updates live.
+
+Every action needs a written reason, which is stored with the decision.
+
+| Situation | Actions available |
+| --- | --- |
+| An **Approval required** rule was violated | **Approve**, **Deny**, **Re-evaluate** |
+| The result is uncertain, or Jev failed | **Re-evaluate** |
+| The decision did not reach the agent | **Retry delivery** |
+
+- **Approve** lets the step continue.
+- **Deny** stops the job.
+- **Re-evaluate** runs the same step again with the reason you typed as additional context. Use it to supply what Jev was missing.
+
+:::warning Must-pass violations cannot be approved
+A violated **Must pass** rule only clears with a passing re-evaluation. Approval is also unavailable when the job was started with **Stop** for approval-required violations.
+:::
+
+Only a Workspace Manager or Policy Maker who can see the job's mission can decide. Policy Auditors and read-only members can read the panel but not act.
+
+A job cannot complete while a checkpoint is pending, paused or stopped.
+
+## Audit trail
+
+**Rules** includes an **Audit trail** of everything rule-related in the workspace, newest first. Filter it by event kind, outcome or job.
+
+| Event kind | What it records |
+| --- | --- |
+| **Rule changes** | Each revision of a rule, with before and after |
+| **Evaluations** | Each Jev call, its verdicts and the model used |
+| **Decisions** | Allow, pause and stop decisions, including approvals and their reasons |
+| **Readiness** | Rule Controller test results and jobs waiting for readiness |
+| **Controller changes** | Changes to the controller source, model or rule policy |
+| **Delivery** | Each attempt to send a decision back to the agent |
+
+You only see events for missions you can already see in Studio.
+
+## Agent requirements
+
+Rules run on agents built with the Supervaizer v2 contract. In its registration, the agent must declare:
+
+- the `rule_checkpoints` capability, version `1`, with the phases it supports (`before`, `after`);
+- a job-scoped action with the id `rule.checkpoint.resume`, which Studio calls to deliver a decision.
+
+The agent may also list `secret_refs`: paths in the checkpoint context that Studio must remove before evaluation.
+
+If an agent lacks these, jobs with rules are refused, or wait, according to the **Unsupported controller** rule control.
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+| --- | --- |
+| The job form says the Rule Controller is not configured | No credential source is saved yet. See [Configure the Rule Controller](./setup#1-configure-the-rule-controller). |
+| **Test connection** shows **Unavailable** | The Jev key is wrong or inactive, or Jev did not answer within 10 seconds. |
+| A rule I just edited is not applied | Running jobs keep their frozen rules. The edit applies to new jobs. |
+| A rule is never evaluated | It is still a draft, or its timing does not match the step phase. |
+| **Rule activity** is missing on a job | You need policy read access, and rules must be enabled for the workspace. |
+| An approved step did not resume | Another checkpoint on the same job is still blocking. It resumes once that one is resolved. |
