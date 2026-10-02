@@ -1,0 +1,202 @@
+---
+id: monitor
+title: Monitor a campaign
+description: Follow a live Aidan interview campaign in Supervaize Studio - charts, cases, transcripts, confidentiality, synthesis, exports and closing.
+displayed_sidebar: supervaizeFleetSidebar
+slug: monitor
+---
+
+# Monitor an Aidan campaign
+
+Once a campaign is launched, you follow it from its job page: **Job Analytics** shows the trends, the **Cases** show every interview, and the **Configure** tab holds the transcripts, the synthesis and the exports.
+
+- **Each interview is a case.** Missions contain jobs, jobs contain cases, cases contain steps.
+- **Charts are live.** They are served by Aidan and reflect interviews as they happen.
+- **Keep tests out of the real job.** Run test interviews in a separate job, or they count in your results.
+- **Closing is final.** A closed campaign cannot be reopened from Studio.
+
+## Where to look
+
+| You want to know | Go to |
+| --- | --- |
+| How the campaign is progressing overall | The job, **Operations** tab: **Job Analytics** |
+| Who has been interviewed, who has not | The job, **Operations** tab: the cases |
+| What was said in one interview | The job, **Configure** tab, **Interviews** |
+| What the campaign says as a whole | **Synthesis**, then **Links & exports** |
+| The summaries of an anonymised campaign | The case in the **Deliverable** swimlane |
+
+To reach an interview from the dashboard: **Missions**, the campaign's mission, its job, then the case.
+
+## Read the charts
+
+The job page shows Aidan's analytics under **Job Analytics**, above the cases. The same insights open from Aidan's card on the mission page.
+
+**Job Metadata**, just above, recalls the campaign's name, status, manager, whether it is anonymised, and its registration link.
+
+| Chart or counter | What it tells you |
+| --- | --- |
+| **Campaign Progress** | Contacts enrolled and **% completion**. |
+| **Session Metrics** | Number of sessions and **Avg duration**. |
+| **Call duration over time** | One point per interview, in seconds. Hover a point for the contact, status and end reason. |
+| **Sessions per campaign per day** | The daily rhythm of the campaign. |
+| **Sessions by day and hour** | When participants take their interview. |
+
+Two filters apply to the charts:
+
+- **Window**: **24h**, **7d**, **14d** or **All**, or a **From** and **To** date.
+- **Session start time**: **UTC**, or **Contact local** to read the hours in each participant's own timezone. Use it to see when people around the world actually take the call.
+
+:::tip Read the duration chart first
+A full interview and an abandoned one look very different. On a 15 to 20 minute scenario, complete interviews sit around 1,000 seconds. A point at 14 seconds is someone who opened the link and left, or a test.
+:::
+
+## Follow the cases
+
+Open the job's **Operations** tab. Every participant's interview is a case, and you choose the view: **Board**, **List** or **Calendar**. [Navigate a job](../features/job-navigation) describes them in full.
+
+| Board column | What it means for an interview |
+| --- | --- |
+| **Todo** | The participant is enrolled and has not started. |
+| **In Progress** | The interview is running. |
+| **Success** | The interview is complete. |
+| **Anomaly** | The interview failed or was cancelled. |
+
+- **Open a case** to see its steps and status. **Contact Data** shows the participant's e-mail and personal interview link.
+- **Counters** next to the **Cases** title give the totals: Total, Completed, Waiting, Failed.
+- **Switch to List** to sort and filter. Filter on **Status** to isolate the participants who have not started.
+- **Export** from **View all**: **Export CSV** lets you pick the columns, **Full export** takes every field.
+
+### Anonymised campaigns: the Deliverable case
+
+On an anonymised campaign, the participants' cases in the **Work** swimlane carry no results. One case in the **Deliverable** swimlane gathers them instead:
+
+- **One anonymised summary per interview**, named after the session ID, not the participant.
+- **The campaign synthesis**, once it has been generated.
+
+There is no transcript anywhere on an anonymised campaign.
+
+## Read the interviews
+
+Open the job's **Configure** tab, then **Interviews**. Each row is one conversation, newest first.
+
+| Column | What it shows |
+| --- | --- |
+| **Participant** | The participant's name, or "Participant 1", "Participant 2" on an anonymised campaign. |
+| **Status** | Where the interview stands. |
+| **Started** | When the conversation began. |
+| **Duration** | How long it lasted. |
+| **Transcript** | The full conversation. |
+| **Prompt used** | The exact personalised instructions Aidan received for this interview. Use it to audit what was asked. |
+| **Synthesis** | The summary of this interview, once it has been produced. |
+
+The table shows the 200 most recent interviews.
+
+## Confidentiality
+
+| Situation | What Studio shows | Who is responsible |
+| --- | --- | --- |
+| **Anonymised campaign** | Participants are numbered. No **Transcript** or **Prompt used** column, and no campaign data export. The anonymised summaries, identified by session ID, are in the [Deliverable case](#anonymised-campaigns-the-deliverable-case). | Studio enforces it. |
+| **A participant asked for confidentiality** | The whole interview is covered, not a passage. Its content is replaced by a "confidentiality requested" notice, in Studio and in the exports. | Studio enforces it. |
+| **Identified campaign, no request** | Transcripts are attributed to participants. | Your team. Decide who may read transcripts and how quotes are used. |
+
+A request is detected from what the participant says. Aidan mentioning the confidentiality option in its introduction does not count as a request.
+
+## Keep tests out of the results
+
+Test interviews create cases, sessions and chart points like real ones.
+
+- **Before launch**, test on a separate job. See [Test before you go live](./setup#test-before-you-go-live).
+- **During the campaign**, keep a parallel pilot job for trials, such as a new scenario version. Its results stay out of the main job.
+- **Removing has a limit.** A participant who already has an interview cannot be removed in **Participants**. If test interviews landed in the real campaign, list the test users and ask Runwaize to clean them.
+
+## Keep participation moving
+
+Participants stay editable while the campaign is live.
+
+- **Add latecomers** with **Enrol contact** or **Import contacts** in **Participants**.
+- **Find who has not answered.** Download **Invite links (CSV)** from **Links & exports**. The `status` column shows where each participant stands, and `interview_url` is the link to resend.
+
+Studio sends no reminders. Send them from your own mail tool.
+
+## Generate the synthesis
+
+Open **Synthesis**.
+
+| Field | What to choose |
+| --- | --- |
+| **Synthesis prompt** | The instructions used to turn the interviews into one campaign summary. |
+| **Perimeter** | **All completed interviews**, or a sample of the first or last 1 or 5 interviews to try the synthesis first. |
+
+Click **Generate synthesis**. The result appears in **Links & exports** as **Campaign synthesis**.
+
+The **Synthesis** section is hidden once the campaign is closed. Generate the final synthesis before you close.
+
+## Open and download results
+
+Open **Links & exports**.
+
+| Item | What you get | Available |
+| --- | --- | --- |
+| **Registration link** | The shared sign-up page. | When **Allow contact registration** is on |
+| **Invite links (CSV)** | Every participant with their status and personal interview link. | Always |
+| **Campaign synthesis** | The campaign summary, displayed in Studio. | After a synthesis was generated |
+| **Interview summaries (ZIP)** | The summary of each interview. | After launch, once a synthesis exists |
+| **Campaign data export (ZIP)** | The full campaign data, with the scenario version that was used. Confidential interviews are redacted. | Not on anonymised campaigns |
+
+## Close the campaign
+
+A campaign closes in one of two ways:
+
+- **Automatically**, when the **End date** is reached (midnight UTC).
+- **By hand**: open **Review & launch**, click **Close campaign** and confirm.
+
+:::warning Closing is final
+Participants can no longer start interviews. The campaign cannot be reopened from Studio. To run it again, start a new job.
+:::
+
+## What changes at launch
+
+| Section | Before launch | While live | After closing |
+| --- | --- | --- | --- |
+| **Parameters** | Editable | Read-only | Read-only |
+| **Participants** | Editable | Editable | Read-only |
+| **Scenario** | Editable | Read-only | Read-only |
+| **Review & launch** | Launch campaign | Close campaign | Read-only |
+| **Interviews** | Hidden | Available | Read-only |
+| **Synthesis** | Hidden | Available | Hidden |
+| **Links & exports** | Available | Available | Read-only |
+
+## Example: a mid-campaign review
+
+A typical review session, half an hour, a few days into the first round of a two-round campaign. The organisation and people are fictional.
+
+**The setting.** A team is capturing the know-how of its senior experts. Round one is an identified campaign with a shared registration link, and it must be complete by the following Tuesday. The campaign manager walks two colleagues through Studio.
+
+| Step | What they do | What they learn |
+| --- | --- | --- |
+| **1. Job Analytics** | Open the mission, then its job, and read the charts. | Most interviews last close to 1,000 seconds. A few points sit at a few seconds. |
+| **2. Duration chart** | Hover the short points. | They are the team's own test runs, including a 14-second one. They pollute the averages. |
+| **3. Cases** | Open the job's **Operations** tab, then one case. | The path to any interview: mission, job, case. The case shows the participant's link and status. |
+| **4. Todo column** | Look at the cases that have not moved. | These participants are enrolled and have not started. They are the ones to remind. |
+| **5. List view** | Switch to **List**, filter on **Status**, export the CSV. | A reminder list, ready for the mail tool. |
+| **6. Confidentiality** | Ask what happens to sensitive answers. | The campaign is identified, so the team owns how transcripts are shared. A participant who asks for confidentiality has the whole interview withheld. |
+| **7. Test data** | Try to remove the test users in **Participants**. | Removal is refused for participants who already have an interview. |
+| **8. Session timing** | Switch **Session start time** to **Contact local**. | Participants in every region mostly take the call during their working hours. |
+
+**What they decide.**
+
+- **List the test users** and have them cleaned from the campaign.
+- **Create a parallel pilot job** for all further trials, so tests no longer mix with real interviews. One colleague wants to read their own test interview first, so the pilot job keeps it.
+- **Prepare round two in the pilot job.** The second scenario is tested there before round one closes.
+
+## Plan a second round
+
+A follow-up round can build on what each participant said the first time. The scenario of round two is then personalised per participant, from the transcripts or summaries of round one.
+
+This is prepared with Runwaize: a master scenario template, plus a builder step that condenses each participant's first interview into their own scenario. Plan it before round one closes, and test it in a separate job.
+
+## Monitor from Claude or ChatGPT
+
+With the [Supervaize MCP connector](../mcp-connector/install), you can ask an assistant about the campaign's mission, job and cases instead of opening Studio.
+
+Back to: [set up an Aidan campaign](./setup).

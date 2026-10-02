@@ -1,0 +1,212 @@
+---
+id: scenario
+title: Write a scenario
+description: Guidelines for drafting an Aidan interview scenario - required outputs, flow, branching, size budget and participant context.
+displayed_sidebar: supervaizeFleetSidebar
+slug: scenario
+---
+
+# Write an Aidan scenario
+
+A scenario is the campaign-specific design of an interview. It says why the interview exists, who is interviewed, what must be learned, in which order, and how the conversation ends.
+
+- **It is not a full prompt.** Aidan's tone, listening, probing, safety and technical handling are built in. Leave them out.
+- **Start from the outputs.** Every question must serve something the interview has to make knowable.
+- **Keep it short and mostly linear.** The limit is 12,000 characters. Aim for 4,000 to 7,000.
+
+:::tip Drafting with an AI assistant
+Point your assistant to this page when you ask it to draft a scenario.
+:::
+
+## Leave platform behaviour out
+
+Do not write instructions about:
+
+- tone of voice, warmth, empathy or conversational style;
+- asking one question at a time, listening, or keeping questions concise;
+- generic probing, clarification, summaries and transitions;
+- adapting language to the participant;
+- interruptions, pauses, reconnection or other technical handling;
+- standard safety, privacy and consent guardrails;
+- generic opening, closing, thanks and feedback.
+
+Repeating them makes the scenario longer, more brittle and more likely to conflict with platform improvements.
+
+Add such an instruction only for a **specific exception**: a mandatory legal disclosure, a forbidden topic, an exact approved phrase. Test with the defaults first, observe a failure, then make the smallest change.
+
+## Start from the required outputs
+
+Before writing questions, list what the interview must establish. For each output, define:
+
+- the field, insight, decision or hypothesis;
+- the evidence needed to support it;
+- whether it is mandatory or optional;
+- what stays confidential, attributable or anonymised.
+
+Remove questions that are merely interesting.
+
+## Build the flow
+
+A default sequence. Short interviews can merge phases.
+
+| Phase | Purpose |
+| --- | --- |
+| **1. Context and qualification** | Confirm the participant's role and relevance. Do not ask what is already known. |
+| **2. Current reality** | What happens today, through recent, concrete examples. |
+| **3. Experience and evidence** | What worked, what failed, how often, with what consequences. |
+| **4. Needs, barriers and trade-offs** | Unmet needs, root causes, constraints, competing priorities. |
+| **5. Future state or options** | Desired outcomes and candidate changes, only after the current state is clear. |
+| **6. Prioritisation** | Force a choice: what matters most, what comes first. |
+| **7. Closure** | Check the key interpretation, capture what was missed, state the next step. |
+
+For each section, write an **objective**, the **essential questions** and the **evidence to obtain**. Do not script alternate phrasings. Aidan conducts the conversation.
+
+Good questions follow an evidence path:
+
+- Begin broad enough to avoid imposing your assumptions.
+- Move from a general claim to a specific recent example.
+- Quantify when useful: frequency, time, cost, volume.
+- Ask hypothetical questions only after the facts are established.
+- Avoid compound, leading and answer-containing questions.
+
+## Branch deliberately
+
+Add a branch only when an answer should change what happens next. Each branch needs its own end-to-end test.
+
+Write each branch as:
+
+> **Condition** → **Objective** → **Topics or evidence to collect** → **Return point or exit**
+
+Typical branches: the participant has or has not used the product, has direct or second-hand experience, is a decision-maker or a contributor, or is short on time. Every branch rejoins the main flow or defines a clear early exit.
+
+## Control size and time
+
+An oversized scenario cannot be fixed with a pacing instruction. Size it before writing.
+
+| Scenario size | Top-level branches |
+| --- | --- |
+| Under 6,000 characters | 2 at most |
+| 6,000 to 9,000 characters | 3 at most |
+| Above 9,000 characters | 4 at most, each one justified |
+
+Classify every section:
+
+- **Must cover**: required for a valid interview. Never skipped.
+- **Cover if relevant**: triggered by the participant's context or answers.
+- **Optional depth**: only when time remains.
+
+A workable split at 5,500 characters:
+
+| Phase | Share |
+| --- | --- |
+| Context and qualification | 10% |
+| Current reality | 30% |
+| Experience and evidence | 25% |
+| Needs, barriers, trade-offs | 20% |
+| Prioritisation and closure | 15% |
+
+If one phase needs more than 35%, the scenario is trying to be two interviews.
+
+**Estimate duration from dialogue, not question count.** Each substantive theme costs three to five turns. A five-minute interview supports two or three themes.
+
+## Use only the context that exists
+
+Placeholders are replaced at interview time. Use only the ones below.
+
+| Kind | Placeholders |
+| --- | --- |
+| Workspace and campaign | `{{ tenant.name }}`, `{{ campaign.name }}`, `{{ campaign.caller_name }}` |
+| Timing | `{{ interview_date }}`, `{{ session.localtime }}` |
+| Participant | `{{ contact.first_name }}`, `{{ contact.email }}`, `{{ contact.city }}`, `{{ contact.country }}`, `{{ contact.timezone }}`, `{{ contact.greeting }}`, `{{ contact.greeting_style }}` |
+| Participant metadata | `{{ contact.metadata.<key> }}`, defined per campaign |
+
+Rules:
+
+1. **Never reference a field that is not in the table.** `{{ contact.role }}` or `{{ contact.company }}` do not resolve, and validation blocks the scenario.
+2. **Do not write prose placeholders.** "Use the participant's bio as a baseline" makes Aidan invent a bio. If the information is not loaded, ask for it.
+3. **Check metadata for every participant.** A key that is filled for most participants passes testing and breaks in production.
+4. **Memory of earlier sessions is not guaranteed.** A first interview has none. Any "as you mentioned last time" needs a path for both cases.
+5. **Asking costs time.** Collect only what a required output depends on.
+
+## Example scenario
+
+A neutral baseline of 15 to 20 minutes. Replace `[technology]` and the bracketed wording with your own.
+
+````md
+# Professional Practice and Emerging Technology
+
+## Purpose
+Understand how a participant currently uses [technology] in their own work,
+across their team, and with customers. Identify concrete uses, demonstrated
+value, limitations, barriers, and the main opportunity for the next six months.
+
+## Required outputs
+- Participant role and work context.
+- At least one concrete example of current use, or confirmation of non-use.
+- Observed value, limitations and decision criteria.
+- Main barrier or unmet need.
+- One prioritised opportunity and a plausible first step.
+
+## Flow
+
+### Introduction
+- {{ contact.greeting }}
+- "Thanks for making the time. I'm Aidan, reaching out on behalf of [sponsor]."
+- State the goal of the discussion.
+- State how the interview will be used, and that the participant can ask for
+  the discussion to remain confidential at any point. Ask if all is clear.
+
+### 1. Role and current context
+Objective: establish responsibilities and current focus.
+- "What responsibilities are taking most of your attention at the moment?"
+Evidence: role, current priorities, team context.
+
+### 2. Individual practice
+Objective: understand actual behaviour, value and limitations.
+- "Where, if anywhere, does [technology] appear in your own work today?"
+- "Please walk me through a recent example."
+- "What changed as a result: time, quality, cost, risk?"
+- "Where has it been unreliable or unsuitable?"
+If the participant does not use it:
+- "What has prevented or discouraged you from using it?"
+Evidence: activity and frequency, observable outcome, reason for non-use.
+
+### 3. Team practice
+Ask only if the participant has visibility into a team.
+- "How, if at all, is [technology] used across your team?"
+- "What appears to help or hinder effective use?"
+
+### 4. Barriers and opportunity
+- "Where is the largest unresolved need or opportunity?"
+- "What is currently blocking progress?"
+- "If only one change could be made in the next six months, what should it be?"
+Evidence: one prioritised opportunity, principal barrier, first step.
+
+### 5. Conclusion
+- Summarise two or three findings for confirmation.
+- "What important point have we not covered?"
+
+## Branches
+- **No direct use:** focus on reasons and conditions for trial, then go to
+  Team practice.
+- **No team visibility:** skip Team practice.
+- **Insufficient time:** Individual practice, Barriers and opportunity,
+  Conclusion.
+
+## Completion criteria
+The interview is complete when each required output is supported by concrete
+evidence or explicitly recorded as unknown or not applicable.
+````
+
+## Final review
+
+- [ ] Does the purpose name the decision the interview supports?
+- [ ] Is every question tied to a required output?
+- [ ] Does the flow move from facts toward interpretation and prioritisation?
+- [ ] Can every branch rejoin the main path?
+- [ ] Is the scope realistic for the stated duration, and tested with short, typical and long answers?
+- [ ] Is every piece of participant context either loaded or asked for?
+- [ ] Have tone and behaviour instructions been removed?
+- [ ] Will the outputs be comparable across interviews?
+
+Next: [set up the campaign in Studio](./setup).

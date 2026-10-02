@@ -224,6 +224,29 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "category",
+          label: "Aidan Interview Campaigns",
+          collapsible: true,
+          collapsed: false,
+          items: [
+            {
+              type: "doc",
+              id: "supervaize-fleet/aidan/setup",
+              label: "Set Up a Campaign",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/aidan/scenario",
+              label: "Write a Scenario",
+            },
+            {
+              type: "doc",
+              id: "supervaize-fleet/aidan/monitor",
+              label: "Monitor a Campaign",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "Supervaize MCP (Claude / ChatGPT)",
           collapsible: true,
           collapsed: false,
