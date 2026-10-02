@@ -1,0 +1,111 @@
+---
+id: job-navigation
+title: Navigate a job
+description: Find your way around a job in Supervaize Studio and view its cases as a board, a list or a calendar.
+displayed_sidebar: supervaizeFleetSidebar
+slug: job-navigation
+---
+
+import CasesViewDemo from "@site/src/components/StudioDemo/CasesViewDemo";
+
+# Navigate a job
+
+The job page is where you follow an agent's run. Its **Cases** section shows every case of the job, and you choose how: a **Board**, a **List** or a **Calendar**.
+
+Switch views, card size and sorting here. This is a working miniature.
+
+<CasesViewDemo />
+
+- **Board** answers "what needs me now?": cases move across status columns.
+- **List** answers "show me the numbers": one row per case with dates, cost and steps.
+- **Calendar** answers "what happened when?": one column per day.
+
+## The job page at a glance
+
+| Area | What you find there |
+| --- | --- |
+| **Header** | The job's name and status, then its actions: **Start**, **Stop**, **Edit**, **Clone**, **Delete**, rating, **Rules** and **Tracing** |
+| **Details** | The parameters the job was started with, its mission and its agent |
+| **Cases** | Every case of the job, in the view you choose |
+
+You only see the actions your role allows.
+
+Some agents add a setup screen. Their jobs show two tabs, **Configure** and **Operations**. A job that has not started opens on **Configure**; once started, it opens on **Operations**, where the cases are.
+
+## The three case views
+
+Open the **Display** menu at the top right of the **Cases** section and pick a **View**.
+
+### Board
+
+The default view. Cases are grouped in **swimlanes**, one per kind of case, and each swimlane has five status columns.
+
+| Column | Cases in it |
+| --- | --- |
+| **Todo** | Not started yet |
+| **In Progress** | Starting, running, or being cancelled |
+| **Waiting for Input** | Waiting for a human answer |
+| **Success** | Completed |
+| **Anomaly** | Failed or cancelled |
+
+- **Swimlanes come from the agent.** Setup, Work and Deliverable come first, then any other in alphabetical order. A case with no kind goes to **Work**.
+- **Click a swimlane's name to collapse it.** Studio remembers collapsed swimlanes for each job, in your browser, for 180 days.
+
+:::tip Start with Waiting for Input
+Those cases are blocked until someone answers. Open one and answer the agent's question to let it resume.
+:::
+
+### List
+
+A table with one row per case: **Name**, **Status**, **Lane**, a date, **Cost** and **Steps**.
+
+- **The date column follows the sort.** Sort by Start date and the column shows start dates; the same goes for End date and Last update date.
+- **Group by swimlane** in the **Display** menu splits the table into one collapsible block per swimlane.
+
+### Calendar
+
+One column per day, from the first day with a case to the last. A day with nothing shows **No cases**; cases with no date are gathered in a last **No date** column.
+
+Choose which date places a case with **Calendar date** in the **Display** menu: **Created date** (the default), **Started date** or **Finished date**.
+
+### Card size
+
+In the Board and Calendar views, **Cards** switches between two sizes.
+
+| Size | What a card shows |
+| --- | --- |
+| **Compact** (default) | Name and status |
+| **Full** | Name, status, reference, number of steps, cost, and the date you sort by |
+
+## Filter and sort
+
+The **Filters** and **Sort** buttons sit next to the **Cases** title and apply to all three views.
+
+| Control | Options |
+| --- | --- |
+| **Filters** | Search by text, **Status**, **Agent**, **Swimlane**. **Clear all** removes them. |
+| **Sort** | **Case name**, **Start date**, **End date**, **Last update date**; ascending or descending. **Reset to default** restores it. |
+
+The default sort is **Last update date**, newest first.
+
+- **The counters follow the filters.** Total, Completed, Waiting and Failed count only the cases that match, and a line under the cases reads _Showing 3 of 8 cases_.
+- **A green dot marks a changed menu.** It shows on Filters, Sort or Display when the menu is not on its defaults.
+
+:::info View settings are not saved
+The view, card size, filters and sort go back to their defaults when you leave the job page. Only collapsed swimlanes are remembered.
+:::
+
+## Open a case, or all of them
+
+- **Click a case** in any view to open it and read its steps.
+- **View all** next to the **Cases** title opens the full case list of the job, with pagination and export: **Export CSV** lets you choose the columns, **Full export** exports every field.
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| "No cases for this job yet." | The agent has not created a case yet | Wait, or check that the job is started |
+| "No cases match the current filters." | A filter or the search hides everything | Open **Filters** and click **Clear all** |
+| A swimlane shows only its name | It is collapsed | Click its name to expand it |
+| No cases on a job with a **Configure** tab | You are on the setup screen | Switch to the **Operations** tab |
+| The view went back to Board | View settings are not saved between visits | Pick the view again in **Display** |

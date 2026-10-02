@@ -1,0 +1,135 @@
+/* Styles for the Studio walkthrough demos. Tabs, cards, buttons and fields
+   come from McpDemo/styles.module.css; this file only adds the Studio layouts. */
+
+.wide {
+  max-width: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spread {
+  justify-content: space-between;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.75rem;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.chip {
+  display: inline-block;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  padding: 0 0.45rem;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.chipOn {
+  border-color: var(--demo-accent);
+  background: var(--demo-accent-soft);
+}
+
+.label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.lane {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.laneHead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  border: 0;
+  background: var(--ifm-color-emphasis-100);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.6rem;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.caseCard {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.75rem;
+  background: var(--ifm-background-surface-color);
+  overflow: hidden;
+}
+
+.caseName {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table {
+  display: table;
+  width: 100%;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.table th,
+.table td {
+  padding: 0.35rem 0.6rem;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .split,
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .columns,
+  .days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
