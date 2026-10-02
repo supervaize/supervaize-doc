@@ -206,7 +206,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "category",
-          label: "Rules (Jev)",
+          label: "Rules (Jev) · Beta Preview",
           collapsible: true,
           collapsed: false,
           items: [
