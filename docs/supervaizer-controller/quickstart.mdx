@@ -183,7 +183,7 @@ export SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL=https://app.supervaize.com/w/your-wor
 The issuer is the Studio web origin used to sign authorization tokens. The JWKS URL uses the Django API origin and `/w/<workspace-slug>/api/v1/...` route; it is public and provides the verification key. Copy the generated values from Studio when available. This is separate from `SUPERVAIZE_API_KEY` (agent → Studio) and `SUPERVAIZER_API_KEY` (Studio → controller). If using a different Studio deployment, use that deployment's generated values instead of these production examples.
 ### For local development only {#localdev}
 
-:::warning Local development
+:::warning[Local development]
 If the agent is not deployed to a publicly accessible server, you need to install a **Tunneling** solution so that `supervaize` can operate your agent.
 Here are the instructions to [setup a tunnel for your local development](tunneling-setup)
 :::
@@ -219,7 +219,7 @@ Local mode runs your agents alongside a built-in Hello World agent — no Studio
   </TabItem>
   <TabItem value="direct" label="direct">
 
-:::info Debug
+:::info[Debug]
 Use the direct python call for advanced debugging
 :::
 
@@ -245,7 +245,7 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
-:::tip Verify endpoints
+:::tip[Verify endpoints]
 Once the server is running, you'll have:
 
 - **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`

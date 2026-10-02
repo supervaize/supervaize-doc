@@ -49,7 +49,7 @@ Creating a job is always two-phase: the assistant first calls `job_setup` in **p
 - _Rename the Q4 Check-ins mission and set its end date._ See [Missions](#missions).
 - _Stop the March cohort job._ See [Jobs](#jobs).
 
-:::tip Write a weekly report in one prompt
+:::tip[Write a weekly report in one prompt]
 _Every Monday I want a status of all in-progress missions: cases completed last week, cost, and anything awaiting input. Write it as a short email to my team._ The assistant chains `mission_list`, `mission_stats` and `case_list` on its own.
 :::
 
@@ -88,7 +88,7 @@ sequenceDiagram
 
 Each pattern shows what you type, which tools the assistant calls, what comes back, and the access rule that applies. The wording of your request does not matter; the assistant finds the right tools. Data in the examples is fictional.
 
-:::info Actions that cannot be undone
+:::info[Actions that cannot be undone]
 `tags_set`, `comment_delete`, `mission_archive`, `mission_delete`, `job_stop` and `job_delete` are flagged as destructive, so Claude and ChatGPT usually ask you to confirm before running them. Each client decides how it asks. `job_start`, `job_stop` and `job_complete` also make the agent work, so check the request before you confirm.
 :::
 
