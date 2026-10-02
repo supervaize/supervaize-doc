@@ -117,7 +117,7 @@ If an agent lacks these, jobs with rules are refused, or wait, according to the 
 
 | Symptom | Likely cause |
 | --- | --- |
-| The job form says the Rule Controller is not configured | No credential source is saved yet. See [Configure the Rule Controller](./setup#1-configure-the-rule-controller). |
+| The job form says the Rule Controller is not configured | The workspace has no active Jev key and no managed credential is enabled. See [Configure the Rule Controller](./setup#1-configure-the-rule-controller). |
 | **Test connection** shows **Unavailable** | The Jev key is wrong or inactive, or Jev did not answer within 10 seconds. |
 | A rule I just edited is not applied | Running jobs keep their frozen rules. The edit applies to new jobs. |
 | A rule is never evaluated | It is still a draft, or its timing does not match the step phase. |
