@@ -39,7 +39,8 @@ If **Rules** is missing from the **Advanced** section of the sidebar, ask Runwai
 The Rule Controller is the Jev credential Studio uses to evaluate rules. There is nothing to select: Studio picks it for you.
 
 - **Your workspace has an active Jev key:** it is used for every Jev call. Add one on **LLM Integrations** as an integration with the provider **Jev (TypeSafe)**. With several active Jev keys, the most recently updated one is used.
-- **Your workspace has none:** the Runwaize-managed credential is used, when Runwaize has enabled it for your deployment.
+- **Your workspace has an active OpenRouter key and no Jev key:** the OpenRouter key is used. OpenRouter serves Jev, so you do not need a second key.
+- **Your workspace has neither:** the Runwaize-managed credential is used, when Runwaize has enabled it for your deployment.
 
 The **Rule Controller** card on **LLM Integrations** names the key in use. Click **Test connection** to run a live check: the card shows **Ready** when it succeeds and **Unavailable** with the reason when it fails. Jobs with active rules cannot start while no key is available.
 
