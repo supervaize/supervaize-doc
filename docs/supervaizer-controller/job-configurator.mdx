@@ -187,7 +187,7 @@ Field types are `text`, `number`, `boolean`, `date`, `email`, `select`, `resourc
 | `required`, `read_only` | Studio blocks an empty required field and locks a read-only one. |
 | `description`, `placeholder` | Help text. |
 | `multiline` | A text area for a `text` field. |
-| `options` | Choices of a `select`, as `{ "value", "label" }` objects. |
+| `options` | Choices of a `select`, as `{ "value", "label" }` objects. A required `select` has no empty choice: it shows its `placeholder` until the operator chooses. |
 | `options_source` | Choices of a `resource_ref`, loaded from one of the agent's resources. |
 | `depends_on` | Shows the field only for some values of another field. |
 
