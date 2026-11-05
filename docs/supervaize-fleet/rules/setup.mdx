@@ -26,7 +26,7 @@ If **Rules** is missing from the **Advanced** section of the sidebar, ask Runwai
 
 | Task | Role needed |
 | --- | --- |
-| Choose the Rule Controller credential | Workspace Manager or Settings Manager |
+| Add a Jev key and test the Rule Controller | Workspace Manager or Settings Manager |
 | Set the rule policy, create and edit rules | Workspace Manager or Policy Maker |
 | Read rules, rule activity and the audit trail | Workspace Manager, Policy Maker, Policy Auditor or Auditor |
 | Pick rule controls when starting a job | Anyone who can run jobs |
@@ -36,18 +36,16 @@ If **Rules** is missing from the **Advanced** section of the sidebar, ask Runwai
 
 ### 1. Configure the Rule Controller
 
-The Rule Controller is the Jev credential Studio uses to evaluate rules. Jobs with active rules cannot start until it is configured.
+The Rule Controller is the Jev credential Studio uses to evaluate rules. There is nothing to select: Studio picks it for you.
 
-1. Open **LLM Integrations** and find the **Rule Controller** card.
-2. Choose a **Credential source**:
-   - **Runwaize-managed credential**: nothing else to enter.
-   - **Workspace Jev key**: first add an LLM integration with the provider **Jev (TypeSafe)** on the same page, then select it here.
-3. Click **Save controller**, then **Test connection**.
+- **Your workspace has an active Jev key:** it is used for every Jev call. Add one on **LLM Integrations** as an integration with the provider **Jev (TypeSafe)**. With several active Jev keys, the most recently updated one is used.
+- **Your workspace has an active OpenRouter key and no Jev key:** the OpenRouter key is used. OpenRouter serves Jev, so you do not need a second key.
+- **Your workspace has neither:** the Runwaize-managed credential is used, when Runwaize has enabled it for your deployment.
 
-The card shows **Ready** when the live test succeeds, and **Unavailable** with the reason when it fails.
+The **Rule Controller** card on **LLM Integrations** names the key in use. Click **Test connection** to run a live check: the card shows **Ready** when it succeeds and **Unavailable** with the reason when it fails. Jobs with active rules cannot start while no key is available.
 
-:::warning[Changing the source resets readiness]
-Saving a different source, key or model clears the last test result. Run **Test connection** again.
+:::info[Running jobs keep their key]
+A job is admitted with the key available at that moment and keeps it. Adding or disabling a Jev key only affects jobs started afterwards.
 :::
 
 ### 2. Set the rule policy
