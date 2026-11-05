@@ -71,6 +71,8 @@ An action is job-scoped and changes state unless you say otherwise. Declare a re
 
 When an operator starts a job, Studio loads the `job.start` surface and draws the form that your agent returns.
 
+![The start form of the Hello World agent](/img/controller/job-start-form.png)
+
 ```python
 @sv_server.v2_surface("job.start", agent_slug=agent.slug)
 def job_start_form(request: V2SurfaceRequest) -> dict[str, Any]:
@@ -240,7 +242,7 @@ To start a job, change the method to `supervaizer/action.invoke` and add `"actio
 
 For automatic tests, post the same requests to `sv_server.app` with FastAPI's `TestClient`. The Hello World [`tests/`](https://github.com/runwaize/supervaize_hello_world/tree/main/tests) folder has the helpers.
 
-To connect the controller to your workspace, set the credentials as the [Quick Start](quickstart#3) shows.
+To connect the controller to your workspace, set the credentials as the [Quick Start](quickstart#3) shows. On the first use in a workspace, an admin opens the agent page in Studio, gives an **agent workspace ID** (the name of this workspace on the agent side) and accepts the agent grant.
 
 ## Add what your agent needs
 

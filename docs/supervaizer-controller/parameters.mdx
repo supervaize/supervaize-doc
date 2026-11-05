@@ -9,6 +9,8 @@ slug: parameters
 
 A **parameter** is a setting that your agent needs and that the workspace provides once: an API key, a model name, a sender address. A workspace admin sets the values in Studio. Your code never holds them.
 
+![The Parameters card of the agent page in Studio](/img/controller/agent-parameters.png)
+
 ## Which setting goes where
 
 | The value | Use | Set by | When |
@@ -52,8 +54,10 @@ agent = Agent(
 | `name` | The name your code uses. |
 | `description` | The text Studio shows next to the input. |
 | `is_secret` | Studio hides the value after it is saved. |
-| `is_required` | Studio asks for a value before the agent is ready. |
+| `is_required` | Marks the parameter as required in Studio. |
 | `is_environment` | The controller also puts the value in `os.environ[name]`. |
+
+Until an admin saves the parameters, Studio shows the agent as **Pending Setup**.
 
 ## Read the values
 

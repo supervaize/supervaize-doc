@@ -22,7 +22,7 @@ The [Supervaizer integration skill](https://github.com/supervaize/supervaizer/tr
 ## How it works
 
 1. The agent declares the `job.configurator` surface in its v2 registration.
-2. An operator starts a job with the normal `job.start` flow. Studio then opens the job on its **Configure** tab. The generic cases and steps stay available under **Operations**.
+2. An operator starts a job with the normal `job.start` flow. The job page then has two tabs: **Configure**, and **Operations** with the cases and steps. Studio opens a job on Configure while it has no case, and on Operations after that.
 3. Studio loads the surface with `supervaizer/surface.load`. The agent returns a `Configurator` document.
 4. Studio validates the document and draws one tab per section. A document that fails validation is refused as a whole and Studio shows _Configurator contract error_.
 5. A button in a section invokes the agent action named by its **binding**. The agent validates, saves, and Studio reloads the document.
@@ -165,6 +165,8 @@ A binding connects a button to an agent action. Studio never guesses an action f
 
 The _Parameters_ tab. The component needs a `save` binding.
 
+![The Parameters section of the Hello World Configure screen](/img/controller/configure-parameters.png)
+
 ```json
 {
   "type": "Form",
@@ -302,6 +304,8 @@ The _Review & launch_ tab. The component takes no data and no bindings:
 
 Studio fills it with the document's `readiness` list and puts the `primary_action` button under it.
 
+![A Review section with one blocked item and a disabled primary action](/img/controller/configure-review.png)
+
 ```json
 "readiness": [
   { "id": "greeting", "label": "Greeting is set", "status": "ok", "section_id": "parameters" },
@@ -323,6 +327,8 @@ Studio fills it with the document's `readiness` list and puts the `primary_actio
 ### `Table`: read-only rows, links and downloads
 
 The _Links & exports_ tab. `Table` needs schema version `"2"` and its `bindings` must be empty.
+
+![A Table section with a link and an artifact](/img/controller/configure-exports.png)
 
 ```json
 {

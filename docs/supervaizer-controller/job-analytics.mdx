@@ -16,6 +16,8 @@ Studio can show a dashboard of your agent's data in two places. Your agent retur
 
 Both surfaces use the same document and the same datasets, so one builder can serve the two.
 
+![The mission dashboard of the Hello World agent: a filter, a chart, KPI cards and a table](/img/controller/mission-analytics.png)
+
 :::info[Working example]
 The [Hello World example](https://github.com/runwaize/supervaize_hello_world) implements both surfaces in `agent_dashboard.py`.
 :::
@@ -47,12 +49,13 @@ registration = build_v2_agent_registration(
         {
             "id": "hello_cases",
             "label": "Hello cases",
-            "scope": "mission",
             "display": {"columns": ["title", "city", "status"]},
         }
     ],
 )
 ```
+
+Keep the dataset at the default scope, `workspace`. Studio runs a dataset query from a job page only for a workspace-scoped dataset. Your query handler limits the rows to the job or the mission.
 
 The SDK derives the action `dataset.hello_cases.query` with `mutating=False`. Register one handler for it, and one for each surface:
 
@@ -195,7 +198,7 @@ A job dashboard should cover the whole job by default. If your mission dashboard
 
 ## Checklist
 
-- [ ] Every dataset of the document is declared in `datasets` of the registration.
+- [ ] Every dataset of the document is declared in `datasets` of the registration, with the `workspace` scope.
 - [ ] `job.analytics` and `mission.analytics` are in `surfaces`, each with a handler.
 - [ ] The query action returns a `dataset.queried` effect with `dataset` and `rows`.
 - [ ] Charts use `visualization.type: "vega-lite"` with a `spec`.
@@ -205,6 +208,7 @@ A job dashboard should cover the whole job by default. If your mission dashboard
 
 | Symptom | Cause |
 | --- | --- |
+| The section shows _Failed to load chart data_ | The dataset is not workspace-scoped, or the workspace did not accept the agent grant again. |
 | No Job Analytics section | `job.analytics` is not in the registration, or the agent was not registered again. |
 | _No analytics datasets declared_ | The document has no `datasets`, or their ids match no declared dataset. |
 | A widget does not show | Its visualization is not `vega-lite`, or it has no `spec`. |
