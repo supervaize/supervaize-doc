@@ -31,6 +31,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaizer-controller/job-configurator",
+          label: "Job Configurator (Configure screen)",
+        },
+        {
+          type: "doc",
           id: "supervaizer-controller/dynamic-choices",
           label: "Dynamic Choices",
         },
