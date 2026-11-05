@@ -1,379 +1,260 @@
 ---
 id: controller-setup
-title: Controller Setup Guide
+title: Build your controller
 displayed_sidebar: supervaizerControllerSidebar
 slug: controller-setup
 ---
 
-import Link from "@docusaurus/Link";
-import "bootstrap-icons/font/bootstrap-icons.css";
+# Build your controller
 
-This guide walks you through customizing your Supervaizer controller step by step.
+The controller is one Python file, `supervaizer_control.py`. It tells Studio what your agent can show and do, and it connects Studio's calls to your agent's code.
 
-## Overview
+This page builds a complete controller in six steps. Decide your [missions, jobs, cases and steps](core-concepts) first.
 
-:::info
-
-This step-by-step guide uses the [<i className="bi bi-github"></i> Hello World Agent](https://github.com/runwaize/supervaize_hello_world) as a reference example.
-
-See the [Quickstart guide](quickstart) for installation instructions.
+:::tip[Let a coding agent do it]
+The [Supervaizer integration skill](/docs/integrations/skills/supervaizer-integration) asks you the design questions and then follows this guide in your project.
 :::
 
-After running `supervaizer scaffold`, you'll have a template file to customize. This guide shows you how to:
+## 1. Create the file
 
-[<i className="bi bi-1-circle-fill"></i> Define agent parameters: ParameterSetup()](#1)
-
-[<i className="bi bi-2-circle-fill"></i> Define agent methods: AgentMethod()](#2)
-
-[<i className="bi bi-3-circle-fill"></i> Define the **fields** of the AgentMethods: AgentMethodField()](#3)
-
-[<i className="bi bi-4-circle-fill"></i> Declare the agent: Agent()](#4)
-
-[<i className="bi bi-5-circle-fill"></i> Define the account: Account()](#5)
-
-[<i className="bi bi-6-circle-fill"></i> Setup the server: Server()](#6)
-
-[<i className="bi bi-7-circle-fill"></i> (Optional) Custom Routes: APIRouter()](#7)
-
-:::note
-Open `supervaizer_control_example.py` and adapt the content to your agent.
-:::
-
-## 1. Define agent parameters {#1}
-
-Use **Parameter** / **ParametersSetup** to declare what the agent needs. These show up in Supervaize UI and can be marked as env or secret.
-
-```js reference title="Map Parameters"
-https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L10-L30
+```bash
+pip install supervaizer
+supervaizer scaffold
 ```
 
-**📖 See the model references**
+`supervaizer scaffold` writes a working `supervaizer_control.py`: one agent, one start form, one start action. The next steps explain each part and extend it.
 
-[Parameter Documentation](/docs/supervaizer-controller/model_reference/model_core#parameterparameterabstract)
+## 2. Register the agent
 
-[ParameterSetup Documentation](/docs/supervaizer-controller/model_reference/model_core#parameterparameterssetup)
-
-<details>
-<summary>**Prompt: Define agent parameters**</summary>
-
-```text
-In my supervaizer_control.py, define the agent parameters using ParametersSetup and Parameter from the supervaizer package.
-
-My agent needs the following configuration:
-- [Describe each parameter: name, description, whether it's an environment variable, whether it's a secret]
-
-Use ParametersSetup.from_list([...]) with Parameter objects.
-Set is_environment=True for env variables and is_secret=True for secrets.
-```
-
-</details>
-
-## 2. Define agent methods {#2}
-
-Point Supervaizer to your agent's functions.
-
-:::tip
-It usually saves time to create a wrapper module where your agent's methods are called with the expected parameters.
-:::
-
-```python title="Methods: wire your agent's functions"
-from supervaizer import AgentMethod
-
-job_start = AgentMethod(
-    name="start",  # This is required
-    method="agent_simple.job_start",  # Path to the main function in dotted notation
-    params={},  # Default parameters to pass to the function
-    is_async=False,  # Only use sync methods for the moment
-    fields=[]  # Defined below
-)
-```
-
-[See below for definition of fields ](#3)
-
-```python title="Additional required methods"
-job_stop = AgentMethod(
-    name="stop",  # Must be present
-    method="agent_simple.job_stop",
-    is_async=False,
-)
-
-job_status = AgentMethod(
-    name="status",  # Must be present
-    method="agent_simple.job_status",
-    is_async=False,
-)
-```
-
-```python title="Optional: poll method for manual update checking"
-job_poll = AgentMethod(
-    name="poll",  # Optional
-    method="agent_simple.job_poll",
-    description="Check external services for updates",
-    is_async=False,
-)
-```
-
-:::tip
-The `job_poll` method is optional. Define it when your agent depends on external events (webhooks, email replies, etc.) and you want a manual "Check for updates" button in the workbench. See [Manual Polling](application-flow-control#manual-polling-job_poll) for details.
-:::
-
-**📖 See the model reference**
-
-[ParameterModel Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentmethodabstract)
-
-<details>
-<summary>**Prompt: Define agent methods**</summary>
-
-```text
-In my supervaizer_control.py, define the AgentMethod entries that wire Supervaizer to my agent's functions.
-
-My agent module is called [my_agent_module] and exposes these functions:
-- [function_name] for starting jobs
-- [function_name] for stopping jobs
-- [function_name] for checking status
-
-Create three AgentMethod objects:
-1. job_start with name="start", method="[my_agent_module].[start_function]", is_async=False, params and fields (fields will be defined next)
-2. job_stop with name="stop", method="[my_agent_module].[stop_function]", is_async=False
-3. job_status with name="status", method="[my_agent_module].[status_function]", is_async=False
-
-The "start" and "stop" and "status" method names are required by Supervaizer.
-```
-
-</details>
-
-## 3. Define the fields of the AgentMethods {#3}
-
-The `fields` parameter defines the user input form that will be displayed in the Supervaize UI. Each field specifies what data users need to provide when calling your agent method.
-
-### Field setup for the "Start" method
-
-```js reference title="Fields of Start AgentMethod"
-https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L32-L60
-```
-
-**📖 See the model reference**
-
-[AgentMethodField Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentmethodfield)
-
-<details>
-<summary>**Prompt: Define AgentMethod fields**</summary>
-
-```text
-In my supervaizer_control.py, define the AgentMethodField entries for the "start" method's fields parameter.
-
-These fields define the user input form displayed in the Supervaize UI when a job is launched.
-
-My start method needs the following user inputs:
-- [Field name, type (str/int/float/bool), field_type (CharField/IntegerField/TextField/BooleanField), required or optional]
-
-Create AgentMethodField objects and assign them to the fields=[] list of the job_start AgentMethod.
-Each field needs: name, type, field_type, and required.
-```
-
-</details>
-
-### Dynamic choices
-
-For fields whose options are determined at runtime (e.g., a list of projects fetched from a database), use `dynamic_choices` instead of static `choices`:
+The registration declares the **surfaces** (screens) and the **actions** (commands) of your agent.
 
 ```python
-AgentMethodField(
-    name="List of projects",
-    type=str,
-    field_type="ChoiceField",
-    dynamic_choices="projects",  # key name — resolved at runtime
-    required=True,
+import os
+from typing import Any
+
+from supervaizer import (
+    Account,
+    Agent,
+    Server,
+    V2ActionRequest,
+    V2SurfaceRequest,
+    build_v2_agent_registration,
 )
+
+AGENT_NAME = "My Agent"
+
+agent = Agent(
+    name=AGENT_NAME,
+    version="0.1.0",
+    description="Describe what your agent does.",
+    supervaizer_v2_registration=build_v2_agent_registration(
+        agent_slug="my-agent",  # must equal the slugified agent name
+        display_name=AGENT_NAME,
+        a2ui_catalog_version="my-agent-ui.1",  # change it when your surfaces change
+        surfaces=["job.start"],
+        actions=["job.start", "job.sync", "job.stop"],
+    ),
+)
+
+account = Account(
+    workspace_id=os.getenv("SUPERVAIZE_WORKSPACE_ID") or "dummy_workspace_id",
+    api_key=os.getenv("SUPERVAIZE_API_KEY") or "dummy_api_key",
+    api_url=os.getenv("SUPERVAIZE_API_URL") or "https://app.supervaize.com",
+)
+
+sv_server = Server(agents=[agent], supervisor_account=account)
 ```
 
-Then define a callback function and pass it to your Agent:
+An action is job-scoped and changes state unless you say otherwise. Declare a read-only action with `V2ActionDefinition(id="...", mutating=False)`. Studio uses this to decide who may call it.
+
+## 3. Describe the start form {#fields}
+
+When an operator starts a job, Studio loads the `job.start` surface and draws the form that your agent returns.
 
 ```python
-def get_dynamic_choices(method_name: str, context: dict) -> dict[str, list[tuple[str, str]]]:
-    if method_name == "start":
-        # Fetch from database, API, or any source
-        # context contains workspace_id and mission_id
-        return {
-            "projects": [("P1", "Project 1"), ("P2", "Project 2"), ("P3", "Project 3")],
-        }
-    return {}
-
-agent = Agent(
-    name="my_agent",
-    # ... other fields ...
-    dynamic_choices_callback=get_dynamic_choices,
-)
+@sv_server.v2_surface("job.start", agent_slug=agent.slug)
+def job_start_form(request: V2SurfaceRequest) -> dict[str, Any]:
+    return {
+        "surface": request.surface,
+        "document": {
+            "type": "Form",
+            "id": "my_agent.job.start",
+            "title": "Start job",
+            "fields": [
+                {"id": "goal", "label": "Goal", "type": "text", "multiline": True, "required": True},
+                {
+                    "id": "mode",
+                    "label": "Mode",
+                    "type": "select",
+                    "default": "fast",
+                    "options": [{"value": "fast", "label": "Fast"}, {"value": "deep", "label": "Deep"}],
+                },
+                {
+                    "id": "max_sources",
+                    "label": "Maximum sources",
+                    "type": "integer",
+                    "default": 10,
+                    "depends_on": {"field": "mode", "in": ["deep"]},
+                    "validation": {"min": 1, "max": 50, "message": "Choose 1 to 50 sources"},
+                },
+                {"id": "review", "label": "Review before sending", "type": "boolean", "default": False},
+            ],
+            "submit": {"action": "job.start", "label": "Start"},
+        },
+    }
 ```
 
-:::info
-`choices` and `dynamic_choices` are mutually exclusive on a field. Use `choices` for fixed options known at definition time, and `dynamic_choices` for options that change at runtime.
-:::
+### Field definitions
 
-See the full [Dynamic Choices guide](/docs/supervaizer-controller/dynamic-choices) for details.
+The same field definition is used in every form: the start form, a [human-in-the-loop](human-in-the-loop) form, a [Configure](job-configurator) form and a [resource](resources) form.
 
-## 4. Declare the agent {#4}
+| Type | Input |
+| --- | --- |
+| `string`, `text` | One line of text. With `multiline: true`, a text area. |
+| `integer`, `number` | A number. |
+| `boolean` | A checkbox. |
+| `date`, `email` | A date picker, an e-mail input. |
+| `select`, `multi_select` | One or several choices from `options`. |
+| `resource_ref` | A choice from one of the agent's [resources](resources), with `options_source`. |
+| `file` | A file upload. See [Human in the loop](human-in-the-loop#files). |
+| `list` | A repeatable group of `item_fields`. |
 
-The `Agent` class defines your agent's metadata and capabilities. This is where you specify what your agent does, who maintains it, and how it can be discovered.
+| Key | Use |
+| --- | --- |
+| `id`, `label` | Required. The `id` is the key of the value that your action receives. |
+| `required` | Studio blocks the submit while the field is empty. |
+| `default`, `placeholder` | The start value, and the hint in an empty input. |
+| `description` | Help text, at most 300 characters. |
+| `multiline`, `min_rows` | A text area and its height. |
+| `read_only` | Shows the value and locks it. |
+| `options` | Choices as `{"value", "label"}` objects. A required `select` has no empty choice. |
+| `options_source` | Choices loaded from a resource: `{"type": "resource", "resource": "contacts", "value_field": "id", "label_field": "email"}`. |
+| `depends_on` | Shows the field only when another field has one of the listed values: `{"field": "mode", "in": ["deep"]}`. |
+| `validation` | `min_length`, `max_length`, `pattern` for text; `min`, `max` for numbers; `min_items`, `max_items` for lists; `message` for the error text. |
 
-```js reference title="Agent definition"
-https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L62-L85
+Studio checks the fields for the operator's comfort. Your action must check the values again.
+
+## 4. Start the job and return the job state
+
+The `job.start` action receives the form values in `request.input`. It runs your agent and returns the **job state**: the job, its cases and their steps.
+
+```python
+@sv_server.v2_action("job.start", agent_slug=agent.slug)
+def start_job(request: V2ActionRequest) -> dict[str, Any]:
+    job_id = request.job_id or "local-job"
+    if job_id in JOBS:  # Studio can send the same start again: never run it twice
+        return started(JOBS[job_id])
+
+    result = run_my_agent(goal=request.input["goal"], mode=request.input.get("mode", "fast"))
+
+    JOBS[job_id] = {
+        "job": {
+            "id": job_id,
+            "agent_slug": request.agent_slug,
+            "mission_id": request.mission_id,
+            "status": "completed",
+            "source": {"type": "fresh_start"},
+            "information": {"cost": {"total_cost": result.cost}},
+        },
+        "cases": [
+            {
+                "id": f"{job_id}-case-1",
+                "lane": "work",
+                "title": request.input["goal"],
+                "status": "completed",
+                "steps": [
+                    {
+                        "id": f"{job_id}-case-1-research",
+                        "activity": "operation",
+                        "status": "completed",
+                        "title": "Research",
+                        "cost": result.cost,
+                    }
+                ],
+            }
+        ],
+    }
+    return started(JOBS[job_id])
+
+
+def started(job_state: dict[str, Any]) -> dict[str, Any]:
+    job = job_state["job"]
+    return {
+        "status": "ok",
+        "effects": [{"type": "job.started", "job_id": job["id"], "status": job["status"]}],
+        "job_state": job_state,  # Studio reads cases and steps only from here
+    }
 ```
 
-**📖 See the model reference**
+`JOBS` is a store that you own. Use a dictionary to begin, and your database in production.
 
-[Agent Documentation](/docs/supervaizer-controller/model_reference/model_core#agentagentabstract)
+Three rules:
 
-<details>
-<summary>**Prompt: Declare the agent**</summary>
+- **Return the job state at the top level of the result.** Studio does not read cases from an effect.
+- **Make the start safe to repeat.** Studio sends the same `job_id` and `idempotency_key` again after an uncertain answer and for each scheduled run. Return the first result.
+- **Long work does not block the answer.** Return the cases as `pending` or `active`, run the work in the background, and let `job.sync` report the progress.
 
-```text
-In my supervaizer_control.py, declare the Agent instance that registers my agent with Supervaizer.
+## 5. Sync and stop
 
-Use the following metadata:
-- name: [My Agent Name]
-- author: [Author Name <email>]
-- version: [version string, e.g. "1.0"]
-- description: [What the agent does]
-- tags: [list of tags for discovery, e.g. "automation", "data processing"]
+Studio calls `job.sync` to get the current state, and `job.stop` when an operator stops or completes the job.
 
-Generate a deterministic ID using shortuuid.uuid(name).
-Wire the previously defined methods using AgentMethods(job_start=..., job_stop=..., job_status=..., job_poll=... (optional)).
-Attach the parameters_setup defined in step 1.
+```python
+@sv_server.v2_action("job.sync", agent_slug=agent.slug)
+def sync_job(request: V2ActionRequest) -> dict[str, Any]:
+    job_state = JOBS.get(request.job_id)
+    result: dict[str, Any] = {"status": "ok", "effects": [{"type": "job.synced", "job_id": request.job_id}]}
+    if job_state:
+        result["job_state"] = job_state
+    return result
+
+
+@sv_server.v2_action("job.stop", agent_slug=agent.slug)
+def stop_job(request: V2ActionRequest) -> dict[str, Any]:
+    cancel_my_agent(request.job_id)
+    JOBS.pop(request.job_id, None)
+    return {"status": "ok", "effects": [{"type": "job.stopped", "job_id": request.job_id}]}
 ```
 
-</details>
+Studio does not poll your agent. When the work makes progress, return the new job state from the next action, or ask Studio for a sync. The Hello World file [`agent_rules.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_rules.py) shows the sync request.
 
-:::tip
-If your agent uses dynamic choice fields, pass the `dynamic_choices_callback` parameter to the Agent constructor. See [Dynamic Choices](/docs/supervaizer-controller/dynamic-choices).
-:::
+## 6. Run and test
 
-## 5.Setup the Supervaize Account and configure your Environment variables {#5}
+Run the controller without Studio:
 
-:::info
-This step is not needed to run the supervaizer as an A2A server only. See [Protocol support](/docs/supervaizer-controller/ref/PROTOCOLS)
-:::
-
-[Create your developer account](/docs/supervaize-fleet/developer-account#getting_started) on the Supervaize platform.
-
-Create your API Key and collect your environment variables.
-
-See the [Quickstart guide](quickstart#3) to setup the environment variables
-
-```js reference title="Account definition"
-https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L87-L95
+```bash
+supervaizer start --local
 ```
 
-**📖 See the model reference**
+Then load the start form:
 
-[Account Documentation](/docs/supervaizer-controller/model_reference/model_core#accountaccountabstract)
-
-<details>
-<summary>**Prompt: Setup the account**</summary>
-
-```text
-In my supervaizer_control.py, define the Supervaize Account using environment variables.
-
-Create an Account instance with:
-- workspace_id from SUPERVAIZE_WORKSPACE_ID env var (default to a dummy value)
-- api_key from SUPERVAIZE_API_KEY env var (default to a dummy value)
-- api_url from SUPERVAIZE_API_URL env var (default to "https://app.supervaize.com")
-
-Use os.getenv() with fallback defaults to prevent errors when env vars are missing.
+```bash
+curl -s http://127.0.0.1:8000/a2a \
+  -H "X-API-Key: local-dev" -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": "1", "method": "supervaizer/surface.load",
+       "params": {"request_id": "r1", "actor": {"user_id": "me"}, "workspace": {"id": "local"},
+                  "mission_id": "local-mission", "agent_slug": "my-agent",
+                  "surface": "job.start", "input": {}}}'
 ```
 
-</details>
+To start a job, change the method to `supervaizer/action.invoke` and add `"action": "job.start"`, a `"job_id"` and your form values in `"input"`.
 
-## 6. Setup the Server {#6}
+For automatic tests, post the same requests to `sv_server.app` with FastAPI's `TestClient`. The Hello World [`tests/`](https://github.com/runwaize/supervaize_hello_world/tree/main/tests) folder has the helpers.
 
-### Config
+To connect the controller to your workspace, set the credentials as the [Quick Start](quickstart#3) shows.
 
-The `Server` class wraps all the defined components together.
+## Add what your agent needs
 
-At the minimum, the server requires at least one agent to be defined and the supervisor account (we are using Supervaize as the supervisor).
+| Your agent | Add |
+| --- | --- |
+| needs settings or secrets from the workspace | [Agent parameters](parameters) |
+| must wait for a person | [Human in the loop](human-in-the-loop) |
+| has data that jobs share or operators edit | [Shared resources](resources) |
+| costs money to run | [Cost reporting](cost-reporting) |
+| has effects that mission rules must control | [Guardrail controls](rule-checkpoints) |
+| needs setup on the job page | [Job Configurator](job-configurator) |
+| has data worth charting | [Job and mission analytics](job-analytics) |
 
-```js reference title="Server definition"
-https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L97-L105
-```
+## Reference
 
-:::warning[Important]
-Note that if `supervisor_account` is provided, the A2A protocol is automatically activated
-:::
-
-**📖 See the model reference**
-
-[Server Documentation](/docs/supervaizer-controller/model_reference/model_core#serverserverabstract)
-
-### Server launch
-
-```js reference title="Server launch"
-https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L107-L115
-```
-
-See [Server Start 🚀](/docs/supervaizer-controller/quickstart#start) for CLI instructions
-
-<details>
-<summary>**Prompt: Setup the server**</summary>
-
-```text
-In my supervaizer_control.py, define the Server instance and the launch entry point.
-
-Create a Server with:
-- agents: list of my Agent instances defined in step 4
-- a2a_endpoints: True to enable A2A protocol discovery
-- supervisor_account: the Account instance defined in step 5
-
-Expose the FastAPI app for deployment:
-  app = sv_server.app
-
-Add the main entry point:
-  if __name__ == "__main__":
-      sv_server.launch(log_level="DEBUG")
-```
-
-</details>
-
-## 7. Custom Routes (optional) {#7}
-
-Agents can mount their own FastAPI routers to expose custom HTTP endpoints alongside the workbench. This is useful for tool endpoints, webhooks, or any agent-specific API.
-
-```python title="Define custom routes"
-from fastapi import APIRouter
-
-agent_api = APIRouter()
-
-@agent_api.post("/webhook")
-async def handle_webhook(payload: dict):
-    """Receive webhooks from an external service."""
-    # Process the webhook payload
-    return {"status": "received"}
-
-@agent_api.get("/status")
-async def custom_status():
-    """Custom status endpoint for this agent."""
-    return {"healthy": True, "pending_tasks": 0}
-```
-
-Then pass the router to your `Agent` definition:
-
-```python title="Attach custom routes to the agent"
-agent = Agent(
-    # ... other config from step 4 ...
-    custom_routes=agent_api,
-)
-```
-
-Supervaizer mounts the router at `/agents/{agent_slug}/api/`, so the endpoints above become:
-- `POST /agents/my-agent/api/webhook`
-- `GET /agents/my-agent/api/status`
-
-:::tip
-Custom routes are mounted without any additional authentication by Supervaizer. If your endpoints need auth, handle it within the router itself.
-:::
-
-## What's next?
-
-- Learn about [Application Flow Control](application-flow-control) to manage cases, track progress, and handle human input
-- Return to the [Quickstart](/docs/supervaizer-controller/quickstart) to continue with configuration and deployment
-- Check the [Model Reference](/docs/supervaizer-controller/model_reference/model_core) for detailed field specifications
-- Explore [API Reference](/docs/supervaizer-controller/ref/API_REFERENCE) for advanced usage
+- [Supervaizer v2 guide](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md): the full contract.
+- [Hello World](https://github.com/runwaize/supervaize_hello_world): a working agent with every feature of these guides, and its tests.

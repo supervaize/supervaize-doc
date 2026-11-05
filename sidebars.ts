@@ -22,12 +22,37 @@ const sidebars: SidebarsConfig = {
         {
           type: "doc",
           id: "supervaizer-controller/core-concepts",
-          label: "Core Concepts",
+          label: "Missions, Jobs, Cases, Steps",
         },
         {
           type: "doc",
           id: "supervaizer-controller/controller-setup",
-          label: "Controller Setup Guide",
+          label: "Build Your Controller",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/parameters",
+          label: "Parameters and Secrets",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/human-in-the-loop",
+          label: "Human in the Loop",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/resources",
+          label: "Shared Resources",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/cost-reporting",
+          label: "Cost Reporting",
+        },
+        {
+          type: "doc",
+          id: "supervaizer-controller/rule-checkpoints",
+          label: "Guardrail Controls",
         },
         {
           type: "doc",
@@ -38,16 +63,6 @@ const sidebars: SidebarsConfig = {
           type: "doc",
           id: "supervaizer-controller/job-analytics",
           label: "Job and Mission Analytics",
-        },
-        {
-          type: "doc",
-          id: "supervaizer-controller/dynamic-choices",
-          label: "Dynamic Choices",
-        },
-        {
-          type: "doc",
-          id: "supervaizer-controller/application-flow-control",
-          label: "Application Flow Control",
         },
         {
           type: "doc",
@@ -87,11 +102,6 @@ const sidebars: SidebarsConfig = {
               type: "doc",
               id: "supervaizer-controller/model_reference/model_extra",
               label: "Extended Model Reference",
-            },
-            {
-              type: "doc",
-              id: "supervaizer-controller/ref/API_REFERENCE",
-              label: "API Reference",
             },
             {
               type: "doc",
