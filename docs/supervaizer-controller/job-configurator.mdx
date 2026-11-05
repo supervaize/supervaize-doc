@@ -123,6 +123,19 @@ Section ids and component ids must be unique in the document. The `label` is the
 
 Policies are presentation. The agent must check every action again.
 
+A typical campaign agent moves its policies with the life of the job:
+
+| Section | Draft | Running | Finished |
+| --- | --- | --- | --- |
+| Parameters | `editable` | `read_only` | `read_only` |
+| Participants | `editable` | `editable` | `read_only` |
+| Scenario | `editable` | `read_only` | `read_only` |
+| Review & launch | `editable` | `editable` | `read_only` |
+| Interviews, Synthesis | `hidden` | `editable` | `read_only` or `hidden` |
+| Links & exports | `editable` | `editable` | `read_only` |
+
+Result sections such as _Interviews_ stay `hidden` during setup and appear after launch. A field can also be locked alone with `read_only: true` while the rest of its form stays editable.
+
 ### Bindings
 
 A binding connects a button to an agent action. Studio never guesses an action from a component type or an id.
@@ -179,6 +192,26 @@ Field types are `text`, `number`, `boolean`, `date`, `email`, `select`, `resourc
 | `depends_on` | Shows the field only for some values of another field. |
 
 Studio invokes the `save` binding with the values of the visible fields under `value`.
+
+A `Form` is not only for settings. Three more uses:
+
+- **Display.** A form of `read_only` fields shows facts such as the creation date or the owner.
+- **Trigger.** The `save` binding can name any job-scoped action, and `save_label` names the button. A _Synthesis_ tab is a `Form` with a prompt `select` and the label _Generate synthesis_.
+- **Upload.** A `file` field sends a file with the form:
+
+```json
+{
+  "id": "report_file",
+  "label": "Insights report (.md)",
+  "type": "file",
+  "accept": ".md,text/markdown",
+  "max_bytes": 1048576,
+  "storage": "studio",
+  "required": true
+}
+```
+
+Studio stores the file, keeps the save button disabled during the upload, and sends the agent a stored-file reference in place of the bytes. A file field must be a top-level field of the form.
 
 ### `ResourceList`: rows the operator adds and removes
 
@@ -253,7 +286,7 @@ While the operator types, Studio reloads the surface with a **read-only event** 
 }
 ```
 
-The event types are `validation.requested` and `selection.changed`. `local_state` holds the unsaved draft and is limited to 64 KiB. Build the answer from it, but **do not save anything** on a surface load, and keep the same `revision`.
+Studio sends the event types `validation.requested` (after a typing pause) and `selection.changed` (another node or version). Ignore a type you do not know. `local_state` holds the unsaved draft and is limited to 64 KiB. Build the answer from it, but **do not save anything** on a surface load, and keep the same `revision`.
 
 ### `Review`: the checklist and the main button
 
@@ -309,6 +342,17 @@ The _Links & exports_ tab. `Table` needs schema version `"2"` and its `bindings`
 - `artifact` is a flat object with a string `id`. Studio sends it back unchanged to the agent's `artifact.get` action and shows or downloads the content. Declare `artifact.get` with `mutating=False`.
 - Limits: 20 columns and 500 rows. Keys in a row that match no column are dropped.
 
+## Design the screen over the life of the job
+
+The document is rebuilt on every load, so the screen can follow the state of the job:
+
+- **Before the domain object exists.** A job can start empty. Return one `editable` section that creates or selects the object (for example, a campaign), set the other sections to `hidden`, and add one `blocked` readiness line that says what to do first.
+- **During setup.** All setup sections are `editable`. The primary action is the launch, `disabled` until every readiness item is `ok`.
+- **While the job runs.** Lock the setup sections, show the result sections, and change the primary action, for example to _Close campaign_ with a `confirmation`.
+- **After the job ends.** Set `primary_action` to `null` and the sections to `read_only`.
+
+Return the job's `job_state` from the actions that change cases, such as the launch, so Studio updates the **Operations** view at once.
+
 ## Step 4: handle saves and revisions
 
 Studio adds the document's `revision` to every action input. The agent receives, for a `Form` save:
@@ -339,6 +383,8 @@ def configure(job_id, action_input):
 ```
 
 On a conflict, Studio reloads the document and keeps the operator's unsaved input so they can apply it again.
+
+For every other refusal, return `status: "error"` with one effect that carries a `message`, for example `{"type": "campaign.configure.failed", "message": "End date must be in the future"}`. Check the section's policy and the readiness again before you write: a locked section in Studio does not stop a direct call.
 
 Rules for the revision:
 
@@ -425,6 +471,10 @@ The Hello World test `test_configurator_sections_readiness_and_primary_action` s
 | A picker shows a text box | The `resource_ref` field has no `options_source`. |
 | The screen is locked with an offline message | The agent server is down or paused. Configure works again once it reconnects. |
 | An action fails with a scope error | The bound action is not job-scoped. |
+
+## Related
+
+- [Job and mission analytics](job-analytics): add a dashboard to the job page with the `job.analytics` surface.
 
 ## Reference
 

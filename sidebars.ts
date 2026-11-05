@@ -36,6 +36,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "supervaizer-controller/job-analytics",
+          label: "Job and Mission Analytics",
+        },
+        {
+          type: "doc",
           id: "supervaizer-controller/dynamic-choices",
           label: "Dynamic Choices",
         },
