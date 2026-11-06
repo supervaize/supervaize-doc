@@ -8,12 +8,18 @@ import clsx from "clsx";
 import BrowserWindow from "@site/src/components/BrowserWindow";
 
 import { SCENARIOS } from "./scenarios";
+import { PATTERN_SCENARIOS } from "./scenariosPatterns";
 import styles from "./styles.module.css";
 
 const STEP_MS = 1100;
 
-export default function ChatReplay({ only }: { only?: string }): ReactNode {
-  const scenarios = only ? SCENARIOS.filter((s) => s.id === only) : SCENARIOS;
+/** No `only`: the four overview replays. `only`: the replays with these ids, in the order given. */
+export default function ChatReplay({ only }: { only?: string | string[] }): ReactNode {
+  const ids = only === undefined ? undefined : [only].flat();
+  const all = [...SCENARIOS, ...PATTERN_SCENARIOS];
+  const scenarios = ids
+    ? ids.map((id) => all.find((s) => s.id === id)).filter((s) => s !== undefined)
+    : SCENARIOS;
   const [active, setActive] = useState(0);
   const [shown, setShown] = useState(1);
   const steps = scenarios[active].steps;
@@ -68,6 +74,19 @@ export default function ChatReplay({ only }: { only?: string }): ReactNode {
                 <div key={i} className={styles.tool}>
                   <span className={styles.dot} />
                   Supervaize · {step.name}
+                  {step.note && <span className={styles.toolNote}>→ {step.note}</span>}
+                </div>
+              );
+            if (step.kind === "confirm")
+              return (
+                <div key={i} className={styles.confirm}>
+                  <span>
+                    Claude asks to run <code>{step.tool}</code> on Supervaize
+                  </span>
+                  <span className={styles.confirmButtons}>
+                    <span className={styles.confirmDeny}>Deny</span>
+                    <span className={styles.confirmAllow}>Allow</span>
+                  </span>
                 </div>
               );
             return (

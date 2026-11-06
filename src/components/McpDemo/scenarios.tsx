@@ -4,7 +4,8 @@ import React, { type ReactNode } from "react";
 
 type Step =
   | { kind: "user"; text: string }
-  | { kind: "tool"; name: string }
+  | { kind: "tool"; name: string; note?: string }
+  | { kind: "confirm"; tool: string }
   | { kind: "assistant"; body: ReactNode };
 
 export interface Scenario {

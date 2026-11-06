@@ -96,6 +96,8 @@ Each pattern shows what you type, which tools the assistant calls, what comes ba
 
 Tags are free-text labels. Missions, jobs and cases in list results now carry their `tags`.
 
+<ChatReplay only="tags" />
+
 #### Tag many cases in one call
 
 - **You say:** _Tag the 12 cases from last week's interview batch "needs-review"._
@@ -113,6 +115,8 @@ Tags are free-text labels. Missions, jobs and cases in list results now carry th
 ### Comments
 
 Comment tools work only when the **Comments** feature is switched on for the workspace.
+
+<ChatReplay only="comments" />
 
 #### Read one thread, post, edit or delete
 
@@ -142,6 +146,8 @@ Each user has their own read marker. It never changes what other people see.
 ### Ratings
 
 A **rating** scores an agent, mission, job or case on dimensions that your workspace defines, for example "clarity". Ratings can be turned off per target.
+
+<ChatReplay only="ratings" />
 
 #### See what can be rated, then rate it
 
@@ -189,6 +195,10 @@ A **rating** scores an agent, mission, job or case on dimensions that your works
 
 ### Jobs
 
+Stopping a job is flagged as destructive, so the chat app asks first. This replay stops a job and renames its mission.
+
+<ChatReplay only="manage" />
+
 | Request | Tool | Calls the agent | Destructive |
 | --- | --- | --- | --- |
 | Edit name, description, input fields or instructions | `job_update` | No | No |
@@ -209,6 +219,8 @@ Two more rules to know:
 - `job_delete` deletes the job for good and needs the right to manage the mission. If other records still refer to the job, Studio deactivates it instead, and the answer says so.
 
 ### Analytics
+
+<ChatReplay only={["dashboard", "pending"]} />
 
 #### How is the workspace doing
 
@@ -234,6 +246,8 @@ Two more rules to know:
 ## What you can and cannot see
 
 The assistant works as you. Every tool applies the same rules as Studio: your workspace role, the missions you can see, a participant's case scope and the switches of each mission.
+
+<ChatReplay only="access" />
 
 - **Hidden means not found.** An object you cannot see answers "Requested entity not found", never "forbidden". This holds for tags, comments, ratings and every other tool, so an id from a mission you cannot see reveals nothing.
 - **Read-only members cannot write.** Write tools are refused for read-only members. They are also refused when the connection was approved with **Read** only, whatever your role.
