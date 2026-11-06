@@ -15,7 +15,7 @@ A mission manager writes rules for a mission in Studio, for example "do not cont
 | --- | --- | --- |
 | Who decides that a step waits | Your agent, in its code | The mission manager, with rules in Studio |
 | Same for all missions | Yes | No, each mission has its own rules |
-| What the person sees | The form of your agent | The decision screen of Studio |
+| What the person sees | The form of your agent | The **Rule activity** panel of the job in Studio |
 
 Use both when you need both: your agent asks for the missing information, and the mission decides what is allowed.
 
@@ -32,6 +32,10 @@ Add a checkpoint to each step that has an effect outside your agent: it sends a 
    - `stop`: do not do it. The step fails. This is final.
    - `pause`: wait. A person decides in Studio, then Studio calls your `rule.checkpoint.resume` action with `allow` or `stop`.
 4. After the effect, your agent can send a second checkpoint with the result.
+
+A paused step waits in the **Rule activity** panel of the job page. The person reads the rule and the verdict, writes a reason, and selects **Approve** or **Deny**. [Run and review jobs with rules](/docs/supervaize-fleet/rules/run-and-review) explains each decision.
+
+![The Rule activity panel of a job in Studio: the rule in force, the counts of the checks and a paused check with the Approve, Deny and Re-evaluate buttons](/img/controller/rule-checkpoint.png)
 
 Studio starts a job in a mission with rules only if the agent declares rule checkpoints.
 
@@ -108,7 +112,7 @@ async def run_guarded_step(gate: RuleCheckpointGate, job_id: str, case: dict, st
 
 - **`context`** holds the business facts that the rules judge: the operation, the amount, the recipient, the result. Use plain values. Do not send secrets.
 - **`occurrence_id`** identifies this run of the step. Use a stable value, so a retry asks about the same occurrence.
-- A paused step shows as `awaiting` with the reason `rule_checkpoint`. The person decides on Studio's guardrails screen, not in a form of your agent.
+- A paused step shows as `awaiting` with the reason `rule_checkpoint`. The person decides in the **Rule activity** panel of the job page, not in a form of your agent.
 
 `wait_for_resume` waits inside your process. A real agent does not block a request on it: it returns the job state with the paused step and continues when the decision arrives. The Hello World file [`agent_rules.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_rules.py) shows this complete flow.
 
@@ -134,6 +138,10 @@ async def resume(request: V2ActionRequest) -> dict:
 
 `resume_rule_checkpoint` matches the decision to the waiting gate and wakes `wait_for_resume`. A decision for an unknown gate must fail: never apply it by guess.
 
+:::warning[Ask Studio for a sync after the decision]
+Studio delivers the decision and does not read a job state from the answer. When the step continues, ask Studio for a sync again: Studio then calls `job.sync` and shows the new state. Without this request, the job stays **Awaiting** in Studio until an operator selects **Update** on the job page. The function `schedule_refresh` in the Hello World file [`agent_rules.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_rules.py) shows the request.
+:::
+
 ## Keep the gate across restarts
 
 The gate lives in memory in these examples. After a restart, the agent can no longer match a decision, and it must reject it. In production, store the `rule_snapshot` with your job and build the gate again from it.
@@ -146,6 +154,7 @@ The SDK also has a helper, `Case.run_guarded_step()`, that does the whole sequen
 - [ ] Every step with an outside effect asks `before`.
 - [ ] The effect runs only after `allow`.
 - [ ] `stop` fails the step and is final. `pause` shows the step as `awaiting`.
+- [ ] After a decision, the agent asks Studio for a sync.
 - [ ] The `context` has the facts a rule needs, and no secret.
 - [ ] Jobs in a mission without rules run as before.
 
