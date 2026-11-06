@@ -10,23 +10,13 @@ import TabItem from "@theme/TabItem";
 import Link from "@docusaurus/Link";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-:::warning[Work in Progress]
-
-This deployment feature is currently only available in the `feature/deploy` branch.
-
-**GitHub Repository**: [https://github.com/runwaize/supervaizer/tree/feature/deploy](https://github.com/runwaize/supervaizer/tree/feature/deploy)
-
-This documentation covers features that are under active development and may change before the next stable release.
-
-:::
-
-The `supervaizer deploy` command provides **fully automated** deployment of Supervaizer agents to cloud platforms with zero-downtime updates, health verification, and automatic rollback capabilities.
+The `supervaizer deploy` command builds your Supervaizer agent as a Docker image. It pushes the image to the registry of the platform and starts the service.
 
 ## Overview
 
 :::info
 
-The deployment CLI supports **three major cloud platforms**:
+The deployment CLI supports **three cloud platforms**:
 
 - **GCP Cloud Run** - Serverless container platform
 - **AWS App Runner** - Fully managed container service
@@ -34,23 +24,33 @@ The deployment CLI supports **three major cloud platforms**:
 
 :::
 
-The `supervaizer deploy` command automates the entire deployment process:
+The workflow has five steps:
 
-[<i className="bi bi-1-circle-fill"></i> **Test Locally** - Validate your agent with Docker before cloud deployment](#local)
+[<i className="bi bi-1-circle-fill"></i> **Test Locally** - Run your agent with Docker before you deploy](#local)
 
-[<i className="bi bi-2-circle-fill"></i> **Plan** - Preview changes and validate configuration](#plan)
+[<i className="bi bi-2-circle-fill"></i> **Plan** - Preview the changes](#plan)
 
-[<i className="bi bi-3-circle-fill"></i> **Deploy** - Build, push, and deploy with health verification](#deploy)
+[<i className="bi bi-3-circle-fill"></i> **Deploy** - Build, push, and deploy the service](#deploy)
 
-[<i className="bi bi-4-circle-fill"></i> **Monitor** - Check deployment status and health](#status)
+[<i className="bi bi-4-circle-fill"></i> **Monitor** - Check the status and the health](#status)
 
-[<i className="bi bi-5-circle-fill"></i> **Cleanup** - Remove deployments when needed](#down)
+[<i className="bi bi-5-circle-fill"></i> **Cleanup** - Remove the deployment](#down)
 
 ## Prerequisites
 
+### Install the deploy extra
+
+The deploy commands need the `deploy` extra of the package.
+
+```bash
+pip install "supervaizer[deploy]"
+```
+
+Run the commands in a directory that has a `pyproject.toml` file. A parent directory up to three levels above also works. Declare the Python dependencies of your agent in this file.
+
 ### Cloud Provider Setup
 
-Before using the deployment CLI, ensure you have:
+Before you use the deployment CLI, complete the setup for your platform.
 
 <Tabs groupId="platform" queryString>
   <TabItem value="gcp" label="GCP Cloud Run">
@@ -145,6 +145,14 @@ doctl auth init
 # Enter your DigitalOcean API token
 ```
 
+#### Create a container registry
+
+DigitalOcean allows one container registry for each account. The CLI uses this registry. Create it once.
+
+```bash
+doctl registry create <registry-name>
+```
+
 #### Required Permissions
 
 Your API token needs these scopes:
@@ -177,13 +185,13 @@ git status
 
 ### Plan Deployment {#plan}
 
-Preview what will be deployed and validate your configuration:
+Preview what the CLI will deploy:
 
 ```bash
 # Plan deployment to GCP Cloud Run
 supervaizer deploy plan --platform cloud-run --name my-agent --env prod
 
-# Plan with custom options
+# Plan with more options
 supervaizer deploy plan \
   --platform aws-app-runner \
   --name email-agent \
@@ -192,135 +200,100 @@ supervaizer deploy plan \
   --project-id my-aws-account
 ```
 
-**Output Example:**
-
-```
-📋 Deployment Plan: email-agent-staging
-
-Platform: AWS App Runner
-Region: us-east-1
-Environment: staging
-
-Actions:
-  ✅ CREATE: ECR repository (email-agent-staging)
-  ✅ CREATE: Secrets Manager secrets (SUPERVAIZER_API_KEY, SV_RSA_PRIVATE_KEY)
-  ✅ CREATE: App Runner service (email-agent-staging)
-  ✅ UPDATE: Environment variables (SUPERVAIZER_PUBLIC_URL)
-
-Estimated Cost: $0.05/hour
-```
+The command prints the platform, the region, and the target image. It also prints a table of actions with type, resource, action, and description.
 
 ### Deploy Application {#deploy}
 
-Deploy your Supervaizer agent to the cloud:
+Deploy your Supervaizer agent:
 
 ```bash
 # Deploy to GCP Cloud Run
 supervaizer deploy up --platform cloud-run --name my-agent
 
-# Deploy with all options
+# Deploy with more options
 supervaizer deploy up \
   --platform do-app-platform \
   --name email-agent \
   --env prod \
-  --region fra \
+  --region nyc3 \
   --port 8000 \
   --generate-api-key \
-  --generate-rsa \
-  --yes
+  --generate-rsa
 ```
 
 **Deployment Process:**
 
-1. **Build** - Create Docker image from your code
-2. **Push** - Upload image to cloud registry
-3. **Secrets** - Create/update API keys and RSA keys
-4. **Deploy** - Create or update the service
-5. **Configure** - Set `SUPERVAIZER_PUBLIC_URL`
-6. **Verify** - Health check until service is ready
-7. **Output** - Display service URL and endpoints
+1. **Build** - Build the Docker image from your code.
+2. **Push** - Push the image to the registry of the platform.
+3. **Secrets** - Store the API keys as secrets of the platform.
+4. **Deploy** - Create or update the service.
+5. **Configure** - Set `SUPERVAIZER_PUBLIC_URL` to the service URL.
+6. **Verify** - Check the health of the service.
 
-**Success Output:**
+The command prints the service URL, the documentation URLs, the revision, the status, and the health.
 
-```
-🚀 Deployment Complete!
+#### Image name
 
-Service URL: https://email-agent-prod-xyz123.run.app
-Admin Interface: https://email-agent-prod-xyz123.run.app/admin/
-API Documentation: https://email-agent-prod-xyz123.run.app/docs
+The `--image` option takes `name[:tag]`. The CLI adds the registry of the platform. A value with `/` is not valid.
 
-Health Status: ✅ Healthy
-Revision: email-agent-prod-xyz123-001
-Image: gcr.io/my-project/email-agent:abc123def
-```
+The default image is `{name}-{env}:{git-sha}`.
+
+| Platform        | Registry                            |
+| --------------- | ----------------------------------- |
+| `cloud-run`      | Artifact Registry of your project   |
+| `aws-app-runner` | Amazon ECR of your account          |
+| `do-app-platform` | Container registry of your account |
+
+:::info[Credentials stay out of the image]
+
+The CLI does not put credentials in the image. It gives them to the service at runtime.
+
+:::
 
 ### Check Status {#status}
 
-Monitor your deployment status and health:
+Check the status and the health of your deployment:
 
 ```bash
-# Check status
 supervaizer deploy status --platform cloud-run --name my-agent --env prod
-
-# Verbose status with logs
-supervaizer deploy status --platform aws-app-runner --name email-agent --verbose
 ```
 
-**Status Output:**
-
-```
-📊 Deployment Status: email-agent-prod
-
-Service URL: https://email-agent-prod-xyz123.run.app
-Health Status: ✅ Healthy
-Last Check: 2025-01-15 10:30:45 UTC
-
-Configuration:
-  Environment: prod
-  Port: 8000
-  Image: gcr.io/my-project/email-agent:abc123def
-  Revision: email-agent-prod-xyz123-001
-
-Resources:
-  CPU: 1 vCPU
-  Memory: 512 MiB
-  Instances: 1-10 (auto-scaling)
-```
+The command prints the local state from `.deployment/state.json`. It then prints the live status from the platform.
 
 ### Remove Deployment {#down}
 
-Clean up your deployment and associated resources:
+Remove the service and its resources:
 
 ```bash
-# Remove deployment
+# Ask for confirmation
 supervaizer deploy down --platform cloud-run --name my-agent --env prod
 
-# Remove with confirmation
+# Skip the confirmation
 supervaizer deploy down --platform aws-app-runner --name email-agent --yes
 ```
 
 **Cleanup Process:**
 
-1. **Stop** - Scale down service to zero instances
-2. **Delete** - Remove the service
-3. **Secrets** - Delete tool-managed secrets
-4. **Confirm** - Verify cleanup completion
+1. **Confirm** - The CLI asks for confirmation. The `--yes` option skips it.
+2. **Delete** - The CLI deletes the service.
+3. **Secrets** - On Cloud Run and AWS, the CLI deletes the secrets of the service.
+4. **State** - The CLI removes the local deployment state.
 
-:::warning
+:::warning[Registries]
 
-The `down` command only removes **tool-managed** resources. Images in registries are preserved by default.
+On AWS, the command also deletes the ECR repository of the service. On Cloud Run and DigitalOcean, the images stay in the registry. DigitalOcean keeps the registry because the whole account shares it.
 
 :::
 
 ### Test Locally {#local}
 
-Test your Supervaizer agent locally using Docker before deploying to the cloud:
+Test your agent with Docker before you deploy:
 
 ```bash
-# Test locally with default settings
+# Test locally with the default settings
 supervaizer deploy local --name my-agent
 
-# Test with custom options
+# Test with more options
 supervaizer deploy local \
   --name email-agent \
   --env dev \
@@ -333,298 +306,163 @@ supervaizer deploy local \
 
 **Local Testing Process:**
 
-1. **Docker Check** - Verify Docker is running and accessible
-2. **Generate Files** - Create Dockerfile, docker-compose.yml, and .dockerignore
-3. **Generate Secrets** - Create API key and RSA private key for testing
-4. **Build Image** - Build the service image with local-test tag
-5. **Start Services** - Launch Docker Compose with generated secrets
-6. **Health Check** - Poll health endpoint until service is ready
-7. **Verify Endpoints** - Test health, API docs, and admin interface
-8. **Display Info** - Show service URL, API key, and access information
+1. **Docker Check** - Check that Docker runs.
+2. **Secrets** - Set the test API key and the optional RSA key.
+3. **Generate Files** - Create the Dockerfile, `docker-compose.yml`, and `.dockerignore`.
+4. **Build Image** - Build the image with the `local-test` tag.
+5. **Start** - Start the service with Docker Compose.
+6. **Wait** - Wait for the service to answer.
+7. **Health Check** - Call `/.well-known/health` and `/docs`.
+8. **Display Info** - Show the service URL and the access information.
 
-**Success Output:**
-
-```
-🧪 Local Testing Complete!
-
-Service URL: http://localhost:8000
-Admin Interface: http://localhost:8000/admin/
-API Documentation: http://localhost:8000/docs
-
-Health Status: ✅ Healthy
-API Key: sv_test_********************
-RSA Key: Generated and configured
-
-To stop the service:
-docker-compose -f .deployment/docker-compose.yml down
-```
+The command prints the service URL, the `/docs` URL, and the `/redoc` URL.
 
 **Local Testing Options:**
 
-| Option                | Description                                     | Default                  |
-| --------------------- | ----------------------------------------------- | ------------------------ |
-| `--name`              | Service base name                               | Current directory name   |
-| `--env`               | Environment (`dev`, `staging`, `prod`)          | `dev`                    |
-| `--port`              | Application port                                | `8000`                   |
-| `--generate-api-key`  | Create secure API key for testing               | `false`                  |
-| `--generate-rsa`      | Generate RSA private key for testing            | `false`                  |
-| `--timeout`           | Seconds to wait for service startup             | `30`                     |
-| `--verbose`           | Show Docker Compose output                      | `false`                  |
-| `--docker-files-only` | Only generate Docker files without running them | `false`                  |
-| `--source-dir`        | Source directory path                           | `src`                    |
-| `--controller-file`   | Controller file name                            | `supervaizer_control.py` |
+| Option                | Description                                      | Default                  |
+| --------------------- | ------------------------------------------------ | ------------------------ |
+| `--name`              | Service base name (required, the CLI asks for it) | none                     |
+| `--env`               | Environment (`dev`, `staging`, `prod`)           | `dev`                    |
+| `--port`              | Application port                                 | `8000`                   |
+| `--generate-api-key`  | Create a random API key for the test             | `false`                  |
+| `--generate-rsa`      | Generate an RSA private key for the test         | `false`                  |
+| `--timeout`           | Seconds to wait for the service                  | `300`                    |
+| `--verbose`           | Show the Docker Compose output                   | `false`                  |
+| `--docker-files-only` | Generate the Docker files and do not run them    | `false`                  |
+| `--controller-file`   | Controller file name                             | `supervaizer_control.py` |
+
+Without `--generate-api-key`, the test API key is `test-api-key-local`.
 
 **Docker Files Only Mode:**
 
-Use `--docker-files-only` to generate Docker configuration files without starting the services:
+Use `--docker-files-only` to generate the Docker files and not start the services:
 
 ```bash
-# Generate Docker files only
 supervaizer deploy local --docker-files-only --name my-agent
-
-# Generate files with custom configuration
-supervaizer deploy local \
-  --docker-files-only \
-  --name email-agent \
-  --port 8080 \
-  --generate-api-key \
-  --generate-rsa
 ```
 
 This mode is useful for:
 
-- **CI/CD pipelines** - Generate files for external Docker execution
-- **Custom Docker setups** - Use generated files with your own Docker workflow
-- **File inspection** - Review generated Dockerfile and docker-compose.yml before running
-- **Manual testing** - Run Docker commands manually with generated configuration
+- **CI/CD pipelines** - Generate the files for an external Docker step
+- **Custom Docker setups** - Use the files in your own workflow
+- **File inspection** - Read the Dockerfile before you run it
 
 **Generated Files:**
 
 - `.deployment/Dockerfile` - Container image definition
 - `.deployment/docker-compose.yml` - Service orchestration
 - `.deployment/.dockerignore` - Docker build exclusions
-- `.deployment/secrets/` - Generated API keys and RSA keys
 
-**Custom Source Directory and Controller File:**
+The `docker-compose.yml` file holds secret values. The CLI sets its mode to `600`.
 
-Use `--source-dir` and `--controller-file` to customize your project structure:
+**Custom Controller File:**
+
+Use `--controller-file` when your controller has another name:
 
 ```bash
-# Default usage (backward compatible)
-supervaizer deploy local
-
-# Custom source directory
-supervaizer deploy local --source-dir .
-
-# Custom controller file
 supervaizer deploy local --controller-file my_controller.py
-
-# Both custom parameters
-supervaizer deploy local --source-dir lib --controller-file custom_controller.py
-
-# Combined with docker-files-only
-supervaizer deploy local \
-  --docker-files-only \
-  --source-dir . \
-  --controller-file my_controller.py
 ```
-
-**Use Cases:**
-
-- **Non-standard project layouts** - When your source code is not in a `src/` directory
-- **Multiple controllers** - When you have different controller files for different environments
-- **Monorepo setups** - When working with multiple services in a single repository
-- **Legacy projects** - When adapting existing projects with different directory structures
-
-**Local Environment Variables:**
-
-The local testing automatically sets these environment variables:
-
-- `SUPERVAIZER_ENVIRONMENT=dev`
-- `SUPERVAIZER_HOST=0.0.0.0`
-- `SUPERVAIZER_PORT={port}`
-- `SUPERVAIZER_API_KEY={generated-test-key}`
-- `SV_RSA_PRIVATE_KEY={generated-rsa-key}`
-- `SV_LOG_LEVEL=INFO`
-
-**Health Check Endpoints:**
-
-Local testing verifies these endpoints:
-
-- **Basic Health**: `GET http://localhost:{port}/.well-known/health`
-- **API Health**: `GET http://localhost:{port}/agents/health` (with API key header)
-- **API Documentation**: `GET http://localhost:{port}/docs`
 
 **Cleanup:**
 
 ```bash
-# Stop local services
-docker-compose -f .deployment/docker-compose.yml down
+# Stop the local services
+docker compose -f .deployment/docker-compose.yml down
 
-# Remove local images
-docker rmi $(docker images -q "*local-test*")
-
-# Clean up generated files
-rm -rf .deployment/
+# Remove the generated files
+supervaizer deploy clean
 ```
 
-:::tip
+:::tip[Test first]
 
-Use local testing to validate your agent configuration before deploying to cloud platforms. It's faster and doesn't require cloud provider authentication.
+Local testing is fast. It does not need cloud authentication.
 
 :::
+
+### Clean Generated Files {#clean}
+
+Remove the files in `.deployment/`:
+
+```bash
+# Remove everything, after confirmation
+supervaizer deploy clean
+
+# Skip the confirmation
+supervaizer deploy clean --force
+
+# Remove only the Docker files
+supervaizer deploy clean --docker-only
+
+# Remove only the deployment state
+supervaizer deploy clean --state-only
+```
+
+You cannot use `--docker-only` and `--state-only` together. The `--verbose` option shows more detail.
 
 ## Configuration Options
 
 ### Common Options
 
-| Option               | Description                                                       | Default                     |
-| -------------------- | ----------------------------------------------------------------- | --------------------------- |
-| `--platform`         | Cloud platform (`cloud-run`, `aws-app-runner`, `do-app-platform`) | **required**                |
-| `--name`             | Service base name                                                 | Current directory name      |
-| `--env`              | Environment (`dev`, `staging`, `prod`)                            | `dev`                       |
-| `--region`           | Provider region                                                   | Platform default            |
-| `--project-id`       | GCP project / AWS account / DO project                            | From CLI config             |
-| `--port`             | Application port                                                  | `8000`                      |
-| `--image`            | Custom image tag                                                  | Auto-generated from git SHA |
-| `--generate-api-key` | Create secure API key if missing                                  | `false`                     |
-| `--generate-rsa`     | Generate RSA private key secret                                   | `false`                     |
-| `--yes`              | Non-interactive mode                                              | `false`                     |
-| `--no-rollback`      | Keep failed revision on error                                     | `false`                     |
-| `--timeout`          | Deploy + verify timeout (seconds)                                 | `300`                       |
-| `--verbose`          | Show underlying CLI output                                        | `false`                     |
+| Option               | Description                                                                          | Default                                   |
+| -------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------- |
+| `--platform`         | Cloud platform (`cloud-run`, `aws-app-runner`, `do-app-platform`)                    | **required**                              |
+| `--name`             | Service base name (required, the CLI asks for it)                                    | none                                      |
+| `--env`              | Environment (`dev`, `staging`, `prod`)                                               | `dev`                                     |
+| `--region`           | Provider region                                                                      | `us-central1`, `us-east-1`, or `nyc3`     |
+| `--project-id`       | GCP project / AWS account / DO project                                               | none                                      |
+| `--port`             | Application port (`up` and `local`)                                                  | `8000`                                    |
+| `--image`            | Image `name[:tag]` (`up`)                                                            | `{name}-{env}:{git-sha}`                  |
+| `--generate-api-key` | Create a secure API key (`up` and `local`)                                           | `false`                                   |
+| `--generate-rsa`     | Generate an RSA private key (`up` and `local`)                                       | `false`                                   |
+| `--timeout`          | Timeout in seconds (`up` and `local`)                                                | `300`                                     |
+| `--yes`              | Skip the confirmation prompt (`down`)                                                | `false`                                   |
 
-### Platform-Specific Options
-
-<Tabs groupId="platform" queryString>
-  <TabItem value="gcp" label="GCP Cloud Run">
-
-```bash
-# GCP-specific options
-supervaizer deploy up \
-  --platform cloud-run \
-  --project-id my-gcp-project \
-  --region europe-west1 \
-  --use-cloud-build \
-  --min-instances 1 \
-  --max-instances 10
-```
-
-**GCP Options:**
-
-<ul>
-  <li>
-    <code>--use-cloud-build</code> - Use Cloud Build instead of local Docker
-  </li>
-  <li>
-    <code>--min-instances</code> - Minimum running instances (0-1000)
-  </li>
-  <li>
-    <code>--max-instances</code> - Maximum running instances (1-1000)
-  </li>
-</ul>
-
-      </TabItem>
-
-  <TabItem value="aws" label="AWS App Runner">
-
-```bash
-# AWS-specific options
-supervaizer deploy up \
-  --platform aws-app-runner \
-  --region us-east-1 \
-  --cpu 1 \
-  --memory 2 \
-  --min-instances 1 \
-  --max-instances 10
-```
-
-**AWS Options:**
-
-<ul>
-  <li>
-    <code>--cpu</code> - CPU units (0.25, 0.5, 1, 2, 4)
-  </li>
-  <li>
-    <code>--memory</code> - Memory in GB (0.5, 1, 2, 3, 4, 6, 8, 10, 12)
-  </li>
-  <li>
-    <code>--min-instances</code> - Minimum running instances
-  </li>
-  <li>
-    <code>--max-instances</code> - Maximum running instances
-  </li>
-</ul>
-
-      </TabItem>
-
-  <TabItem value="do" label="DigitalOcean App Platform">
-
-```bash
-# DigitalOcean-specific options
-supervaizer deploy up \
-  --platform do-app-platform \
-  --region fra \
-  --size basic-xxs \
-  --instances 1
-```
-
-**DO Options:**
-
-<ul>
-  <li>
-    <code>--size</code> - Instance size (<code>basic-xxs</code>,{" "}
-    <code>basic-xs</code>, <code>basic-s</code>, <code>basic-m</code>)
-  </li>
-  <li>
-    <code>--instances</code> - Number of instances
-  </li>
-</ul>
-
-      </TabItem>
-
-  </Tabs>
+The region default depends on the platform: `us-central1` for `cloud-run`, `us-east-1` for `aws-app-runner`, and `nyc3` for `do-app-platform`.
 
 ## Environment Variables
 
-The deployment CLI automatically sets these environment variables:
+The CLI sets these variables in the service.
 
 ### Standard Variables
 
-| Variable                  | Value          | Description               |
-| ------------------------- | -------------- | ------------------------- |
-| `SUPERVAIZER_ENVIRONMENT` | `--env` value  | Environment name          |
-| `SUPERVAIZER_HOST`        | `0.0.0.0`      | Bind to all interfaces    |
-| `SUPERVAIZER_PORT`        | `--port` value | Application port          |
-| `SV_LOG_LEVEL`            | `INFO`         | Logging level             |
-| `SUPERVAIZER_PUBLIC_URL`  | Service URL    | Auto-set after deployment |
+| Variable                  | Value                                     | Description                         |
+| ------------------------- | ----------------------------------------- | ----------------------------------- |
+| `SUPERVAIZER_ENVIRONMENT` | `--env` value                             | Environment name                    |
+| `SUPERVAIZER_HOST`        | `0.0.0.0`                                 | Bind to all interfaces              |
+| `SUPERVAIZER_PORT`        | `--port` value                            | Application port                    |
+| `SUPERVAIZER_LOG_LEVEL`   | Your shell value, or `INFO`               | Logging level                       |
+| `SUPERVAIZER_PUBLIC_URL`  | Service URL                               | The CLI sets it after the deployment |
+
+### Variables from your shell
+
+The CLI copies these variables into the service when they are set in your shell:
+
+- `SUPERVAIZE_API_KEY`
+- `SUPERVAIZE_WORKSPACE_ID`
+- `SUPERVAIZE_API_URL`
+- `SUPERVAIZER_SERVER_ID`
+- `SUPERVAIZER_WORKSPACE_AUTH_REQUIRED`
+- `SUPERVAIZER_WORKSPACE_AUTH_ISSUER`
+- `SUPERVAIZER_WORKSPACE_AUTH_AUDIENCE`
+- `SUPERVAIZER_WORKSPACE_AUTH_PUBLIC_KEY`
+- `SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL`
+- `SUPERVAIZER_WORKSPACE_AUTH_LEEWAY_SECONDS`
+
+The command `supervaizer login` writes the `SUPERVAIZE_*` and `SUPERVAIZER_WORKSPACE_AUTH_*` variables to a file. See the [quickstart](quickstart). Load the file in your shell before you run `deploy up`.
 
 ### Secret Variables
 
-| Variable              | Source                   | Description                 |
-| --------------------- | ------------------------ | --------------------------- |
-| `SUPERVAIZER_API_KEY` | Generated/Secret Manager | API key for admin interface |
-| `SV_RSA_PRIVATE_KEY`  | Generated/Secret Manager | RSA key for encryption      |
+| Variable                  | Source                                      | Description                         |
+| ------------------------- | ------------------------------------------- | ----------------------------------- |
+| `SUPERVAIZER_API_KEY`     | `--generate-api-key`                        | API key for the `/api` routes |
+| `SUPERVAIZER_PRIVATE_KEY` | `--generate-rsa`                            | RSA key for encryption              |
+| `SUPERVAIZE_API_KEY`      | Your shell                                  | Studio API key                      |
 
-### Custom Variables
-
-You can add custom environment variables using a `.deployment/config.yaml` file:
-
-```yaml
-# .deployment/config.yaml
-environment:
-  CUSTOM_VAR: "custom-value"
-  DATABASE_URL: "postgresql://..."
-
-secrets:
-  - name: "MY_SECRET"
-    value: "secret-value"
-    description: "My custom secret"
-```
+The CLI stores these values in the secret manager of the platform.
 
 ## Generated Files
 
-The deployment CLI creates files under `.deployment/` directory:
+The CLI writes its files in the `.deployment/` directory:
 
 ```
 .deployment/
@@ -632,43 +470,33 @@ The deployment CLI creates files under `.deployment/` directory:
 ├── .dockerignore           # Docker ignore rules
 ├── docker-compose.yml      # Local testing
 ├── do-app-spec.yaml        # DigitalOcean app spec
-├── cloudbuild.yaml         # GCP Cloud Build config
-├── config.yaml             # Custom configuration
 ├── state.json              # Deployment state
-├── DEPLOY_AUTOMATION.md     # Usage documentation
 └── logs/                   # Deployment logs
 ```
 
 :::info
 
-The entire `.deployment/` directory is automatically added to `.gitignore` to prevent accidental commits of deployment artifacts and secrets.
+The CLI adds `.deployment/` to `.gitignore`. The `docker-compose.yml` and `do-app-spec.yaml` files hold secret values and have mode `600`.
 
 :::
 
+## Admin Interface
+
+The admin interface is at `/manage`. You can open it only from a Tailscale network. In local mode, loopback also works. A public service URL does not give access to it.
+
+See the [Admin Documentation](ref/2025_08_ADMIN_README.md).
+
 ## Health Verification
 
-The deployment CLI verifies service health using the `/.well-known/health` endpoint:
+The CLI checks the service at the `/.well-known/health` path:
 
 ```bash
-# Health check endpoint
-GET https://your-service-url/.well-known/health
-
-# Expected response
-{
-  "status": "healthy",
-  "timestamp": "2025-01-15T10:30:45Z",
-  "version": "0.9.8",
-  "uptime": 3600
-}
+curl https://your-service-url/.well-known/health
 ```
 
-### Health Check Process
+This route belongs to the A2A routes of the server. Enable A2A endpoints in your `Server`.
 
-1. **Deploy** - Service is created/updated
-2. **Wait** - Allow service to start (30-60 seconds)
-3. **Poll** - Check health endpoint every 5 seconds
-4. **Verify** - Confirm 200 response with healthy status
-5. **Rollback** - If health check fails (unless `--no-rollback`)
+The CLI retries the check with increasing delays until the service answers or the timeout ends.
 
 ## Troubleshooting
 
@@ -690,56 +518,40 @@ doctl auth init
 
 #### **Permission Errors**
 
-Ensure your account has the required permissions for your chosen platform. See [Prerequisites](#prerequisites) for detailed permission requirements.
+Make sure your account has the permissions for your platform. See [Prerequisites](#prerequisites).
 
 #### **Docker Build Failures**
 
 ```bash
-# Check Docker is running
+# Check that Docker runs
 docker ps
 
-# Test Docker build locally
-docker build -t test-image .
-
-# Check Dockerfile syntax
+# Read the generated Dockerfile
 cat .deployment/Dockerfile
 ```
 
 #### **Health Check Timeouts**
 
 ```bash
-# Check service logs
-supervaizer deploy status --platform cloud-run --name my-agent --verbose
+# Check the status
+supervaizer deploy status --platform cloud-run --name my-agent
 
-# Test health endpoint manually
+# Test the health endpoint
 curl https://your-service-url/.well-known/health
 
-# Increase timeout
-supervaizer deploy up --timeout 600
+# Increase the timeout
+supervaizer deploy up --platform cloud-run --name my-agent --timeout 600
 ```
 
-#### **Rollback Issues**
+#### **DigitalOcean: No container registry**
+
+Create the registry with `doctl registry create <registry-name>`. Then run the command again.
+
+### Debug
+
+Read the deployment state:
 
 ```bash
-# Disable automatic rollback
-supervaizer deploy up --no-rollback
-
-# Manual rollback to previous revision
-supervaizer deploy up --image previous-image-tag
-```
-
-### Debug Mode
-
-Enable verbose logging for detailed troubleshooting:
-
-```bash
-# Verbose deployment
-supervaizer deploy up --platform cloud-run --name my-agent --verbose
-
-# Check deployment logs
-cat .deployment/logs/deploy-*.log
-
-# Check state file
 cat .deployment/state.json
 ```
 
@@ -747,35 +559,24 @@ cat .deployment/state.json
 
 ### Security
 
-1. **API Keys** - Always use `--generate-api-key` for production
-2. **Secrets** - Never commit secrets to version control
-3. **Permissions** - Use least-privilege IAM roles
-4. **Networking** - Configure VPC and firewall rules as needed
+1. **API Keys** - Use `--generate-api-key` for production.
+2. **Secrets** - Never commit secrets to version control.
+3. **Permissions** - Use least-privilege IAM roles.
+4. **Networking** - Configure VPC and firewall rules as needed.
 
 ### Performance
 
-1. **Image Size** - Optimize Docker images for faster deployment
-2. **Dependencies** - Use `.dockerignore` to exclude unnecessary files
-3. **Scaling** - Configure appropriate min/max instances
-4. **Health Checks** - Ensure health endpoints respond quickly
-
-### Reliability
-
-1. **Rollbacks** - Test rollback procedures in staging
-2. **Monitoring** - Set up cloud provider monitoring
-3. **Logging** - Configure centralized logging
-4. **Backups** - Regular state and configuration backups
+1. **Image Size** - Keep the Docker image small.
+2. **Dependencies** - Declare only the dependencies that you need in `pyproject.toml`.
 
 ## What's Next?
 
-- **Monitor** your deployment using the [Admin Interface](/docs/supervaizer-controller/ref/ADMIN_README)
-- **Integrate** with CI/CD pipelines for automated deployments
-- **Scale** your service based on traffic patterns
-- **Explore** advanced features like blue-green deployments
+- **Monitor** your deployment with the [Admin Interface](ref/2025_08_ADMIN_README.md) at `/manage`.
+- **Integrate** the commands in your CI/CD pipeline.
 
 ## Need Help?
 
 - Check the [Troubleshooting Guide](troubleshooting) for common issues
-- Review the [CLI Documentation](ref/CLI) for command-line options
-- See the [REST API reference](ref/REST_API) for detailed endpoint information
-- Visit the [GitHub repository](https://github.com/runwaize/supervaizer) for support
+- Review the [CLI Documentation](ref/2025_08_CLI.md) for command-line options
+- See the [REST API reference](ref/2025_08_REST_API.md) for detailed endpoint information
+- Visit the [GitHub repository](https://github.com/supervaize/supervaizer) for support

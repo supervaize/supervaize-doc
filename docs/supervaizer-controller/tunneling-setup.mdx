@@ -37,7 +37,7 @@ lt --port 8000 --subdomain my_supervaizer_agent
 ```
 
 :::info[Keep track of your url]
-Make note of the host name (without `http://`) : `my_supervaizer_agent.loca.lt` and store it in the `SUPERVAIZER_HOST` environment variable.
+Make note of the full url, for example `https://my_supervaizer_agent.loca.lt`. Store it in the `SUPERVAIZER_PUBLIC_URL` environment variable.
 :::
 
 ## Option 2: Using [**ngrok** <i className="bi bi-box-arrow-up-right"></i>](https://ngrok.com/)
@@ -72,7 +72,7 @@ Install via the [Windows App Store <i className="bi bi-box-arrow-up-right"></i>]
 
 ### Setup & Deploy
 
-[Sign up to grok (free with limitations) <i className="bi bi-box-arrow-up-right"></i>](https://dashboard.ngrok.com/signup) to get a token
+[Sign up to ngrok (free with limitations) <i className="bi bi-box-arrow-up-right"></i>](https://dashboard.ngrok.com/signup) to get a token
 
 ```bash title="Configure"
 ngrok config add-authtoken <token>
@@ -94,7 +94,25 @@ Forwarding                    https://e83bc6b8acec.ngrok-free.app -> http://loca
 ```
 
 :::info[Keep track of your url]
-Make note of the host name (without `http:/`) : `my_supervaizer_agent.ngrok.dev` and store it in the `SUPERVAIZER_HOST` environment variable.
+Make note of the full url, for example `https://my_supervaizer_agent.ngrok.dev`. Store it in the `SUPERVAIZER_PUBLIC_URL` environment variable.
+:::
+
+## Set the public url
+
+Give the url to the controller with an environment variable or with an option of `supervaizer start`.
+
+```bash
+export SUPERVAIZER_PUBLIC_URL=https://my_supervaizer_agent.loca.lt
+supervaizer start
+
+# or use the option
+supervaizer start --public-url https://my_supervaizer_agent.loca.lt
+```
+
+The `--public-url` option has priority over the environment variable.
+
+:::note[SUPERVAIZER_HOST]
+`SUPERVAIZER_HOST` is the address that the server binds to. Do not put the tunnel host name in it.
 :::
 
 ## What's next?

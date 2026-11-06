@@ -23,7 +23,7 @@ The mission page has the same dashboard for all the jobs of the mission, with on
 ![The mission dashboard of the Hello World agent: a filter, a chart, KPI cards and a table](/img/controller/mission-analytics.png)
 
 :::info[Working example]
-The [Hello World example](https://github.com/runwaize/supervaize_hello_world) implements both surfaces in `agent_dashboard.py`.
+The [Hello World example](https://github.com/supervaize/supervaize_hello_world) implements both surfaces in `agent_dashboard.py`.
 :::
 
 :::tip[Let a coding agent do it]
@@ -67,6 +67,28 @@ The SDK derives the action `dataset.hello_cases.query` with `mutating=False`. Re
 for surface in ("mission.analytics", "job.analytics"):
     server.register_v2_surface(surface, handle_surface, agent_slug=agent.slug)
 server.register_v2_action("dataset.hello_cases.query", handle_action, agent_slug=agent.slug)
+```
+
+A dataset also takes `auto_surface=True` for a generated table surface, and a `scope` of `workspace`, `mission` or `job`.
+
+You can also declare a dashboard in the registration. Its widgets point to a dataset:
+
+```python
+dashboards=[
+    {
+        "id": "overview",
+        "label": "Overview",
+        "surface": "mission.analytics",  # the default
+        "widgets": [
+            {
+                "id": "by_city",
+                "title": "Cases by city",
+                "data": {"mode": "ref", "datasetId": "hello_cases"},
+                "visualization": {"type": "vega-lite", "spec": {"mark": "bar", "encoding": {"x": {"field": "city", "type": "nominal"}}}},
+            }
+        ],
+    }
+]
 ```
 
 Studio shows the Job Analytics section only when `job.analytics` is in the registration. A new surface or action changes the grant scopes, so the workspace must accept the agent grant again.
@@ -163,7 +185,7 @@ A widget is one chart. Studio renders widgets whose `visualization.type` is `veg
 ```
 
 - `data.datasetId` names the dataset whose rows fill the chart. Studio injects the rows as the Vega-Lite `data.values`.
-- `data.values` can hold inline rows in place of a dataset reference.
+- In place of a dataset reference, a widget can hold inline rows: `"data": {"mode": "inline", "values": [...]}`.
 - `layout.w` and `layout.h` size the widget on a 12-column grid. `x` and `y` are optional.
 - Any Vega-Lite mark works: bars, lines, points, heatmaps (`rect`), layered charts.
 
