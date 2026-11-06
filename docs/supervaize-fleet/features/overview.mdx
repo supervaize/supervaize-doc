@@ -1,6 +1,6 @@
 ---
 id: overview
-title: Supervaize Studio — Platform Overview
+title: "Supervaize Studio: Platform Overview"
 displayed_sidebar: supervaizeFleetSidebar
 slug: overview
 ---
@@ -8,120 +8,83 @@ slug: overview
 import Link from "@docusaurus/Link";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-:::warning[Content Under Review]
-This content is still under review and may be updated with additional details, screen captures, and refinements.
-:::
-
-This comprehensive guide walks you through the complete workflow of using the Supervaize Studio SaaS platform, from discovering new agents to monitoring job execution.
+This guide shows how to use Supervaize Studio. You register agents, group their work in missions, run jobs and follow the cases that the agents create.
 
 ## Platform Overview
 
-The Supervaize Studio platform enables you to:
+Studio lets you:
 
-- **Discover and onboard** AI agents
-- **Create and manage** missions with specific objectives
-- **Execute jobs** using agents with defined parameters
-- **Monitor and track** job performance and outcomes
+- **Connect** AI agents and set their parameters
+- **Create** missions that group jobs, cases and people
+- **Run** jobs, once or on a schedule
+- **Follow** cases and answer the agents that wait for a person
+- **Check** agent work with rules
+- **Rate** results and stay informed with notifications
+
+Some features show only when they are enabled for your workspace. If a menu item is missing, ask a workspace admin.
 
 ## Core Features
 
 ### <i className="bi bi-1-circle"></i> [Agent Management](/docs/supervaize-fleet/features/agent-management)
 
-Discover, onboard, and configure AI agents for your workspace. Set up secrets, environment variables, and agent parameters to ensure smooth operation.
+Agents register themselves through a server. The **Agents** page lists them with a status: **Active**, **Inactive**, **Suspended**, **Error**, **Inaccessible** or **Paused**.
 
-**Key capabilities:**
-
-- Agent discovery and onboarding
-- Secrets and environment configuration
-- Agent status monitoring
-- Performance tracking
+- Set secrets and parameters in the **Parameters** panel of an agent.
+- An agent owner can pause an agent and resume it later.
 
 ### <i className="bi bi-2-circle"></i> [Mission Management](/docs/supervaize-fleet/features/mission-management)
 
-Create and manage missions with specific objectives, team assignments, and success criteria. Organize your AI operations into structured workflows.
+A mission groups the jobs, cases, people and costs of one goal. Add agents and people to it, then start jobs.
 
-**Key capabilities:**
+### <i className="bi bi-3-circle"></i> [Job Management](/docs/supervaize-fleet/features/job-management)
 
-- Mission creation and configuration
-- Team member assignment
-- Priority and deadline management
-- Mission status tracking
+A job is one run of one agent. Fill in the parameters of the agent, set limits and start.
 
-### <i className="bi bi-3-circle"></i> [Context Management](/docs/supervaize-fleet/features/context-management)
+- Some jobs start in testing mode, so you can try them before you go live.
+- Mission managers can also start jobs on a schedule.
 
-Enhance mission execution with business rules, knowledge base links, and operational constraints. Provide agents with the context they need for optimal performance.
+### <i className="bi bi-4-circle"></i> [Navigate a job](/docs/supervaize-fleet/features/job-navigation)
 
-**Key capabilities:**
-
-- Business rule configuration
-- Knowledge base integration
-- Operational constraints
-- Response template management
-
-### <i className="bi bi-4-circle"></i> [Job Management](/docs/supervaize-fleet/features/job-management)
-
-Define and execute specific tasks using configured agents. Set job criteria, monitor execution, and track performance metrics.
-
-**Key capabilities:**
-
-- Job creation and configuration
-- Agent variable setup
-- Success criteria definition
-- Execution monitoring
+Follow the cases of a job as a board, a list or a calendar. Filter, sort and export them.
 
 ### <i className="bi bi-5-circle"></i> [Case Management](/docs/supervaize-fleet/features/case-management)
 
-Organize related jobs into cases for better workflow management. Track case progress, manage escalations, and maintain customer context.
+An agent creates cases inside a job. A case has steps, and some steps wait for a person.
 
-**Key capabilities:**
+- Open the **Actions Panel** to see the cases that need your input, the anomalies and the completed work.
+- Add tags to jobs, cases and steps, and filter lists by tag.
 
-- Case organization and tracking
-- Escalation management
-- Customer context preservation
-- Case analytics and reporting
+### <i className="bi bi-6-circle"></i> [Context Management](/docs/supervaize-fleet/features/context-management)
 
-### <i className="bi bi-6-circle"></i> [Rating & Analytics](/docs/supervaize-fleet/features/rating-analytics)
+Context items are files, text, URLs and connections. Workspace admins add them to the workspace. Mission managers add them to a mission.
 
-Define success metrics, track performance, and analyze agent effectiveness. Use data-driven insights to optimize your AI operations.
+### <i className="bi bi-7-circle"></i> [Rules](/docs/supervaize-fleet/rules/setup)
 
-**Key capabilities:**
+A rule is a check in plain language. Jev checks each agent step against it. A rule can warn, pause the job for approval, or stop it. See also [Run and review jobs with rules](/docs/supervaize-fleet/rules/run-and-review).
 
-- Performance metric definition
-- Real-time analytics
-- Comparative analysis
-- Trend monitoring
+### <i className="bi bi-8-circle"></i> [Rating & Analytics](/docs/supervaize-fleet/features/rating-analytics)
 
-### <i className="bi bi-7-circle"></i> [Slack Notifications](/docs/supervaize-fleet/features/slack-notifications)
+Users rate agents, missions, jobs and cases with rating dimensions. Admins manage the dimensions in **Ratings Setup**. The **Dashboard** and the analytics of a mission show the activity and the costs.
 
-Stay informed with real-time notifications through Slack integration. Configure alerts for job status, performance issues, and mission updates.
+### <i className="bi bi-9-circle"></i> [Notifications](/docs/supervaize-fleet/features/slack-notifications)
 
-**Key capabilities:**
-
-- Slack workspace integration
-- Customizable notification rules
-- Real-time status updates
-- Team collaboration
+Connect Slack or email in **Integrations**. Set the events and the timing for each mission and agent. **My notifications** lists the notifications of all your workspaces.
 
 ## Workflow Overview
 
-The typical workflow follows this pattern:
-
-1. **Discover and onboard** agents with required configurations
-2. **Create missions** with clear objectives and team assignments
-3. **Add context** to enhance agent understanding and performance
-4. **Define and execute jobs** with specific parameters and criteria
-5. **Monitor progress** through real-time dashboards and analytics
-6. **Track performance** using defined rating criteria and metrics
-7. **Stay informed** with automated notifications and alerts
+1. **Connect** the agents of your workspace.
+2. **Create** a mission and add agents and people.
+3. **Add context** to the mission, if the agents need it.
+4. **Start** a job, or schedule it.
+5. **Follow** the cases and answer the steps that wait for you.
+6. **Rate** the results.
 
 ## Getting Started
 
-To begin using the Supervaize Studio platform:
-
-1. **Setup your workspace** and configure team members
-2. **Onboard your first agent** following the [Agent Management](/docs/supervaize-fleet/features/agent-management) guide
-3. **Create your first mission** using the [Mission Management](/docs/supervaize-fleet/features/mission-management) guide
-4. **Execute and monitor jobs** with the [Job Management](/docs/supervaize-fleet/features/job-management) guide
+1. **Check** the agents in the **Agents** page.
+2. **Create** your first mission with the [Mission Management](/docs/supervaize-fleet/features/mission-management) guide.
+3. **Start** a job with the [Job Management](/docs/supervaize-fleet/features/job-management) guide.
+4. **Follow** its cases with [Navigate a job](/docs/supervaize-fleet/features/job-navigation).
 
 ## Need Help?
 
