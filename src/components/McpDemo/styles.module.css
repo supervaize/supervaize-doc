@@ -177,6 +177,43 @@
   animation: rise 0.35s ease-out;
 }
 
+.toolNote {
+  color: var(--ifm-color-danger-dark);
+}
+
+.confirm {
+  align-self: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  border: 1px dashed var(--ifm-color-emphasis-500);
+  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  animation: rise 0.35s ease-out;
+}
+
+.confirmButtons {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.confirmAllow,
+.confirmDeny {
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: 8px;
+  padding: 0.1rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.confirmAllow {
+  background: var(--ifm-color-emphasis-900);
+  border-color: var(--ifm-color-emphasis-900);
+  color: var(--ifm-background-color);
+}
+
 .dot {
   width: 7px;
   height: 7px;
@@ -228,6 +265,7 @@
   .card,
   .user,
   .tool,
+  .confirm,
   .assistant,
   .typing {
     animation: none;
