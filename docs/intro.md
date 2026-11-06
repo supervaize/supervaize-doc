@@ -6,23 +6,25 @@ sidebar_label: Introduction
 
 # Welcome to Runwaize Documentation
 
-Supervaize is an AI platform that enables you to build and deploy AI agents with confidence.
+Runwaize helps you operate AI agents in production with confidence.
 
-## What is Supervaize?
+## The two parts
 
-Supervaize provides tools and infrastructure for creating, testing, and deploying AI agents at scale. Our platform helps you build reliable, production-ready AI applications.
+- **Supervaizer Controller** is the open-source Python SDK. You add it to your agent, and the agent registers with a Studio workspace.
+- **Supervaize Studio** is the platform where your team operates the agents: missions, jobs, cases, human approvals, rules and analytics.
 
 ## Getting Started
 
-Choose a section from the sidebar to get started:
+Choose a section:
 
-- **Supervaize SaaS** - Learn about our SaaS platform
-- **Supervaizer Controller** - Documentation for the Supervaizer Controller
-- **Internal** - Internal development documentation
+- [**Supervaizer Controller**](/docs/supervaizer-controller/quickstart): install the SDK, build your controller and deploy it.
+- [**Supervaize Studio**](/docs/category/supervaize-studio): operate agents, missions and jobs. This section also covers Rules, Aidan interview campaigns and the MCP connector.
+- [**Integrations**](/docs/integrations/intro): n8n workflows, and skills for coding agents.
 
 ## Quick Links
 
-- [Supervaizer Controller](/docs/supervaizer-controller/quickstart)
-- [Integrations (n8n)](/docs/integrations/n8n-integration)
-- [GitHub Repository](https://github.com/runwaize)
+- [Quick start](/docs/supervaizer-controller/quickstart)
+- [Create a developer account](/docs/supervaize-fleet/developer-account)
+- [Supervaizer integration skill](/docs/integrations/skills/supervaizer-integration)
+- [GitHub](https://github.com/runwaize)
 - [Community Slack](https://join.slack.com/t/supervaize/shared_invite/zt-3ay81n5ap-~gggl0BGbzREcyCdLUf9Kw)
