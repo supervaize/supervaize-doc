@@ -10,9 +10,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Controller guides for Supervaizer v2: parameters, human in the loop, shared resources, cost reporting, guardrail controls, Job Configurator, job and mission analytics.
+- Controller guide sections: agent introduction and full description, scheduled start, guided setup, mission context, billable consumption receipts, Studio-stored artifacts.
+- Reference pages from the SDK in the sidebar: v2 contract, workspace agent grants, guided setup contract, scheduled start, billable consumption, parameter validation, changelog.
+- Studio pages: rule applicability and optional rules, testing and production mode of a job, agent pause, job token usage, tags, schedules.
+
 ### Changed
 
-- Documentation and config updates across integrations, skills, controller docs, and sidebar (see current working tree changes).
+- Cloud deployment guide: rewritten from the current `supervaizer deploy` code.
+- Studio pages rewritten from the current interface: agents, cases, context, ratings, notifications and Slack, platform overview.
+- The `ref/` pages keep the SDK file names (`2025_08_CLI`, `2025_08_REST_API`, `2026_05_PROTOCOLS`, `2025_08_PERSISTENCE`, `2025_08_ADMIN_README`). The old addresses without the date prefix no longer exist.
+- The public address of a controller is `SUPERVAIZER_PUBLIC_URL`. The admin interface is at `/manage`.
+- GitHub links point to the `supervaize` organization for the SDK, Hello World and this repository.
+
+### Removed
+
+- v1 pages: application flow control, dynamic choices, API reference.
+- The Claude Code skill page of the Skills Cookbook section. The Supervaizer Integration page replaces it.
+- Stale copies in `ref/`: `DATA_RESOURCES`, `LOCAL_TESTING`, `PARAMETER_VALIDATION_IMPLEMENTATION`, and the copies without a date prefix.
 
 ## [0.4.2]
 
