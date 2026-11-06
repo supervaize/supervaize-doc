@@ -103,25 +103,67 @@ const sidebars: SidebarsConfig = {
               id: "supervaizer-controller/model_reference/model_extra",
               label: "Extended Model Reference",
             },
+            // The ref/ files are copies of the SDK docs/ folder
+            // (`just generate-docs` in the supervaizer repo). Keep the SDK file names.
             {
               type: "doc",
-              id: "supervaizer-controller/ref/REST_API",
-              label: "REST API",
+              id: "supervaizer-controller/ref/2026_05_SUPERVAIZER_v2",
+              label: "Supervaizer v2 Contract",
             },
             {
               type: "doc",
-              id: "supervaizer-controller/ref/CLI",
-              label: "Command Line Interface",
-            },
-            {
-              type: "doc",
-              id: "supervaizer-controller/ref/PROTOCOLS",
+              id: "supervaizer-controller/ref/2026_05_PROTOCOLS",
               label: "Protocols",
             },
             {
               type: "doc",
-              id: "supervaizer-controller/ref/PERSISTENCE",
+              id: "supervaizer-controller/ref/2026_05_WORKSPACE_AGENT_GRANTS",
+              label: "Workspace Agent Grants",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2026_10_GUIDED_SETUP_CONTRACT",
+              label: "Guided Setup Contract",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2026_10_SCHEDULED_START",
+              label: "Scheduled Start",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2026_10_BILLABLE_CONSUMPTION",
+              label: "Billable Consumption",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2025_08_PARAMETER_VALIDATION",
+              label: "Parameter Validation",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2025_08_REST_API",
+              label: "REST API",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2025_08_CLI",
+              label: "Command Line Interface",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2025_08_PERSISTENCE",
               label: "Persistence",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/2025_08_ADMIN_README",
+              label: "Admin Documentation",
+            },
+            {
+              type: "doc",
+              id: "supervaizer-controller/ref/CHANGELOG",
+              label: "Changelog",
             },
             {
               type: "doc",
@@ -137,11 +179,6 @@ const sidebars: SidebarsConfig = {
               type: "doc",
               id: "supervaizer-controller/ref/CONTRIBUTING",
               label: "Contributing",
-            },
-            {
-              type: "doc",
-              id: "supervaizer-controller/ref/ADMIN_README",
-              label: "Admin Documentation",
             },
             {
               type: "doc",
@@ -220,7 +257,7 @@ const sidebars: SidebarsConfig = {
             {
               type: "doc",
               id: "supervaize-fleet/features/slack-notifications",
-              label: "Slack Notifications",
+              label: "Notifications and Slack",
             },
           ],
         },
@@ -298,18 +335,6 @@ const sidebars: SidebarsConfig = {
       type: "doc",
       id: "skills-cookbook/intro",
       label: "Introduction",
-    },
-    {
-      type: "category",
-      label: "Claude Code Skills",
-      collapsed: false,
-      items: [
-        {
-          type: "doc",
-          id: "skills-cookbook/claude-code-skill",
-          label: "Supervaizer Integration Skill",
-        },
-      ],
     },
   ],
 
