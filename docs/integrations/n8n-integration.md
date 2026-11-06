@@ -41,7 +41,7 @@ Good for:
 - quick onboarding
 - no HITL (human approval) steps required
 
-### 2. MCP Reporting (advanced)
+### 2. MCP reporting (advanced)
 
 Use this when you want rich progress reporting and Human-in-the-Loop (HITL).
 
@@ -49,8 +49,9 @@ What you need:
 
 - an n8n workflow that includes **MCP Client** nodes
 - **n8n API Key** (used for linking/metadata and some runtime operations)
-- **MCP Access Token** from n8n
-- MCP Client nodes configured to call Supervaize MCP tools
+- **n8n MCP server token** from n8n (Studio calls n8n with it)
+- **Studio MCP token** from Studio (the MCP Client nodes call Studio with it)
+- MCP Client nodes configured to call the Supervaize MCP endpoint `https://<your-studio>/mcp/agent/<workspace>`
 
 What you gain:
 
@@ -64,7 +65,7 @@ Prepare these values:
 
 - `Workflow URL` (for example `https://n8n.example.com/workflow/<id>`)
 - `n8n API Key` (in n8n go to `Settings` -> `n8n API`, then click **Create an API Key**)
-- `MCP Access Token` (only for MCP mode; in n8n go to `Settings` -> `Instance-level MCP`)
+- `n8n MCP server token` (only for MCP mode; in n8n go to `Settings` -> `Instance-level MCP`)
 
 #### Get `n8n API` :
 
@@ -85,18 +86,46 @@ Workflow requirements by mode:
 - Zero-touch: must include a `Webhook` trigger node.
 - MCP mode: should include MCP Client nodes calling Supervaize tools such as `report_case_start`, `report_case_step`, `request_human_input`, `get_case_status`, and `report_case_status`.
 
+## Save an n8n Instance
+
+Save each n8n instance once. Workflows on the same host reuse its credentials.
+
+The n8n page is in the workspace settings menu under **Tools**. It shows when you have Developer access and the n8n feature is enabled for the workspace.
+
+1. Open **Settings**, then **Tools**. The page is titled **n8n Integrations**.
+2. In **n8n instances**, click **Add n8n instance**.
+3. Enter the **n8n base URL**.
+4. Enter the **n8n API key**. You can add it later.
+5. For MCP mode, enter the **n8n MCP server token (Studio → n8n)**.
+6. Click **Save**.
+
+To change an instance, click **Edit** on its row. Saved secrets are masked.
+
+### Studio MCP token (MCP mode)
+
+The MCP Client nodes of your workflow need a token from Studio. This token is not the n8n MCP server token.
+
+1. Click **Edit** on the instance.
+2. In **Studio MCP token (n8n → Studio)**, click **Generate Studio MCP token**.
+3. Copy the server URL and the token. Studio shows them one time.
+4. In each n8n MCP Client node, set the server URL and the Bearer credential to these values.
+
+The token is bound to this workspace and this instance. **Regenerate Studio MCP token** revokes the previous token. Do not paste the Studio token in the n8n MCP server token field.
+
 ## Link a Workflow by URL (Recommended)
 
 In Supervaize Studio:
 
-1. Open the **n8n Workflow Integration** page (`Settings/Integrations`).
-2. Click **Link by URL**.
-3. Paste the workflow URL.
-4. Enter your **n8n API Key**.
-5. Leave **Enable MCP Reporting** off for zero-touch, or turn it on for MCP mode.
-6. If MCP mode is on, paste your **MCP Access Token**.
-7. (Optional) Add workflow parameters in the form (name, description, secret, required).
-8. Click **Link Workflow**.
+1. Open **Settings**, then **Tools**.
+2. Click **Link workflow**. The **Link n8n workflow** dialog opens.
+3. In **n8n instance**, select a saved instance. Or select the new-instance option.
+4. Paste the **Workflow URL**. With a saved instance, the URL must be on the same host.
+5. For a new host, enter the **n8n API key (first time)**.
+6. Leave **Enable MCP reporting** off for zero-touch, or turn it on for MCP mode.
+7. If MCP reporting is on, enter the **n8n MCP server token (Studio → n8n)**. Leave it empty to use the token saved on the instance.
+8. (Optional) If the webhook uses authentication in n8n, select **Webhook uses authentication in n8n**. Then select **Header Auth** or **Basic Auth**.
+9. (Optional) Add **Workflow parameters (optional)** with **Add parameter**. Each parameter has a name, a description, **Secret** and **Required**.
+10. Click **Link workflow**.
 
 What happens automatically:
 
@@ -107,19 +136,21 @@ What happens automatically:
 
 ## Import a Workflow from JSON (Alternative)
 
-You can also click **Import JSON** and paste exported workflow JSON from n8n.
+You can also click **Import JSON** and import exported workflow JSON from n8n.
 
 Use this when:
 
 - you already exported a workflow file
 - you want to import without using the workflow URL flow
 
-You will provide:
+In the **Import workflow JSON** dialog, you provide:
 
-- workflow name
-- n8n host URL
-- JSON content
-- optional authentication (API key or username/password)
+- the **n8n instance**, or a new **n8n host URL**
+- the **n8n API key (optional)**
+- the **Workflow file**, or the **Workflow JSON** pasted as text
+- the **Workflow name** (required)
+
+Click **Import** to create the agent.
 
 ## How Your n8n Workflow Receives Data
 
@@ -174,7 +205,7 @@ After linking:
 
 In zero-touch mode:
 
-- Supervaize polls n8n (about every 10 seconds)
+- Supervaize polls n8n (about every 10 seconds, for up to 20 minutes per execution)
 - each completed n8n node appears as a Case step
 - a final summary step is added when execution ends
 
@@ -221,7 +252,7 @@ How to use it:
 
 1. Import it into n8n (`Import from File` or paste JSON).
 2. Activate the workflow in n8n.
-3. In Supervaize, link it with **Link by URL** (leave MCP disabled).
+3. In Supervaize, link it with **Link workflow** (leave MCP reporting off).
 4. Start a test Job.
 5. Confirm Supervaize creates a Case and shows node steps for the webhook/code/response nodes.
 
@@ -236,7 +267,7 @@ What it is:
 How to use it:
 
 1. Import and activate the workflow in n8n.
-2. Link it in Supervaize using **Link by URL** (MCP disabled).
+2. Link it in Supervaize using **Link workflow** (MCP reporting off).
 3. Open the created Agent and verify parameters were detected (for example `API_KEY`, `LOOKUP_COUNT`, `NOTIFICATION_EMAIL`).
 4. Set `API_KEY` (required). Optionally set `LOOKUP_COUNT` and `NOTIFICATION_EMAIL`.
 5. Start a Job and inspect the Case steps and final response in Supervaize.
@@ -257,8 +288,8 @@ How to use it:
 
 1. Import and activate the workflow in n8n.
 2. Configure the MCP Client nodes in n8n to call the Supervaize MCP endpoint and tools.
-3. In Supervaize, link the workflow by URL and enable **MCP Reporting**.
-4. Paste your n8n **MCP Access Token** during linking.
+3. In Supervaize, link the workflow by URL and turn on **Enable MCP reporting**.
+4. Enter your **n8n MCP server token** during linking. Add a Studio MCP token to each MCP Client node.
 5. Start a Job and watch the Case for MCP-reported steps.
 6. When a human-input request appears, respond in Supervaize.
 7. Confirm the workflow resumes and completes in n8n/Supervaize.
@@ -305,7 +336,8 @@ Check:
 Check:
 
 - MCP mode was enabled when linking
-- MCP Access Token is set
+- n8n MCP server token is set on the link form or the instance
+- Studio MCP token is set in each MCP Client node
 - workflow contains MCP Client nodes
 - MCP Client nodes call Supervaize MCP tools (`request_human_input`, etc.)
 
