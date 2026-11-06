@@ -28,7 +28,7 @@ Kickstart a **Python** agent with the **Supervaizer Controller** so it's discove
 The Supervaizer Controller currently supports **Python-based** agents.
 :::
 
-We'll use the **Supervaize Hello World** example — a minimal agent that demonstrates all core Supervaizer concepts:
+The **Supervaize Hello World** repository is a complete, tested agent. It shows every feature of these guides:
 [<i className="bi bi-github"></i> GitHub Repository](https://github.com/runwaize/supervaize_hello_world)
 
 ```bash title="Clone the repo"
@@ -116,9 +116,9 @@ pip install -e .
 
 The Hello World example includes a pre-configured `supervaizer_control.py` that demonstrates:
 
-- **Agent parameters** — secrets and environment variables
-- **Agent methods** — start, stop, and status handlers
-- **Server configuration** — A2A protocol support and admin interface
+- **Agents and their parameters**: the settings and secrets that a workspace provides
+- **The registration**: what Studio can show (surfaces) and call (actions)
+- **The server**: the handlers for each surface and action
 
 ```js reference title="Hello World controller supervaizer_control.py"
 https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L1-L20
@@ -133,7 +133,7 @@ supervaizer scaffold
 # Success: Created an example file at supervaizer_control_example.py
 ```
 
-For detailed instructions on customizing your controller, see the **[Controller Setup Guide](controller-setup)**.
+The file is a working controller with one agent, one start form and one start action. [Build your controller](controller-setup) explains each part.
 
 ## <i className="bi bi-3-circle"></i> Configure your Supervaize account & environment {#3}
 
@@ -258,8 +258,8 @@ Once the server is running, you'll have:
 ## What's next?
 
 - **Deploy to the cloud** using the [Cloud Deployment Guide](deploy) for production-ready hosting
-- Add more **custom methods** (`chat`, `custom`) to extend control
-- Enable **A2A** discovery for agent interoperability
+- Decide your [missions, jobs, cases and steps](core-concepts), then [build your controller](controller-setup)
+- Let a coding agent do the integration with the [Supervaizer integration skill](/docs/integrations/skills/supervaizer-integration)
 - Hook your controller into Supervaize to **monitor, audit, and operate** the agent
 
 ## Need Help?
@@ -270,7 +270,7 @@ If you run into issues, check the **[Troubleshooting Guide](troubleshooting)** f
 
 ## Reference
 
-- **Parameter Model**: [docs link](https://doc.supervaize.com/docs/Supervaizer%20Controller/model_reference#parameterparametermodel)
+- **Parameters**: see [Agent parameters and secrets](parameters)
 - **Protocol Support**: See the [Protocols documentation](ref/PROTOCOLS) for A2A protocol details
 - **API docs**: visit `/docs` and `/redoc` when the server is running
 
