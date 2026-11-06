@@ -78,7 +78,7 @@ V2CostEstimate(status="estimated", unit="USD per interview", min=12, max=20,
 V2CostEstimate(status="unknown", basis="fewer than 3 completed interviews yet")
 ```
 
-Return it in the `setup_plan` of your `job.start.preview` action. See "Setup plan and field schema" in the [SDK guide](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#setup-plan-and-field-schema).
+Return it in the `setup_plan` of your `job.start.preview` action. [Guided setup](controller-setup#guided-setup) shows how to declare that action. See "Setup plan and field schema" in the [SDK guide](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#setup-plan-and-field-schema).
 
 ## Bill the workspace for the work
 
@@ -113,7 +113,15 @@ account.report_consumption_sync(
 )
 ```
 
-The `idempotency_key` makes a repeated report count once. This needs Supervaizer 1.10 or later. The records, the receipts and the retry rules are in the [billable consumption reference](https://github.com/supervaize/supervaizer/blob/main/docs/2026_10_BILLABLE_CONSUMPTION.md).
+The `idempotency_key` makes a repeated report count once. This needs Supervaizer 1.10 or later.
+
+The call returns one receipt for each record, in the order sent:
+
+- `accepted`: Studio booked the record.
+- `duplicate`: Studio has this `idempotency_key` already. Nothing is booked twice.
+- `rejected`: Studio booked nothing. `reason` says why. A rejection is final: do not send the record again.
+
+A batch holds 1 to 200 records. Report the work when it is final. Studio has no update or delete for a record. The full contract is in [Billable consumption](ref/2026_10_BILLABLE_CONSUMPTION.md).
 
 ## Checklist
 
@@ -124,5 +132,5 @@ The `idempotency_key` makes a repeated report count once. This needs Supervaizer
 
 ## Reference
 
-- Hello World: `STEP_COST` and `_job_snapshot` in [`agent_v2.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_v2.py).
+- Hello World: `STEP_COST` and `_job_snapshot` in [`agent_v2.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_v2.py).
 - To chart costs over time, add a dataset to your [analytics dashboard](job-analytics).

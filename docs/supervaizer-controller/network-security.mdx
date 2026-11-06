@@ -25,6 +25,20 @@ If your environment uses IP allowlisting (firewall rules, security groups, egres
 
 Use this page to obtain the current list of IP addresses and keep your allowlist updated when Supervaize publishes changes.
 
+### Inbound traffic to the controller
+
+Studio must also reach your controller. Give the controller a public address in `SUPERVAIZER_PUBLIC_URL`. See [Tunneling setup](tunneling-setup) for a local controller.
+
+Allow inbound HTTPS from the Supervaize app IP addresses to this address.
+
+### Workspace authorization
+
+When you set `SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL`, the controller reads the public key of the workspace from this URL. Allow outbound HTTPS to it.
+
+### Admin interface
+
+The admin interface is at `/manage`. Only a Tailscale network can open it. In local mode, loopback also works. Do not open this path to the public internet. See the [Admin Documentation](ref/2025_08_ADMIN_README.md).
+
 ### Recommendations
 
 - Prefer environments that allow outbound HTTPS to `*.supervaize.com` (or the specific hostnames your agent uses) rather than IP-based allowlists, when possible.
