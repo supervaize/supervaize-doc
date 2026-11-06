@@ -249,7 +249,7 @@ The assistant works as you. Every tool applies the same rules as Studio: your wo
 
 <ChatReplay only="access" />
 
-- **Hidden means not found.** An object you cannot see answers "Requested entity not found", never "forbidden". This holds for tags, comments, ratings and every other tool, so an id from a mission you cannot see reveals nothing.
+- **Hidden means not found.** On the tag, comment, rating, mission, job and analytics tools, an object you cannot see answers "Requested entity not found". The call is refused and no data of that mission is returned, so an id from a mission you cannot see reveals nothing.
 - **Read-only members cannot write.** Write tools are refused for read-only members. They are also refused when the connection was approved with **Read** only, whatever your role.
 - **Mission switches apply to each tool.**
 
