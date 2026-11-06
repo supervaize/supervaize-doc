@@ -137,7 +137,47 @@ The file is a working controller with one agent, one start form and one start ac
 
 ## <i className="bi bi-3-circle"></i> Configure your Supervaize account & environment {#3}
 
-### Supervaize account and credentials
+### The short way: log in from the terminal {#login}
+
+`supervaizer login` gives you the API key and the environment variables in one step. It works when you have no Studio account, and when you have one.
+
+```bash title="Log in to Supervaize Studio"
+supervaizer login
+```
+
+**What you see**
+
+1. The command prints the address of an approval page and a short code. It also opens the page in your browser.
+2. On the page, sign in or sign up. Google sign-in works. A new account gets its own workspace, and you are its admin.
+3. Check that the page shows the same code as your terminal. Choose the workspace, then select **Approve**.
+4. The command writes the variables to `.env` and stops.
+
+**What you get in `.env`**
+
+| Variables | Use |
+| --- | --- |
+| `SUPERVAIZE_API_KEY`, `SUPERVAIZE_WORKSPACE_ID`, `SUPERVAIZE_API_URL` | The controller calls Studio |
+| `SUPERVAIZER_WORKSPACE_AUTH_REQUIRED`, `SUPERVAIZER_WORKSPACE_AUTH_ISSUER`, `SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL` | The controller verifies the calls from Studio |
+
+**Who can approve**
+
+- A member of the workspace who has Developer access.
+- When the workspace has no Developer access yet, only an admin of the workspace can approve. The approval then turns Developer access on.
+
+:::warning[Approve only your own login]
+The approval creates an API key in your name. Approve only when you started `supervaizer login` yourself and the code on the page is the code in your terminal.
+:::
+
+**Good to know**
+
+- The command prints the names of the variables. It does not print a value.
+- Keep `.env` out of git.
+- The code is valid for 15 minutes and for one login. A denied or expired code writes nothing.
+- `--no-browser` does not open the browser: open the printed address yourself, on any device. `--env-file` chooses another file. A file named `.envrc` gets `export` lines.
+
+With the file in place, go to [For local development only](#localdev) if your controller is on your computer, then [start the server](#start) with `--env-file .env`.
+
+### The manual way: Supervaize account and credentials {#manual}
 
 [Create your developer account](/docs/supervaize-fleet/developer-account#getting_started) on the Supervaize platform.
 
@@ -201,7 +241,8 @@ export SUPERVAIZER_HOST=silly-peaches-chapter.loca.lt
 
 ```bash
 # with the virtual environment active
-supervaizer start
+supervaizer start --env-file .env   # the file that `supervaizer login` wrote
+supervaizer start                   # when the variables are already in your shell
 ```
 
   </TabItem>
@@ -244,6 +285,14 @@ INFO:     Started server process
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
+
+After the registration, the log shows the Studio page of each agent:
+
+```
+SUCCESS  | [Server launch] Agent <agent-slug> in Studio: https://studio.supervaize.com/w/<workspace-slug>/agents/<agent-id>
+```
+
+Open this page. In **Workspace Access**, a workspace admin enters the agent workspace ID and accepts the workspace authorization. With `supervaizer login`, this is your only step in Studio. See [Workspace agent grants](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_WORKSPACE_AGENT_GRANTS.md) for the reason.
 
 :::tip[Verify endpoints]
 Once the server is running, you'll have:

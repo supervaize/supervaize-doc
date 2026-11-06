@@ -26,6 +26,7 @@ The most important integration decision is **semantic mapping**, not syntax. If 
 - A Python agent project (Python 3.12 or later) that already works.
 - A coding agent that can load skills.
 - 30 minutes for the interview. Your answers decide what operators see in Studio.
+- No Studio account is necessary at the start. The skill runs `supervaizer login` when the agent is ready, and you sign in or sign up in your browser.
 
 ## Install
 
@@ -33,7 +34,7 @@ In Claude Code:
 
 ```
 /plugin marketplace add supervaize/supervaizer
-/plugin install supervaizer-integration
+/plugin install supervaizer-integration@supervaizer
 ```
 
 With another coding agent, clone the [SDK repository](https://github.com/supervaize/supervaizer) and point the agent to `skills/supervaizer-integration/SKILL.md`.
@@ -60,7 +61,7 @@ Add a human approval before the agent sends an e-mail.
 | **2. Interview** | Asks its questions in rounds. Each question comes with a recommended answer and the reason from your code | Decide |
 | **3. Record** | Writes your decisions to `integration_spec.json` and shows you the summary | Confirm |
 | **4. Build** | Runs `supervaizer scaffold`, then builds one topic at a time from its guide, each with a test | Review |
-| **5. Test and connect** | Runs the controller without Studio, then helps you connect it to your workspace | Set the credentials |
+| **5. Test and connect** | Runs the controller without Studio. Then runs `supervaizer login`, starts the controller and gives you the link to your agent in Studio | Approve the login in your browser, then accept the agent's workspace authorization on its Studio page |
 
 ### The interview
 
