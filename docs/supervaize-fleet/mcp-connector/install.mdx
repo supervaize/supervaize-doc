@@ -87,6 +87,32 @@ Open a new chat and ask:
 
 The assistant should call `workspace_info` and `mission_list`, then answer with your workspace name, your role and your missions. Next: [see what you can do with it](./examples).
 
+## For developers: issuer check and tool-list caching
+
+Claude and ChatGPT users need to do nothing here. These two details matter if you write your own MCP client. They apply to the `2026-07-28` revision of the MCP specification. Studio's tests check only that request shape, and older revisions were not checked.
+
+### The `iss` parameter on every redirect
+
+The authorization server metadata, at `/.well-known/oauth-authorization-server/mcp`, sets `authorization_response_iss_parameter_supported` to `true` ([RFC 9207](https://www.rfc-editor.org/rfc/rfc9207)). Every redirect back to your client then carries an `iss` query parameter. Its value is the issuer: the Studio API origin plus `/mcp`, for example `https://app.supervaize.com/mcp`.
+
+`iss` is present on:
+
+- the approval, together with `code`
+- the denial, with `error=access_denied`
+- the error redirects of `/mcp/authorize`, for example `error=invalid_scope`
+
+Compare `iss` with the `issuer` you discovered and refuse a mismatch. This stops an answer from a different authorization server (a mix-up attack).
+
+In your callback, pass `iss` to your OAuth library unchanged, with `code` and `state`. A client that reads the metadata flag refuses a redirect without `iss`, so do not strip query parameters from the redirect, for example in a proxy.
+
+### Cache hints on the tool list
+
+A `tools/list` result carries `ttlMs: 900000` (15 minutes) and `cacheScope: "public"`. This holds on both servers: `/mcp/<workspace>` and `/mcp/agent/<workspace>`. The tool lists change only when Studio is released, and they are the same for every caller. A client can keep the list and does not need to ask again on each request.
+
+After a Studio release that adds, removes or changes a tool, a client can show the previous list for up to 15 minutes.
+
+**Caching does not weaken the access rules.** Tool results (`tools/call`) carry no cache hint. They depend on you and on your access rights, so they are never cached. Only the list of tool names and schemas is kept, never the data a tool returns.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
