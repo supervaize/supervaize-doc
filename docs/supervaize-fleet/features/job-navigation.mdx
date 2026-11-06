@@ -24,13 +24,41 @@ Switch views, card size and sorting here. This is a working miniature.
 
 | Area | What you find there |
 | --- | --- |
-| **Header** | The job's name and status, then its actions: **Start**, **Stop**, **Edit**, **Clone**, **Delete**, rating, **Rules** and **Tracing** |
-| **Details** | The parameters the job was started with, its mission and its agent |
+| **Header** | A **← Back to Mission** link, the job's name and status, its tags, then its actions: **Start**, **Stop**, **Job Rating**, **Job comments**, **Edit**, **Clone**, **Delete** and **Tracing** |
+| **Cards** | **Information**, **Instructions**, **Job Fields**, **Job Methods**, **Rule activity**, **Job Metadata**, **Job Definition** and **Dialog Transcript** |
 | **Cases** | Every case of the job, in the view you choose |
 
-You only see the actions your role allows.
+You only see the actions and cards your role allows. Some cards show only for some agents. **Clone** does not show on jobs of Supervaizer v2 agents.
 
-Some agents add a setup screen. Their jobs show two tabs, **Configure** and **Operations**. A job that has not started opens on **Configure**; once started, it opens on **Operations**, where the cases are.
+- **Rules:** the **Rules** button is in the header of the **Rule activity** card. It opens the policy rules of the job.
+- **Tags:** the tags sit in the title row. **Add tag** opens a searchable list of the workspace tags, with a **Create** row. Each click saves at once. Read-only and auditor roles cannot edit tags.
+- **Tokens:** the **Information** card has a **Tokens** row when you can view costs. It reads **Total**, **Voice** and **Text**, and **Unknown** when some tokens are unclassified. It adds **Estimated** or **Mixed sources** when the count is not exact.
+
+### Configure and Operations
+
+Some agents add a setup screen. Their jobs show two tabs, **Configure** and **Operations**. The job opens on **Configure** in these cases:
+
+- The job has not started.
+- The job has no case yet.
+- You follow a link that asks for **Configure**, such as the **Open** button of a launched plan in the chat.
+
+Otherwise the job opens on **Operations**, where the cases are.
+
+### Testing and production
+
+When the feature is enabled for your workspace, a job of a Supervaizer v2 agent has a mode. A new job starts in testing mode. A badge beside the title reads **Testing** or **Production**.
+
+| Control | What it does |
+| --- | --- |
+| **Go live** | Asks **Go live?** to confirm. New cases go to the Production lane. Test cases stay in Testing. |
+| **Back to testing** | Asks **Back to testing?** to confirm. New cases go to the Testing lane again. |
+
+- **Mission managers** use these controls.
+- **A test case** is a case that the agent creates while the job is in testing mode. The mark never changes, also when you switch the mode.
+- **The agent** does not see the mode.
+- **A job from the chat, or imported from an existing source,** starts in production mode.
+
+On the board, test cases show in a **Testing** swimlane. On a job with a mode, the default lane reads **Production**.
 
 ## The three case views
 
@@ -48,12 +76,23 @@ The default view. Cases are grouped in **swimlanes**, one per kind of case, and 
 | **Success** | Completed |
 | **Anomaly** | Failed or cancelled |
 
-- **Swimlanes come from the agent.** Setup, Work and Deliverable come first, then any other in alphabetical order. A case with no kind goes to **Work**.
+- **Swimlanes come from the agent.** Setup, Testing, Work (or Production) and Deliverable come first, then any other in alphabetical order. A case with no kind goes to **Work**.
 - **Click a swimlane's name to collapse it.** Studio remembers collapsed swimlanes for each job, in your browser, for 180 days.
 
 :::tip[Start with Waiting for Input]
 Those cases are blocked until someone answers. Open one and answer the agent's question to let it resume.
 :::
+
+#### Board layouts
+
+In the **Display** menu, **Layout** changes how the board shows the cases.
+
+| Layout | What it shows |
+| --- | --- |
+| **Horizontal** | Swimlanes, with status columns in each (the default) |
+| **Vertical** | One column per swimlane, with the cases stacked by status |
+| **Deliverables only** | Only the cases that have deliverables |
+| **Dialog** | The cases as a thread, oldest first |
 
 ### List
 
@@ -108,4 +147,5 @@ The view, card size, filters and sort go back to their defaults when you leave t
 | "No cases match the current filters." | A filter or the search hides everything | Open **Filters** and click **Clear all** |
 | A swimlane shows only its name | It is collapsed | Click its name to expand it |
 | No cases on a job with a **Configure** tab | You are on the setup screen | Switch to the **Operations** tab |
+| No **Go live** button | The feature is off for your workspace, the agent is not Supervaizer v2, or you are not a mission manager | Ask a workspace admin |
 | The view went back to Board | View settings are not saved between visits | Pick the view again in **Display** |

@@ -52,7 +52,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/runwaize/supervaize-doc/blob/main/",
+          editUrl: "https://github.com/supervaize/supervaize-doc/blob/main/",
         },
         blog: false,
         theme: {
@@ -170,7 +170,7 @@ const config: Config = {
             },
             {
               label: "Supervaizer controller",
-              href: "https://github.com/runwaize/supervaizer",
+              href: "https://github.com/supervaize/supervaizer",
               icon: "github",
             },
             {

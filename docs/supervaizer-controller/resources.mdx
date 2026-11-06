@@ -63,6 +63,8 @@ registration = build_v2_agent_registration(
 | `auto_surface` | Studio builds the table and the forms from `display` and `fields`. |
 | `display` | The title field, the table columns and the search fields. |
 | `fields` | The form fields, with the usual [field definitions](controller-setup#fields). |
+| `requires_context` | The context that a call needs. The default is `["workspace.id"]`. |
+| `mounted_views` | Replaces a generated view, such as `edit` or `import`, with a surface of your agent: `{"view": "import", "surface": "..."}`. |
 
 The SDK derives one action for each operation, named `resource.<id>.<operation>`, and the surface `mission.agent.resource.<id>`.
 
@@ -133,6 +135,7 @@ The same controller can serve several workspaces. A resource handler must never 
 - Take the workspace from `request.workspace_authorization`. The SDK verified it from a token that Studio signed.
 - Do not use a workspace id or slug from `request.input`. A caller can write any value there.
 - For a `mission` scope, filter on `request.mission_id` too.
+- `request.mission`, when Studio sends it, holds the mission `id`, `name` and `metadata`. Studio sends the current metadata on each request. Do not cache it. Use it to scope results, never as an access boundary. See the [SDK guide](ref/2026_05_SUPERVAIZER_v2.md).
 
 ## Checklist
 
@@ -144,6 +147,6 @@ The same controller can serve several workspaces. A resource handler must never 
 
 ## Reference
 
-- Hello World: [`agent_data_resource.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_data_resource.py) and the contact actions in [`agent_v2.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_v2.py).
+- Hello World: [`agent_data_resource.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_data_resource.py) and the contact actions in [`agent_v2.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_v2.py).
 - A list of rows that an operator edits inside one job: the `ResourceList` component of the [Job Configurator](job-configurator).
 - Custom edit or import screens, and the full resource contract: the [SDK guide](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#resources).

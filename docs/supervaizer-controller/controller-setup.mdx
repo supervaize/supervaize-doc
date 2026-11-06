@@ -67,6 +67,33 @@ sv_server = Server(agents=[agent], supervisor_account=account)
 
 An action is job-scoped and changes state unless you say otherwise. Declare a read-only action with `V2ActionDefinition(id="...", mutating=False)`. Studio uses this to decide who may call it.
 
+Add a `label` and a `description` to an action or a surface when Studio shows it as a button. Both are plain text, at most 300 characters. To describe a surface, pass `{"id": "job.analytics", "label": "Analytics", "description": "Charts of the job."}` in `surfaces`.
+
+### Describe the agent
+
+Pass `introduction` and `full_description` to `Agent`, next to `description`:
+
+```python
+agent = Agent(
+    name=AGENT_NAME,
+    version="0.1.0",
+    description="Describe what your agent does.",
+    introduction={
+        "tagline": "Turns a question into a sourced brief",
+        "summary": "Collects sources, drafts a synthesis and asks for review.",
+        "example_goals": ["Brief me on a market"],
+    },
+    full_description={"format": "markdown", "content": "# My Agent\n\nWhat it does and its limits."},
+    supervaizer_v2_registration=registration,
+)
+```
+
+Studio shows `introduction` before any job exists. Studio shows `full_description` on the agent page, as `markdown` or `html`, and cleans it before display.
+
+### Allow scheduled starts
+
+Add `scheduled_start=True` to `build_v2_agent_registration` so that Studio can start the job on a schedule. The registration must declare `job.start`. Studio calls `job.start` with the same input as a manual start, and a stable `idempotency_key` for each occurrence. See [Scheduled start](ref/2026_10_SCHEDULED_START.md).
+
 ## 3. Describe the start form {#fields}
 
 When an operator starts a job, Studio loads the `job.start` surface and draws the form that your agent returns.
@@ -134,6 +161,14 @@ The same field definition is used in every form: the start form, a [human-in-the
 | `depends_on` | Shows the field only when another field has one of the listed values: `{"field": "mode", "in": ["deep"]}`. |
 | `validation` | `min_length`, `max_length`, `pattern` for text; `min`, `max` for numbers; `min_items`, `max_items` for lists; `message` for the error text. |
 
+The SDK rejects a bad field definition in setup plans, waiting steps and resources:
+
+- A `validation` rule must fit the type: `min`, `max` for `integer`, `number`; `min_length`, `max_length`, `pattern` for `string`, `text`; `min_items`, `max_items` for `multi_select`, `list`.
+- `min_rows` needs `multiline: true`.
+- A `list` needs `item_fields`. An item field cannot be a `list`.
+- `options` are `{"value", "label"}` objects. A bare string is refused.
+- The values in `depends_on` are strings. Parent fields can chain.
+
 Studio checks the fields for the operator's comfort. Your action must check the values again.
 
 ## 4. Start the job and return the job state
@@ -193,7 +228,8 @@ def started(job_state: dict[str, Any]) -> dict[str, Any]:
 Three rules:
 
 - **Return the job state at the top level of the result.** Studio does not read cases from an effect.
-- **Make the start safe to repeat.** Studio sends the same `job_id` and `idempotency_key` again after an uncertain answer and for each scheduled run. Return the first result.
+- **Make the start safe to repeat.** Studio sends the same `job_id` and `idempotency_key` again after an uncertain answer. A scheduled run has a new key for each occurrence. Return the first result for a repeated key.
+- **Refuse a reused key with other input.** Return `status: "error"` with `errors[0].code` set to `idempotency_conflict`.
 - **Long work does not block the answer.** Return the cases as `pending` or `active`, run the work in the background, and let `job.sync` report the progress.
 
 ## 5. Sync and stop
@@ -217,7 +253,7 @@ def stop_job(request: V2ActionRequest) -> dict[str, Any]:
     return {"status": "ok", "effects": [{"type": "job.stopped", "job_id": request.job_id}]}
 ```
 
-Studio does not poll your agent. When the work makes progress, return the new job state from the next action, or ask Studio for a sync. The Hello World file [`agent_rules.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_rules.py) shows the sync request.
+Studio does not poll your agent. When the work makes progress, return the new job state from the next action, or ask Studio for a sync. The Hello World file [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) shows the sync request.
 
 ## 6. Run and test
 
@@ -240,9 +276,58 @@ curl -s http://127.0.0.1:8000/a2a \
 
 To start a job, change the method to `supervaizer/action.invoke` and add `"action": "job.start"`, a `"job_id"` and your form values in `"input"`.
 
-For automatic tests, post the same requests to `sv_server.app` with FastAPI's `TestClient`. The Hello World [`tests/`](https://github.com/runwaize/supervaize_hello_world/tree/main/tests) folder has the helpers.
+For automatic tests, set `SUPERVAIZER_LOCAL_MODE=true` before you import the control file. Then post the same requests to `sv_server.app` with FastAPI's `TestClient`. Local mode skips the workspace token. Without it, the request needs a signed workspace authorization header. The Hello World [`tests/`](https://github.com/supervaize/supervaize_hello_world/tree/main/tests) folder has the helpers.
+
+Test that the start is safe to repeat. The helper calls your handler twice and fails if the second call changes anything:
+
+```python
+from supervaizer import assert_confirm_idempotent
+
+def test_job_start_is_idempotent(start_request):  # a V2ActionRequest with an idempotency_key
+    assert_confirm_idempotent(start_job, start_request)
+```
 
 To connect the controller to your workspace, set the credentials as the [Quick Start](quickstart#3) shows. On the first use in a workspace, an admin opens the agent page in Studio, gives an **agent workspace ID** (the name of this workspace on the agent side) and accepts the agent grant.
+
+## Guided setup
+
+Studio can set up a job in a chat panel. Your agent describes the setup as a plan. The operator fills in the steps, reads the cost estimate and confirms. Then Studio calls `job.start`.
+
+```python
+from supervaizer import V2CostEstimate, V2SetupFieldDefinition, V2SetupPlan, V2SetupStep
+
+plan = V2SetupPlan(
+    steps=[
+        V2SetupStep(
+            id="scope",
+            title="Scope",
+            fields=[V2SetupFieldDefinition(id="goal", label="Goal", type="text", multiline=True, required=True)],
+            help_actions=["goal.suggest"],
+        )
+    ],
+    cost_estimate=V2CostEstimate(status="estimated", unit="USD", min=1, max=3, basis="for 10 sources"),
+)
+
+registration = build_v2_agent_registration(
+    agent_slug="my-agent",
+    display_name="My Agent",
+    a2ui_catalog_version="my-agent-ui.1",
+    surfaces=["job.start"],
+    actions=[
+        "job.start",
+        {"id": "goal.suggest", "kind": "help", "mutating": False, "target_field": "goal"},
+        {"id": "job.test", "dry_run": True, "label": "Test run"},
+    ],
+    job_policy={"setup": {"plan": plan}},
+)
+```
+
+- `job_policy.setup` adds the read-only `job.start.preview` action. It returns the plan in `setup_plan`.
+- A **help action** has `kind="help"` and `mutating=False`. It proposes a value for the field in `target_field`. It receives `{"field": ..., "values": {...}}` and returns `draft`.
+- A **dry-run action** has `dry_run=True`. It can create temporary data and use model calls. It never sends external messages.
+- A cost estimate is a range or `status="unknown"`. See [Cost reporting](cost-reporting#say-the-cost-before-the-job-starts).
+
+The full contract is in [Guided setup contract](ref/2026_10_GUIDED_SETUP_CONTRACT.md).
 
 ## Add what your agent needs
 
@@ -259,4 +344,4 @@ To connect the controller to your workspace, set the credentials as the [Quick S
 ## Reference
 
 - [Supervaizer v2 guide](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md): the full contract.
-- [Hello World](https://github.com/runwaize/supervaize_hello_world): a working agent with every feature of these guides, and its tests.
+- [Hello World](https://github.com/supervaize/supervaize_hello_world): a working agent with every feature of these guides, and its tests.

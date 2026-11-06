@@ -1,306 +1,122 @@
 ---
 id: case-management
-title: Case Management
+title: Work with cases
+description: Open a case in Supervaize Studio, follow its steps, answer an agent, and find and export cases from your jobs.
 displayed_sidebar: supervaizeFleetSidebar
 slug: case-management
 ---
 
-import Link from "@docusaurus/Link";
-import "bootstrap-icons/font/bootstrap-icons.css";
+# Work with cases
 
-# Case Management
+A case is one unit of work inside a job, for example one person to contact or one document to produce. Your agent creates cases while the job runs. You cannot create a case in Studio.
 
-:::warning[Content Under Review]
-This content is still under review and may be updated with additional details, screen captures, and refinements.
+You use cases to follow progress, answer an agent that waits for you, and collect deliverables.
+
+## Case statuses
+
+| Status | Where you see it |
+| --- | --- |
+| **Stopped** | Not started. The board shows it in the **Todo** column. |
+| **Starting** | The board shows it in **In Progress**. |
+| **In progress** | The board shows it in **In Progress**. |
+| **Cancelling** | The board shows it in **In Progress**. |
+| **Awaiting** | The board shows it in **Waiting for Input**. |
+| **Completed** | The board shows it in **Success**. |
+| **Failed** | The board shows it in **Anomaly**. |
+| **Cancelled** | The board shows it in **Anomaly**. |
+
+For the board, the list and the calendar, see [Navigate a job](./job-navigation).
+
+## The case page
+
+The page title shows the case name, its tags and its status. Two buttons sit next to the status.
+
+| Button | What it does |
+| --- | --- |
+| **Case Rating** | Opens the rating of this case. |
+| **Case comments** | Opens the comments of this case. |
+
+Two links at the top lead back: **Back to Job** and **All cases of this job**.
+
+| Area | What you find there |
+| --- | --- |
+| **Case Information** | **Agent**, **Mission**, **Job**, **Created**, **Finished** and **Type**. The first three are links. |
+| **Case Result** | **Duration**, **Cost** and the number of **Steps**. |
+| **Contact Data** | Data that the agent publishes about the case. It shows only when the agent sends some. |
+| Step timeline | The steps of the case, in order. |
+
+:::note[Ratings]
+Case Rating is available when the mission rates its cases. See [Ratings](./rating-analytics).
 :::
 
-Organize related jobs into cases for better workflow management. Track case progress, manage escalations, and maintain customer context.
+## Answer an agent
 
-## Overview
+An agent can stop a case to ask for a human answer. The case gets the status **Awaiting**.
 
-Case Management allows you to group related jobs together into logical cases, providing better organization and context preservation across multiple interactions. Cases are particularly useful for customer support scenarios, complex projects, or any situation where multiple related tasks need to be coordinated and tracked together.
+1. Open the case.
+2. Find the step that waits for you in the timeline.
+3. Fill in the form of the step.
+4. Select **Submit**.
 
-## Case Organization
+The agent can change the label of this button. The case then continues.
 
-### What is a Case?
+A final step that carries files reads **Deliverables**. A step without files reads **Final**.
 
-A case is a container that groups related jobs and maintains context across multiple interactions. Think of it as a "ticket" or "project" that can contain multiple individual tasks or conversations.
+For the developer side, see [Human in the loop](/docs/supervaizer-controller/human-in-the-loop).
 
-**Examples of cases:**
+## Actions Panel
 
-- Customer support ticket with multiple follow-up interactions
-- Product implementation project with various tasks
-- Bug investigation with multiple analysis jobs
-- Feature request with design and development jobs
+Select **Actions Panel** in the sidebar to see what needs you across your missions. Each section shows a count.
 
-### Case Structure
+| Section | What it shows |
+| --- | --- |
+| **Needs your input** | Cases in **Awaiting** status. |
+| **Anomalies** | Cases that failed or were cancelled. |
+| **Completed** | Completed cases, grouped by job, with the total cost. |
+| **In progress** | Cases that are running. |
 
-Each case contains:
+Each card has a **Details** button. A card in **Needs your input** has **Skip**. A card in **Anomalies** has **Dismiss**.
 
-- **Case Information**: Basic details, priority, and status
-- **Related Jobs**: All jobs associated with the case
-- **Customer Context**: Information about the customer or project
-- **Communication History**: Timeline of all interactions
-- **Escalation Path**: Rules for handling complex situations
+**Skipped** and **Dismissed** lists hold the cards that you hid. Select **Restore** to bring a card back.
 
-## Creating and Managing Cases
+:::tip[Start with Needs your input]
+These cases are blocked until someone answers.
+:::
 
-### Case Creation
+## Case lists
 
-Create a new case when you need to:
+Two lists show cases.
 
-- Handle a customer inquiry that may require multiple interactions
-- Manage a project with multiple related tasks
-- Track a complex issue that needs investigation
-- Coordinate work across multiple agents or teams
+| List | How to open it |
+| --- | --- |
+| Cases of a job | In the **Cases** section of a job, select **View all →**. |
+| **All Cases** | Open it from a card on the Dashboard. It has no sidebar item. |
 
-**Case creation process:**
+### Filters
 
-1. Navigate to **Cases** → **Create New Case**
-2. Fill in case details (title, description, priority)
-3. Assign case owner and team members
-4. Set escalation rules and notification preferences
-5. Link to existing customer or project information
+| Filter | Cases of a job | All Cases |
+| --- | --- | --- |
+| Search by case name or ID | Yes | Yes |
+| **Status** | Yes | Yes |
+| **Agent** | Yes | No |
+| **Lane** | Yes | No |
+| **Has deliverables** | Yes | Yes |
+| Tag filter | Yes | Yes |
 
-### Case Assignment
+**Status** offers **Completed**, **Awaiting**, **In Progress**, **Failed** and **Stopped**.
 
-Assign cases to appropriate team members:
+Click **Tags** to open a searchable list of the tags. Select a tag to show it. Select **Exclude** on a tag to hide every case that has it. The filter shows your picks as chips, such as "Tag is any of billing, urgent" and "Tag is not review". Click **is any of** to switch to **is all of**.
 
-- **Case Owner**: Primary person responsible for case resolution
-- **Team Members**: Additional staff who can work on the case
-- **Escalation Contacts**: People to notify for complex issues
-- **Stakeholders**: People who need visibility into case progress
+### Export
 
-### Case Status Management
+| Button | What you get |
+| --- | --- |
+| **Export CSV** | A CSV file of the listed cases. You pick the columns first. Cases of a job only. |
+| **Full export** | A CSV file with all fields, or a Google Sheet that Studio keeps up to date. |
+| **Download deliverables** | A zip file of the deliverables of the cases you tick. |
 
-Track case progress through different statuses:
+**Download deliverables** is off when no listed case has deliverables.
 
-- **Open**: Case is active and being worked on
-- **In Progress**: Work is actively happening on the case
-- **Waiting**: Case is waiting for customer response or external input
-- **Escalated**: Case has been escalated for additional support
-- **Resolved**: Case has been completed successfully
-- **Closed**: Case is fully resolved and archived
-
-## Case Context and Information
-
-### Customer Context
-
-Maintain comprehensive customer information:
-
-- **Customer Profile**: Account details, preferences, and history
-- **Previous Interactions**: History of support requests and resolutions
-- **Product Usage**: Current subscriptions and feature utilization
-- **Communication Preferences**: Preferred contact methods and times
-
-### Business Context
-
-Include relevant business information:
-
-- **Account Type**: Customer tier and service level
-- **Contract Details**: Service agreements and commitments
-- **Billing Information**: Payment history and current status
-- **Business Impact**: Priority based on customer value
-
-### Technical Context
-
-Preserve technical details:
-
-- **System Environment**: Technical specifications and configurations
-- **Previous Issues**: Related problems and their resolutions
-- **Integration Details**: Connected systems and dependencies
-- **Performance Metrics**: Historical system performance data
-
-## Case Workflow Management
-
-### Job Organization
-
-Organize jobs within cases:
-
-- **Primary Job**: Main task or interaction for the case
-- **Follow-up Jobs**: Additional tasks needed for resolution
-- **Escalation Jobs**: Tasks assigned to specialized agents
-- **Validation Jobs**: Quality checks and confirmations
-
-### Escalation Management
-
-Handle complex cases that need additional support:
-
-**Escalation Triggers:**
-
-- Technical complexity beyond agent capabilities
-- Customer dissatisfaction or complaints
-- Time-sensitive issues requiring immediate attention
-- Business impact requiring management review
-
-**Escalation Process:**
-
-1. Identify escalation need based on triggers
-2. Route case to appropriate escalation contact
-3. Notify stakeholders of escalation
-4. Track escalation progress and resolution
-5. Document escalation outcomes and learnings
-
-### Communication Tracking
-
-Maintain complete communication history:
-
-- **Interaction Log**: All conversations and interactions
-- **Decision Points**: Key decisions made during case resolution
-- **Action Items**: Tasks assigned and their completion status
-- **Follow-up Requirements**: Future actions needed
-
-## Case Analytics and Reporting
-
-### Performance Metrics
-
-Track case effectiveness:
-
-- **Resolution Time**: Time from case creation to resolution
-- **Customer Satisfaction**: Satisfaction scores for case outcomes
-- **Escalation Rate**: Percentage of cases requiring escalation
-- **First Contact Resolution**: Cases resolved in initial interaction
-
-### Case Volume Analysis
-
-Understand case patterns:
-
-- **Case Distribution**: Types and categories of cases
-- **Seasonal Trends**: Patterns in case volume over time
-- **Agent Workload**: Distribution of cases across team members
-- **Resource Utilization**: Efficiency of case handling
-
-### Quality Metrics
-
-Measure case quality:
-
-- **Resolution Quality**: Effectiveness of case resolutions
-- **Customer Experience**: Overall satisfaction with case handling
-- **Process Efficiency**: Speed and efficiency of case workflows
-- **Knowledge Transfer**: Learning and improvement over time
-
-## Case Management Best Practices
-
-### Case Organization
-
-- **Clear Naming**: Use descriptive, consistent case titles
-- **Proper Categorization**: Assign appropriate case types and tags
-- **Customer Linking**: Connect cases to customer profiles
-- **Related Case Linking**: Connect related cases when appropriate
-
-### Context Preservation
-
-- **Comprehensive Documentation**: Record all relevant information
-- **Customer History**: Maintain complete interaction history
-- **Technical Details**: Preserve technical context and specifications
-- **Business Impact**: Document business significance and priorities
-
-### Escalation Management
-
-- **Clear Triggers**: Define specific escalation criteria
-- **Escalation Path**: Establish clear escalation procedures
-- **Stakeholder Communication**: Keep relevant parties informed
-- **Escalation Tracking**: Monitor escalation progress and outcomes
-
-### Continuous Improvement
-
-- **Case Reviews**: Regularly review case outcomes and processes
-- **Process Optimization**: Identify and implement workflow improvements
-- **Agent Training**: Use case learnings to improve agent performance
-- **Customer Feedback**: Incorporate customer input into process improvements
-
-## Advanced Case Features
-
-### Case Templates
-
-Use predefined templates for common case types:
-
-- **Support Request**: Standard customer support case structure
-- **Bug Report**: Technical issue investigation template
-- **Feature Request**: Product enhancement request workflow
-- **Account Management**: Customer account modification process
-
-### Automated Case Routing
-
-Implement intelligent case assignment:
-
-- **Skill-based Routing**: Match cases to agents with appropriate skills
-- **Workload Balancing**: Distribute cases evenly across team members
-- **Priority-based Assignment**: Route high-priority cases to senior staff
-- **Customer Preference**: Respect customer's preferred agent assignments
-
-### Case Collaboration
-
-Enable team collaboration on complex cases:
-
-- **Shared Case Access**: Allow multiple team members to work on cases
-- **Internal Notes**: Share information and updates with team
-- **Case Handoffs**: Smoothly transfer cases between team members
-- **Collaborative Resolution**: Work together on case solutions
-
-## Troubleshooting Common Issues
-
-### Case Organization Problems
-
-**Common causes:**
-
-- Inconsistent case naming conventions
-- Poor categorization and tagging
-- Missing customer context
-- Inadequate case linking
-
-**Solutions:**
-
-- Establish clear naming conventions
-- Implement consistent categorization
-- Ensure complete customer context
-- Create proper case relationships
-
-### Escalation Issues
-
-**Common causes:**
-
-- Unclear escalation criteria
-- Inadequate escalation procedures
-- Poor stakeholder communication
-- Insufficient escalation tracking
-
-**Solutions:**
-
-- Define clear escalation triggers
-- Establish escalation procedures
-- Improve stakeholder communication
-- Implement escalation tracking
-
-### Context Loss
-
-**Common causes:**
-
-- Incomplete case documentation
-- Poor information organization
-- Inadequate case handoffs
-- Missing customer history
-
-**Solutions:**
-
-- Ensure comprehensive documentation
-- Improve information organization
-- Streamline case handoff processes
-- Maintain complete customer history
-
-## Next Steps
-
-After setting up case management:
-
-1. **Create cases** for complex customer interactions
-2. **Organize jobs** within cases for better tracking
-3. **Monitor case progress** through dashboards
-4. **Analyze case performance** to identify improvements
-
-## Related Features
-
-- **[Job Management](/docs/supervaize-fleet/features/job-management)**: Execute tasks within cases
-- **[Mission Management](/docs/supervaize-fleet/features/mission-management)**: Organize cases within missions
-- **[Context Management](/docs/supervaize-fleet/features/context-management)**: Maintain case context
-- **[Rating & Analytics](/docs/supervaize-fleet/features/rating-analytics)**: Track case performance
-- **[Slack Notifications](/docs/supervaize-fleet/features/slack-notifications)**: Get case updates
+:::note[Google Sheets]
+A Google Sheet keeps the status, agent and mission filters only. It does not keep search, deliverables or tag filters. Use the CSV for those.
+:::

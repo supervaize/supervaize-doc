@@ -1,278 +1,342 @@
-# SUPERVAIZER
+# Supervaizer
 
-[Operate AI Agents with confidence]
+> **Created:** 2024-12-28
+> **Updated:** 2026-10-11
 
-A Python toolkit for building, managing, and connecting AI agents with full [Agent-to-Agent (A2A)](https://a2a-protocol.org/) protocol support.
+Supervaizer is the Python controller SDK for exposing AI agents to Supervaize Studio through the Supervaizer v2 operation contract.
 
-[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/downloads/)
-[![A2A Protocol](https://img.shields.io/badge/A2A-Protocol-orange.svg)](https://a2a-protocol.org/)
-[![Test Coverage](https://img.shields.io/badge/Coverage-81%25-brightgreen.svg)](https://github.com/supervaize/supervaizer)
+Supervaizer v2 is layered on:
 
-> **⚠️ Beta Disclaimer**: SUPERVAIZER is currently in beta mode. Not everything works as expected yet. Please report any issues you encounter.
+- [A2A](https://a2a-protocol.org/) for discovery, Agent Cards, JSON-RPC controller calls, and SSE events
+- [A2UI](https://a2ui.org/) for agent-authored UI surface documents rendered by Studio
+- Supervaizer v2 semantics for Jobs, Cases, Steps, Resources, Datasets, Surfaces, Actions, Artifacts, and `job.sync` convergence
 
-- [Description](#description)
-  - [Quick Start](#quick-start)
-    - [What we'll do](#what-well-do)
-    - [1. Install Supervaizer](#1-install-supervaizer)
-    - [3. Scaffold the controller](#3-scaffold-the-controller)
-    - [(Optional) 4. Configure your Supervaize account \& environment](#optional-4-configure-your-supervaize-account--environment)
-    - [5. Start the server 🚀](#5-start-the-server-)
-    - [6. Local mode](#6-local-mode)
-    - [7. Optional parameters](#7-optional-parameters)
-    - [What's next?](#whats-next)
-  - [Features](#features)
-  - [Protocol Support](#protocol-support)
-  - [Cloud Deployment](#cloud-deployment)
-    - [Quick Start](#quick-start-1)
-    - [Deployment Commands](#deployment-commands)
-    - [Features](#features-1)
-    - [Documentation](#documentation)
-  - [Using the CLI](#using-the-cli)
-  - [API Documentation \& User Interfaces](#api-documentation--user-interfaces)
-    - [Admin Interface (`/admin`)](#admin-interface-admin)
-      - [Quick Start](#quick-start-2)
-- [Calculating costs](#calculating-costs)
-  - [Documentation](#documentation-1)
-  - [Contributing](#contributing)
-  - [License](#license)
+Supervaizer does not contain agent business logic. Agents declare their resources, surfaces, actions, and artifacts; Studio consumes that declaration as a generic operations UI.
 
-## Description
+> **Beta:** Supervaizer v2 is under active development. Protocol versions are pinned in the registration contract and incompatible versions should fail explicitly.
 
-SUPERVAIZER is a toolkit built for the age of AI interoperability. At its core, it implements the Agent-to-Agent (A2A) protocol, enabling seamless discovery and interaction between agents across different systems and platforms.
+## Start Here
 
-With comprehensive support for the A2A protocol specification, SUPERVAIZER allows you to:
-
-- Enhance the capabilities of your agents, making them automatically discoverable by other A2A compatible systems
-- Expose standardized agent capabilities through agent cards
-- Monitor agent health and status through dedicated endpoints
-- Connect your agents to the growing ecosystem of A2A-compatible tools
-
-Beyond A2A interoperability, SUPERVAIZER provides a robust API for agent registration, job control, event handling, telemetry, and more, making it a crucial component for building and managing AI agent systems.
-
-SUPERVAIZER is the recommended controller to integrate AI Agents into the [supervaize](https://supervaize.com) plateform.
+- [Product feature map](https://github.com/supervaize/supervaizer/blob/main/docs/product/feature-map.md) — workflows, routes, and the pytest that covers each one
+- [Supervaizer v2 concepts](2026_05_SUPERVAIZER_v2.md)
+- [Protocols: A2A, A2UI, AG-UI, and Supervaizer v2](2026_05_PROTOCOLS.md)
+- [CLI reference](2025_08_CLI.md)
+- [API surfaces and authentication](2025_08_REST_API.md)
+- [Admin interface and workbench](2025_08_ADMIN_README.md)
+- [Hello World example repository](https://github.com/supervaize/supervaize_hello_world)
+- [Built-in local Hello World agent](https://github.com/supervaize/supervaizer/blob/main/src/supervaizer/examples/hello_world_agent.py)
+- [Supervaizer integration skill](https://github.com/supervaize/supervaizer/tree/main/skills/supervaizer-integration) — lets a coding agent (Claude Code, Cursor, Codex) integrate an existing Python agent step by step
+- Studio guides: [Job Configurator (Configure screen)](https://docs.runwaize.com/docs/supervaizer-controller/job-configurator), [Job and mission analytics](https://docs.runwaize.com/docs/supervaizer-controller/job-analytics)
 
 ## Quick Start
 
-Kickstart a **Python** agent with the **Supervaizer Controller** so it's discoverable and operable by Supervaize.
-
-See full our full [documentation](https://doc.supervaize.com/docs/category/supervaizer-controller)
-
-### What we'll do
-
-1. **Install Supervaizer** in that project
-2. **Scaffold the controller** and map it to your agent
-3. **Configure secrets & env**, then **start** the server 🚀
-
-### 1. Install Supervaizer
-
-First, navigate to your existing Python AI agent project. This could be built with any framework - LangChain, CrewAI, AutoGen, or your own custom implementation. Supervaizer works as a wrapper around your existing agent, regardless of the underlying framework you're using.
+### 1. Install
 
 ```bash
 pip install supervaizer
 ```
 
-### 3. Scaffold the controller
-
-Generate a starter controller in your project:
+For local development from this repository:
 
 ```bash
-supervaizer scaffold
-# Success: Created an example file at supervaizer_control_example.py
+just install-dev   # uv sync --extra dev
 ```
 
-This creates **`supervaizer_control_example.py`**. You'll customize it to:
+### 2. Run The Built-In V2 Hello World Agent
 
-- Define **agent parameters** (secrets, env, required inputs)
-- Define **agent methods** (start/stop/status, etc.)
-- Map those methods to **your agent's functions**
-
-### (Optional) 4. Configure your Supervaize account & environment
-
-Create your developer account on the [Supervaize platform](https://www.supervaize.com).
-
-Create your API Key and collect your environment variables:
-
-```bash
-export SUPERVAIZE_API_KEY=...
-export SUPERVAIZE_WORKSPACE_ID=team_1
-export SUPERVAIZE_API_URL=https://app.supervaize.com
-```
-
-### 5. Start the server 🚀
-
-```bash
-# with the virtual environment active
-supervaizer start
-```
-
-Or run directly:
-
-```bash
-python supervaizer_control.py
-```
-
-Once the server is running, you'll have:
-
-- **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`
-- **A2A discovery**: `/.well-known/agents.json`
-- **ACP discovery**: `/agents`
-
-### 6. Local mode
-
-Run the server locally without connecting to Studio:
+The fastest way to see the v2 controller is local mode:
 
 ```bash
 supervaizer start --local
 ```
 
-This starts the server with your agents from `supervaizer_control.py` alongside a built-in Hello World agent. If no `supervaizer_control.py` exists, only the Hello World agent is loaded.
+Local mode runs the agents from your `supervaizer_control.py` plus the built-in Hello World agent (disable it with `SUPERVAIZER_DISABLE_HELLO_WORLD=true`); with no control file it starts Hello World alone. Hello World declares:
 
-- **No Studio registration** — the server runs fully offline
-- **`SUPERVAIZER_LOCAL_MODE=true`** is set automatically
-- **API key** defaults to `local-dev` (override with `SUPERVAIZER_API_KEY`)
-- **Disable Hello World** by setting `SUPERVAIZER_DISABLE_HELLO_WORLD=true`
+- a v2 Agent Card
+- `job.start` and `case.step.awaiting` A2UI surfaces
+- `job.start`, `job.start.preview`, `job.sync`, and `step.awaiting.submit` actions
+- one generated resource action, `resource.hello_messages.list`
+- a minimal HITL review step when human review is enabled
 
-### 7. Optional parameters
-
-Configure retry behavior for HTTP requests to the Supervaize API:
-
-- **`SUPERVAIZE_HTTP_MAX_RETRIES`**: Number of retry attempts for failed HTTP requests (default: `2`). The client will automatically retry requests that fail with status codes 429, 500, 502, 503, or 504.
+Local mode binds to `127.0.0.1`, skips Studio registration, and uses the API key `local-dev`. It also bypasses Studio workspace authorization for `/a2a` actions and surfaces, so `X-API-Key` alone is enough:
 
 ```bash
-export SUPERVAIZE_MAX_HTTP_RETRIES=3  # Will attempt up to 4 times total (1 original + 3 retries)
+curl -s http://127.0.0.1:8000/a2a \
+  -H "X-API-Key: local-dev" -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": 1, "method": "supervaizer/action.invoke",
+       "params": {"request_id": "r1", "actor": {"user_id": "me"},
+                  "workspace": {"id": "local"}, "mission_id": "m1",
+                  "agent_slug": "hello-world-ai-agent", "surface": "job.start",
+                  "action": "job.start", "input": {"count": 1}, "job_id": "job-1"}}'
 ```
 
-### What's next?
+Handlers receive an unverified `workspace_authorization` whose `grant_id` is `local-mode`, and the server logs a startup warning. The bypass applies only while the server has no Studio account, workspace auth is not enabled, and issuer, audience, public key, and JWKS URL are all empty. `SUPERVAIZER_WORKSPACE_AUTH_LEEWAY_SECONDS` does not count, and `SUPERVAIZER_WORKSPACE_AUTH_REQUIRED=false` leaves the bypass on. Otherwise every call needs a real Studio token. JSON-RPC `-32030` then carries `error.data.code` `workspace_authorization_missing` when the verifier is enabled and the header is absent, or `workspace_authorization_not_configured` when no verifier is enabled. Never expose a local-mode port: anyone who reaches it can run your agents with the well-known key. `--host 0.0.0.0`, `--host ::`, and an empty host bind `127.0.0.1`; any other `--host` is kept.
 
-- Add more **custom methods** (`chat`, `custom`) to extend control
-- Turn on **A2A** discovery for interoperability
-- Hook your controller into Supervaize to **monitor, audit, and operate** the agent
+Open these endpoints:
 
-For detailed instructions on customizing your controller, see the [Controller Setup Guide](https://doc.supervaize.com/docs/supervaizer-controller/controller-setup)
+| URL | Purpose | Access |
+| --- | --- | --- |
+| `http://127.0.0.1:8000/docs` | FastAPI Swagger docs | public |
+| `http://127.0.0.1:8000/.well-known/agents.json` | A2A discovery | public |
+| `http://127.0.0.1:8000/.well-known/health` | Controller health | public |
+| `POST http://127.0.0.1:8000/a2a` | A2A JSON-RPC controller endpoint | `X-API-Key` (write scope); workspace token outside local mode |
+| `GET http://127.0.0.1:8000/a2a/events` | SSE stream for v2 effects | `X-API-Key` (read scope) |
+| `http://127.0.0.1:8000/manage` | Admin interface and agent workbench | Tailscale IP, or loopback in local mode |
 
-## Features
+### 3. Inspect The Hello World Example
 
-- **Agent Management**: Register, update, and control agents
-- **Job Control**: Create, track, and manage jobs
-- **Event Handling**: Process and respond to system events
-- **Custom Routes**: Agents can mount their own FastAPI routers at `/agents/{slug}/api/` for tool endpoints, webhooks, or custom APIs
-- **Scheduled Steps**: Defer step execution to a future time with automatic background polling and workbench controls (execute now, cancel, reschedule)
-- **Human-in-the-Loop (HITL)**: Form-based and dialog-based interactive content review with chat interface
-- **Agent Workbench**: Built-in testing interface with real-time monitoring, job control, HITL forms, and live console
-- **🚀 Cloud Deployment**: Automated deployment to GCP Cloud Run, AWS App Runner, and DigitalOcean App Platform
-- **A2A Protocol Support**: Full integration with the Agent-to-Agent protocol for standardized agent discovery and interaction
-- **Server Communication**: Interact with SUPERVAIZE servers (see [supervaize.com](https://www.supervaize.com) for more info)
-- **Web Admin Interface**: Easy to use web-based admin dashboard for managing jobs, cases, and system monitoring
+The built-in agent is the v2 reference implementation:
 
-## Protocol Support
+- Local built-in implementation: [src/supervaizer/examples/hello_world_agent.py](https://github.com/supervaize/supervaizer/blob/main/src/supervaizer/examples/hello_world_agent.py)
+- Local server registration: [src/supervaizer/examples/local_server.py](https://github.com/supervaize/supervaizer/blob/main/src/supervaizer/examples/local_server.py)
+- Public repository: [supervaize/supervaize_hello_world](https://github.com/supervaize/supervaize_hello_world). It shows the standalone project layout but still uses the v1 `AgentMethodField` style; model new agents on the built-in v2 agent instead.
 
-SUPERVAIZER provides comprehensive support for the A2A agent communication protocol. See [Protocol Documentation](PROTOCOLS.md) for complete details.
-
-## Cloud Deployment
-
-SUPERVAIZER includes a powerful deployment CLI that automates the entire process of deploying your agents to production cloud platforms.
-
-### Quick Start
+Run the standalone example:
 
 ```bash
-# Install with deployment dependencies
-pip install supervaizer[deploy]
-
-# Test locally with Docker
-supervaizer deploy local --generate-api-key --generate-rsa
-
-# Deploy to Google Cloud Run
-supervaizer deploy up --platform cloud-run --region us-central1
-
-# Deploy to AWS App Runner
-supervaizer deploy up --platform aws-app-runner --region us-east-1
-
-# Deploy to DigitalOcean App Platform
-supervaizer deploy up --platform do-app-platform --region nyc
+git clone https://github.com/supervaize/supervaize_hello_world.git
+cd supervaize_hello_world
+uv venv
+source .venv/bin/activate
+uv pip install -e .
+supervaizer start
 ```
 
-### Deployment Commands
+### 4. Add A V2 Controller To Your Agent
 
-- **`supervaizer deploy plan`** - Preview deployment actions before applying
-- **`supervaizer deploy up`** - Deploy to cloud platform with automated build, push, and verification
-- **`supervaizer deploy down`** - Tear down deployment and clean up resources
-- **`supervaizer deploy status`** - Check deployment status and health
-- **`supervaizer deploy local`** - Local Docker testing with docker-compose
-- **`supervaizer deploy clean`** - Clean up deployment artifacts and state
-
-### Features
-
-- ✅ **Automated Docker Workflow**: Build → Push → Deploy → Verify
-- ✅ **Secret Management**: Secure handling of API keys and RSA keys
-- ✅ **Health Verification**: Automatic health checks at `/.well-known/health`
-- ✅ **Idempotent Deployments**: Safe create/update operations with rollback on failure
-- ✅ **Local Testing**: Full Docker Compose environment for pre-deployment testing
-
-### Documentation
-
-- [Local Testing Guide](LOCAL_TESTING.md) - Docker testing documentation
-
-## Using the CLI
-
-SUPERVAIZER includes a command-line interface to simplify setup and operation. See [CLI Documentation](CLI.md) for complete details.
-
-Also, check the list of [Environment variables](CLI.md#environment-variables).
-
-## API Documentation & User Interfaces
-
-SUPERVAIZER provides multiple ways to interact with and explore the API. See [REST API Documentation](REST_API.md) for complete details.
-
-### Admin Interface (`/admin`)
-
-A comprehensive web-based admin interface for managing your SUPERVAIZER instance
-See [Admin documentation](ADMIN_README.md)
-
-#### Quick Start
+Run `supervaizer scaffold` to create `supervaizer_control.py`, or write the file yourself. It is a complete v2 agent: one registration, one surface, and one action. The scaffolded file also builds a Studio `Account` from the environment; local mode ignores it.
 
 ```python
-from supervaizer import Server, Agent
+from typing import Any
 
-# Create server with admin interface
-server = Server(
-    agents=[your_agents],
-    api_key="your-secure-api-key",  # Required for admin interface
-    admin_interface=True,  # Enable admin interface (default: True)
+from supervaizer import (
+    Agent,
+    Server,
+    V2ActionRequest,
+    V2SurfaceRequest,
+    build_v2_agent_registration,
 )
 
-server.launch()
-print(f"Admin Interface: http://localhost:8000/admin/")
+agent = Agent(
+    name="My Agent",
+    version="0.1.0",
+    description="My Supervaizer v2 agent.",
+    supervaizer_v2_registration=build_v2_agent_registration(
+        agent_slug="my-agent",  # must equal Agent.slug, the slugified name
+        display_name="My Agent",
+        a2ui_catalog_version="my-agent-ui.1",  # bump when your surfaces change
+        surfaces=["job.start"],
+        actions=["job.start"],
+    ),
+)
+
+server = Server(agents=[agent])
+
+
+@server.v2_surface("job.start", agent_slug=agent.slug)
+def job_start_form(request: V2SurfaceRequest) -> dict[str, Any]:
+    return {
+        "surface": request.surface,
+        "document": {
+            "type": "Form",
+            "title": "Start job",
+            "fields": [
+                {"id": "goal", "label": "Goal", "type": "string", "required": True}
+            ],
+            "submit": {"action": "job.start", "label": "Start"},
+        },
+    }
+
+
+@server.v2_action("job.start", agent_slug=agent.slug)
+def start_job(request: V2ActionRequest) -> dict[str, Any]:
+    job_id = request.job_id or "local-job"
+    return {
+        "status": "ok",
+        "effects": [{"type": "job.started", "job_id": job_id, "status": "completed"}],
+        "job_state": {
+            "job": {
+                "id": job_id,
+                "mission_id": request.mission_id,
+                "agent_slug": request.agent_slug,
+                "status": "completed",
+                "source": {"type": "fresh_start"},
+            },
+            "cases": [
+                {
+                    "id": "case-1",
+                    "title": request.input["goal"],
+                    "status": "completed",
+                    "steps": [
+                        {"id": "step-1", "activity": "operation", "status": "completed"}
+                    ],
+                }
+            ],
+        },
+    }
 ```
 
-## Calculating costs
+Start it in local mode. The CLI loads `supervaizer_control.py`, finds the `Server`, and launches it:
 
-Developers are free to define the cost of the transaction the way they want when updating the cases.
-Here is a way to easily get an estimate of the cost of an LLM transaction (note that litellm also supports custom pricing. )
+```bash
+supervaizer start --local
+```
+
+Load the surface:
+
+```bash
+curl -s http://127.0.0.1:8000/a2a \
+  -H "X-API-Key: local-dev" -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": 1, "method": "supervaizer/surface.load",
+       "params": {"request_id": "r1", "actor": {"user_id": "me"},
+                  "workspace": {"id": "local"}, "mission_id": "m1",
+                  "agent_slug": "my-agent", "surface": "job.start"}}'
+```
+
+| Part | Role |
+| --- | --- |
+| `build_v2_agent_registration` | Declares the `surfaces` Studio can show and the `actions` Studio can call. |
+| `@server.v2_surface` | Returns the A2UI document for one declared surface. |
+| `@server.v2_action` | Runs one declared action. Returns `effects` and an optional `job_state` snapshot. |
+
+Rules that prevent the usual first errors:
+
+- `agent_slug` in the registration must equal `Agent.slug` (the slugified `name`). A mismatch fails at `Agent` creation.
+- Register one handler for each declared action and each surface you serve. A missing action handler answers JSON-RPC error `-32010`; a missing surface handler answers `-32011`.
+- Pass `agent_slug` to each handler decorator. Local mode adds the built-in Hello World agent, so the server holds two agents and cannot infer the slug.
+- A bare action id defaults to `mutating=True, scope="job"`. Declare a read-only action with `V2ActionDefinition(id=..., mutating=False, scope=...)`.
+
+Add these when you need them:
+
+- Status convergence: declare `job_policy={"sync": {"action": "job.sync"}}` and register a `job.sync` handler.
+- Human review: return a step with `status="awaiting"` and an `awaiting` object. Declare the `case.step.awaiting` surface and the `step.awaiting.submit` action.
+- Business objects: declare `resources=[...]`. The SDK derives the `resource.<id>.<operation>` actions; you register their handlers.
+
+The built-in [Hello World agent](https://github.com/supervaize/supervaizer/blob/main/src/supervaizer/examples/hello_world_agent.py) shows all three. [Supervaizer v2 concepts](2026_05_SUPERVAIZER_v2.md) holds the full model.
+
+### 5. Connect To Studio
+
+Studio-managed operation needs a `supervisor_account` on the `Server`, the controller's own API key, and workspace authorization trust material. The scaffold template (`supervaizer scaffold`) reads these variables:
+
+```bash
+export SUPERVAIZE_API_KEY=...            # agent -> Studio calls
+export SUPERVAIZE_WORKSPACE_ID=...
+export SUPERVAIZE_API_URL=https://app.supervaize.com
+export SUPERVAIZER_API_KEY=...           # Studio -> controller calls (X-API-Key); generated if unset
+export SUPERVAIZER_PUBLIC_URL=https://your-controller.example.com
+
+# Workspace authorization: required when A2A is enabled and the controller registers with Studio
+export SUPERVAIZER_WORKSPACE_AUTH_REQUIRED=true
+export SUPERVAIZER_WORKSPACE_AUTH_ISSUER=https://studio.supervaize.com
+export SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL=https://app.supervaize.com/w/your-workspace-slug/api/v1/workspace-agent-grants/jwks/  # or SUPERVAIZER_WORKSPACE_AUTH_PUBLIC_KEY=<PEM>
+```
+
+The short way: `supervaizer login` opens an approval page in your browser, where you sign in or sign up, and then writes the Studio variables to `.env`. Start with `supervaizer start --env-file .env`. The start log shows the Studio page of each agent. See [docs/2025_08_CLI.md](2025_08_CLI.md#login).
+
+The manual way: copy the generated workspace values from Studio's **Developer → Environment variables** section. `SUPERVAIZE_WORKSPACE_ID` must be the workspace slug shown there; the API key's user must belong to that workspace and retain Developer access. A mismatch can make `SERVER_REGISTER` return HTTP 403. The issuer must match Studio's token issuer. The JWKS URL is public and supplies the signing key. Workspace authorization is separate from `SUPERVAIZE_API_KEY` and `SUPERVAIZER_API_KEY`.
+
+In your own control file, build the account explicitly; `Server` does not read the `SUPERVAIZE_*` variables itself:
 
 ```python
-from litellm import completion_cost
-prompt = "Explain how transformers work."
-output = "Transformers use attention mechanisms..."
-model = "gpt-4"
-cost = completion_cost(model=model, prompt=prompt, completion=output)
-print(cost)
+import os
+
+from supervaizer import Account, Server
+
+account = Account(
+    workspace_id=os.environ["SUPERVAIZE_WORKSPACE_ID"],
+    api_key=os.environ["SUPERVAIZE_API_KEY"],
+    api_url=os.environ.get("SUPERVAIZE_API_URL", "https://app.supervaize.com"),
+)
+server = Server(agents=[agent], supervisor_account=account)
 ```
 
-A list of costs is maintained here:
-`https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json`
+To bill workspaces for the agent's work, declare `Agent(billing_catalog=[...])` and push records with `account.report_consumption(...)`; see [docs/2026_10_BILLABLE_CONSUMPTION.md](2026_10_BILLABLE_CONSUMPTION.md).
 
-## Documentation
+Without the three `SUPERVAIZER_WORKSPACE_AUTH_*` variables, a Studio-registered controller refuses to launch (`Studio-registered Supervaizer v2 A2A requires workspace authorization`). Local mode does not need them. See [docs/2026_05_WORKSPACE_AGENT_GRANTS.md](2026_05_WORKSPACE_AGENT_GRANTS.md).
 
-For a full tutorial and example usage, go to [doc.supervaize.com](https://doc.supervaize.com)
+Then start the controller:
+
+```bash
+supervaizer start
+```
+
+Studio registration remains the trust bootstrap. It owns server identity, public key exchange, and encrypted payload handling. The A2A Agent Card advertises the v2 operational contract after Studio knows the controller.
+
+## V2 Concepts
+
+| Concept | Meaning |
+| --- | --- |
+| Job | Committed work that Studio tracks for an agent. |
+| Case | A unit of work inside a Job, grouped by `lane` (default `work`). |
+| Step | An observable activity inside a Case: `activity`, `status`, optional `awaiting`, and `outputs`. |
+| Surface | A named UI entry point. Its handler returns an A2UI document. |
+| Action | A typed command invoked through A2A JSON-RPC. Its handler returns `effects` and an optional `job_state`. |
+| Resource, Dataset | Agent-owned business objects and queryable data that Studio renders generically. |
+| Artifact | An agent-owned output, referenced from Step `outputs`. |
+
+Failure is a status, not a step kind. Human review is `status="awaiting"` plus an `awaiting` object. Dynamic UI behavior is A2UI local logic or a typed action call, never a callback.
+
+The full model, the standard surface and action ids, and the protocol split are in [docs/2026_05_SUPERVAIZER_v2.md](2026_05_SUPERVAIZER_v2.md) and [docs/2026_05_PROTOCOLS.md](2026_05_PROTOCOLS.md).
+
+## CLI
+
+Common commands:
+
+```bash
+supervaizer start
+supervaizer start --local
+supervaizer start --host 0.0.0.0 --port 8000
+```
+
+See [docs/2025_08_CLI.md](2025_08_CLI.md) for the full CLI reference and environment variables.
+
+## Deployment
+
+Install deployment extras:
+
+```bash
+pip install "supervaizer[deploy]"
+```
+
+Preview, smoke-test in Docker, and deploy:
+
+```bash
+supervaizer deploy plan --platform cloud-run --name my-agent --project-id my-gcp-project
+supervaizer deploy local --name my-agent --generate-api-key
+supervaizer deploy up --platform cloud-run --name my-agent --project-id my-gcp-project --region us-central1
+```
+
+`deploy up` builds the image, pushes it to the platform registry, and, when `--generate-api-key` or `--generate-rsa` is set, stores `SUPERVAIZER_API_KEY` and `SUPERVAIZER_PRIVATE_KEY` as platform secrets. Targets: Google Cloud Run, AWS App Runner, and DigitalOcean App Platform.
+
+Cloud Run services start private, and the runtime service account needs access to those secrets. App Runner has no ECR or instance role, so treat that platform as experimental. `deploy up` prints failures and still exits 0. Options, registries, and the full limit list are in the [CLI reference](2025_08_CLI.md#deploy).
+
+See:
+
+- [Cloud deployment RFC](https://github.com/supervaize/supervaizer/blob/main/docs/rfc/2025_10_001-cloud-deployment-cli.md)
+- [Local Docker testing guide](2025_10_LOCAL_TESTING.md)
+
+## Admin Interface
+
+The admin interface and agent workbench are mounted at `/manage` (`admin_interface=True`, the default). Access is restricted to Tailscale addresses (`100.64.0.0/10`), plus loopback in local mode; no API key is used. The workbench starts v1 jobs only; a v2-only agent is operated through `POST /a2a`. See [docs/2025_08_ADMIN_README.md](2025_08_ADMIN_README.md).
+
+## Development
+
+Run tests and checks:
+
+```bash
+just test        # pytest, no coverage
+just precommit   # ruff check, ruff format, mypy, hooks
+```
 
 ## Contributing
 
-We welcome contributions from the community! Whether you're fixing bugs, adding features, improving documentation, or sharing feedback, your contributions help make SUPERVAIZER better for everyone.
+Supervaizer is public SDK infrastructure. Keep public contracts typed, generic, and free of agent-specific business logic. If a protocol field changes, update the producer and consumer documentation together.
 
-Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started, coding standards, and the contribution process.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution details.
 
 ## License
 
-This project is licensed under the [Mozilla Public License 2.0](LICENSE.md) License.
+This project is licensed under the [Mozilla Public License 2.0](LICENSE.md).
 
 
-*Uploaded on 2026-04-09 00:25:26*
+*Uploaded on 2026-11-06 15:07:19*

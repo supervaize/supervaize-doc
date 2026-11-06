@@ -1,182 +1,96 @@
 ---
 id: agent-management
-title: Agent Management
+title: Manage agents
+description: Find your agents in Supervaize Studio, read their details, set their parameters, and pause, share or remove them.
 displayed_sidebar: supervaizeFleetSidebar
 slug: agent-management
 ---
 
-import Link from "@docusaurus/Link";
-import "bootstrap-icons/font/bootstrap-icons.css";
+# Manage agents
 
-# Agent Management
+An agent registers itself with Studio. You do not add it by hand. The agent appears in your **Agents** list.
 
-:::warning[Content Under Review]
-This content is still under review and may be updated with additional details, screen captures, and refinements.
-:::
+Workspace admins can see the servers that agents register through. Open **Advanced**, then **Servers**. This item shows only when servers are enabled for the workspace.
 
-Discover, onboard, and configure AI agents for your workspace. Set up secrets, environment variables, and agent parameters to ensure smooth operation.
+## The Agents list
 
-## Overview
+Each agent has a card with its status and an onboarding badge.
 
-Agent Management is the foundation of the Supervaize Studio platform. It allows you to discover available AI agents, configure them with the necessary credentials and parameters, and monitor their status and performance.
+The onboarding badge reads **New**, **Updated**, **Pending Setup**, **Operational** or **Decommissioned**.
 
-## <i className="bi bi-1-circle"></i> Discover Newly Added Agent
+To narrow the list, use **Search agents...** or the **Status** filter. The status values are **Active**, **Inactive**, **Suspended**, **Error**, **Inaccessible** and **Paused**.
 
-### Step 1: Access Agent Discovery
+## The agent page
 
-Navigate to the **Agents** section in your Supervaize Studio dashboard.
+The header shows the name, the status and the description.
 
-### Step 2: View Available Agents
+Agent managers see two tabs.
 
-The platform will display all discoverable agents in your workspace:
+| Tab | What it shows |
+| --- | --- |
+| **Overview** | The details of the agent, described below |
+| **Activity** | The jobs and cases of the agent per status, with **Jobs per day** and **Cases per day** charts |
 
-- **Agent Name**: Human-readable identifier
-- **Agent Type**: Category/functionality (e.g., "Email AI", "Data Analysis")
-- **Status**: Online/Offline/Available
-- **Capabilities**: List of supported operations
-- **Required Parameters**: Variables the agent needs to function
+Other members see the overview only.
 
-### Step 3: Define Agent Secrets & Variables
+| Card | What it shows |
+| --- | --- |
+| **About** | The full description that the agent sends when it registers. |
+| **Agent Info** | **Slug**, **Name**, **Runtime**, **Version**, **Supervaizer SDK**, **Author**, **Developer**, **Maintainer**, **Editor**, **Environment**, **Server**, **Onboarding**, **Tags**, **Created** and **Updated**. A row shows only when the agent gives a value. |
+| **Parameters** | The settings of the agent. |
+| **Rating** | The ratings of the agent. See [Ratings](./rating-analytics). |
 
-Click on the agent you want to onboard and configure the required parameters in the form fields:
+### Set parameters
 
-- **Secrets**: Enter API keys, access tokens, and database credentials
-- **Environment Variables**: Set environment-specific configurations like log levels and timeouts
+The agent declares its own parameters. Each parameter shows its name and a **Set** or **Not Set** badge. A key icon marks a secret.
 
-:::tip[Security]
+1. Type a value in the field. A secret field hides the value.
+2. Repeat for each parameter to change.
+3. Select **Save Parameters**.
 
-- Secrets are encrypted at rest
-- Use environment-specific configurations
-- Rotate credentials regularly
-  :::
+Studio saves only the values that you touched.
 
-## Agent Configuration Options
+The controller reads the values when it starts. After you change a value, the developer restarts the controller. See [Parameters](/docs/supervaizer-controller/parameters).
 
-### Required Secrets
+## Header actions
 
-Most agents require some form of authentication or access credentials:
+| Button | What it does |
+| --- | --- |
+| **New Mission** | Creates a mission for this agent. See [Create a mission](./mission-management). |
+| **Pause** or **Resume** | Pauses the agent or ends the pause. |
+| **Edit** | Edits the agent. |
+| **LLM settings** | Opens the settings of an LLM agent. |
+| **Delete** | Deletes the agent. |
+| **Request Publication** or **Unpublish** | Asks to publish the agent, or withdraws it. |
+| **Remove from workspace** | Removes a shared agent from your workspace. |
 
-- **API Keys**: For external service integrations
-- **Access Tokens**: For secure API communication
-- **Database Credentials**: For data access and storage
-- **Service Account Keys**: For cloud service authentication
+Edit, delete and publication actions belong to the workspace that owns the agent.
 
-### Environment Variables
+## Pause an agent
 
-Configure agent behavior based on your environment:
+The owner of an agent can pause it.
 
-- **Environment**: Production, staging, or development
-- **Log Level**: Debug, info, warning, or error
-- **Concurrency Limits**: Maximum simultaneous job processing
-- **Timeout Settings**: Response time limits for operations
+1. Select **Pause**.
+2. In the **Pause agent** dialog, read the warning.
+3. Confirm.
 
-## Agent Status Monitoring
+If jobs run, the dialog lists them. Select **Pause anyway and stop N jobs** to continue, or **Cancel**.
 
-### Real-time Status
+A paused agent behaves as follows.
 
-Monitor your agents' current status:
+- Studio stops its health checks.
+- Studio blocks all operations of the agent. The job **Start** button is disabled, and its tooltip reads **Agent paused**.
+- The status is **Paused**.
+- A banner shows the date and the reason.
 
-- **Online**: Agent is available and ready to process jobs
-- **Offline**: Agent is unavailable or experiencing issues
-- **Busy**: Agent is currently processing jobs
-- **Error**: Agent has encountered an error and needs attention
+Only the owner can end the pause. Select **Resume**.
 
-### Performance Metrics
+A server that stays down for a long time is paused with its agents. The default delay is 24 hours.
 
-Track agent performance over time:
+Pause exists in Studio only. It sends nothing to the agent server.
 
-- **Job Success Rate**: Percentage of successfully completed jobs
-- **Average Response Time**: Typical time to complete tasks
-- **Resource Usage**: CPU, memory, and network utilization
-- **Error Frequency**: Rate of failures and issues
+## Share an agent
 
-## Agent Assignment
+You can share an agent with another workspace. The **Workspace Access** card on the shared agent shows the state of the authorization.
 
-### Mission Assignment
-
-Once configured, agents can be assigned to specific missions:
-
-- **Primary Agent**: Main agent responsible for mission execution
-- **Backup Agent**: Alternative agent for fallback scenarios
-- **Specialized Agents**: Agents with specific capabilities for particular tasks
-
-### Role Configuration
-
-Define how agents participate in missions:
-
-- **Handler**: Primary agent for task execution
-- **Validator**: Agent that reviews and validates results
-- **Escalation**: Agent that handles complex or escalated cases
-
-## Troubleshooting Common Issues
-
-### Agent Offline
-
-**Common causes:**
-
-- Network connectivity issues
-- Service authentication failures
-- Resource constraints
-- Configuration errors
-
-**Solutions:**
-
-- Check network connectivity
-- Verify credentials and permissions
-- Review resource allocation
-- Check configuration settings
-
-### Performance Issues
-
-**Common causes:**
-
-- High resource utilization
-- Network latency
-- Service rate limits
-- Inefficient configurations
-
-**Solutions:**
-
-- Monitor resource usage
-- Optimize agent parameters
-- Implement caching strategies
-- Scale resources if needed
-
-## Best Practices
-
-### Security
-
-- Use environment-specific credentials
-- Implement least-privilege access
-- Regularly rotate secrets and keys
-- Monitor access patterns and anomalies
-
-### Performance
-
-- Set appropriate concurrency limits
-- Monitor resource utilization
-- Implement proper error handling
-- Use caching for frequently accessed data
-
-### Monitoring
-
-- Set up alerts for agent failures
-- Track performance metrics over time
-- Monitor error rates and patterns
-- Implement automated health checks
-
-## Next Steps
-
-After configuring your agents:
-
-1. **Create missions** to organize your AI operations
-2. **Set up monitoring** to track agent performance
-3. **Configure notifications** to stay informed of issues
-4. **Scale operations** by adding more agents as needed
-
-## Related Features
-
-- **[Mission Management](/docs/supervaize-fleet/features/mission-management)**: Assign agents to missions
-- **[Job Management](/docs/supervaize-fleet/features/job-management)**: Execute tasks with configured agents
-- **[Rating & Analytics](/docs/supervaize-fleet/features/rating-analytics)**: Monitor agent performance
-- **[Slack Notifications](/docs/supervaize-fleet/features/slack-notifications)**: Get alerts about agent status
+The receiving workspace must accept the agent before any job can start. A workspace admin or an agent manager of that workspace accepts it and sets the agent workspace reference.

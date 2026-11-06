@@ -19,14 +19,15 @@ A rule is a check written in plain language, such as "Do not disclose restricted
 - **Everything is recorded.** Every evaluation, approval and rule change lands in an audit trail.
 
 :::info[Availability]
-If **Rules** is missing from the **Advanced** section of the sidebar, ask Runwaize to enable it for your workspace.
+**Rules** is in the **Audit** section of the sidebar. If it is missing, ask Runwaize to enable it for your workspace.
 :::
 
 ## Who can do what
 
 | Task | Role needed |
 | --- | --- |
-| Add a Jev key and test the Rule Controller | Workspace Manager or Settings Manager |
+| Test the Rule Controller | Workspace Manager or Settings Manager |
+| Add a Jev key | Workspace Manager |
 | Set the rule policy, create and edit rules | Workspace Manager or Policy Maker |
 | Read rules, rule activity and the audit trail | Workspace Manager, Policy Maker, Policy Auditor or Auditor |
 | Pick rule controls when starting a job | Anyone who can run jobs |
@@ -38,11 +39,19 @@ If **Rules** is missing from the **Advanced** section of the sidebar, ask Runwai
 
 The Rule Controller is the Jev credential Studio uses to evaluate rules. There is nothing to select: Studio picks it for you.
 
-- **Your workspace has an active Jev key:** it is used for every Jev call. Add one on **LLM Integrations** as an integration with the provider **Jev (TypeSafe)**. With several active Jev keys, the most recently updated one is used.
+- **Your workspace has an active Jev key:** it is used for every Jev call. Open **LLM Integrations** and click **Add Jev key** on the **Recommended** card. You can also click **Add API key** and choose the provider **Jev (TypeSafe)**. With several active Jev keys, the most recently updated one is used.
 - **Your workspace has an active OpenRouter key and no Jev key:** the OpenRouter key is used. OpenRouter serves Jev, so you do not need a second key.
 - **Your workspace has neither:** the Runwaize-managed credential is used, when Runwaize has enabled it for your deployment.
 
-The **Rule Controller** card on **LLM Integrations** names the key in use. Click **Test connection** to run a live check: the card shows **Ready** when it succeeds and **Unavailable** with the reason when it fails. Jobs with active rules cannot start while no key is available.
+To see the key in use, open **Rules** and click **Test controller**. The **Rule Controller** popup shows **Status**, **Credential** and **Last check**. Click **Test connection** to run a live check. The status shows **Ready** when it succeeds and **Unavailable** with the reason when it fails. Jobs with active rules cannot start while no key is available.
+
+The popup links to **LLM Integrations** for Workspace Managers. Other users see a request to ask a Workspace Manager.
+
+:::info[Recommended card]
+The **Recommended** Jev card stays on **LLM Integrations** until the workspace has an active Jev key. An OpenRouter key does not remove it, but it still serves Jev.
+:::
+
+In **LLM Integrations**, you can edit a key to load the provider's current models and pick the models the key may use.
 
 :::info[Running jobs keep their key]
 A job is admitted with the key available at that moment and keeps it. Adding or disabling a Jev key only affects jobs started afterwards.
@@ -50,7 +59,7 @@ A job is admitted with the key available at that moment and keeps it. Adding or 
 
 ### 2. Set the rule policy
 
-Open **Rules** and find **Rule policy**. For each situation, choose the default outcome and which alternatives a job starter may pick instead.
+Open **Rules** and select the **Policy** tab. Only users who can write rules see this tab. The tab shows **Rule policy**. For each situation, choose the default outcome and which alternatives a job starter may pick instead.
 
 | Situation | Choices | Default |
 | --- | --- | --- |
@@ -71,7 +80,19 @@ On **Rules**, create a rule and fill in two sections.
 | --- | --- |
 | **Rule name** | A short statement of the rule, for example "Do not disclose restricted information". |
 | **When to evaluate** | **Before a step**, **After a step**, or **Before and after each step**. |
-| Severity | **Warning** records the result and lets work continue. **Approval required** pauses for an authorized decision. **Must pass** prevents work until it passes. |
+| **Severity** | **Warning** records the result and lets work continue. **Approval required** pauses for an authorized decision. **Must pass** prevents work until it passes. |
+
+**Applies to**
+
+A workspace rule has an **Applies to** section. Choose one of three modes:
+
+| Mode | The rule applies to |
+| --- | --- |
+| **Compulsory** | Every agent and mission |
+| **Selected** | Only the **Agents** and **Missions** you pick |
+| **On demand** | A job only when the person who starts it turns the rule on |
+
+For **Selected**, pick at least one agent or mission. If you pick both agents and missions, a job must match both lists. Studio offers only agents that your workspace can use. If a selected rule has no usable agent or mission left, the list shows "This rule no longer applies to anything."
 
 **What to evaluate**
 
@@ -98,9 +119,11 @@ A rule belongs to one scope, and applies to everything below it:
 
 | Created in | Applies to |
 | --- | --- |
-| **Rules** (workspace) | Every job in the workspace |
+| **Rules** (workspace) | The jobs that match its **Applies to** mode |
 | The **Rules** tab of a mission | Every job of that mission |
 | The **Rules** tab of a job | That job only |
+
+The **Applies to** section shows only when you create or edit a workspace rule. The form of a mission rule or a job rule does not have it.
 
 On a mission or job, rules from a higher scope are listed as **Inherited** and are read-only there. Edit them where they were created.
 
@@ -110,8 +133,8 @@ In the rule form, the **Optional test** box lets you paste a sample step context
 
 The test calls Jev but runs no agent action, and it is never required to activate a rule.
 
-## Deleting and deactivating
+## Deactivating a rule
 
-Deleting a rule deactivates it. The rule and its revisions are kept so that jobs which ran under it stay explainable.
+Click **Deactivate** on an active rule to stop it. The rule and its revisions are kept so that jobs which ran under it stay explainable.
 
 Next: [see what happens when a job runs with rules](./run-and-review).

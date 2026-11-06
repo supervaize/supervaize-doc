@@ -73,6 +73,34 @@ For an agent that runs on an LLM, **New Job** opens a **Job Builder Conversation
 A job built this way is created but does not start by itself. Open it and click **Start**.
 :::
 
+### Guided setup chat
+
+Some agents have a setup plan. In the chat, paste a scenario. The assistant runs the agent's help action on the draft. It shows the proposed text and the changes. Studio records the text only after you accept it.
+
+On the **Configure** tab of the job, the scenario editor has these controls:
+
+- **Upload file** replaces the text of a block with a `.txt` or `.md` file. The file can be 200 KB at most.
+- The agent's help actions show as buttons. For Aidan, one button is **Recommend improvements**.
+- **Use this** applies a proposal. Nothing is saved until you save.
+
+An agent with a setup plan also gets the job name, so it can name what it creates. A job with a setup plan and no case yet opens on **Configure**. See [Navigate a job](./job-navigation.mdx).
+
+### Testing mode
+
+When the feature is enabled for your workspace, a new job of a Supervaizer v2 agent starts in testing mode. Its first cases are test cases. Mission managers switch the job to production with **Go live**. See [Testing and production](./job-navigation.mdx#testing-and-production).
+
+### Scheduled jobs
+
+When the feature is enabled for your workspace, the mission page has a **Schedules** block. Mission managers click **Schedule** to start jobs on a schedule. The schedule form has the same **Optional rules** block as the job form.
+
+### Rules
+
+When rules are enabled for your workspace, the job form shows **Rule controls** and **Optional rules**. See [Run and review jobs with rules](../rules/run-and-review.mdx).
+
+### Tags
+
+Each job has tags. The **Jobs** list and the mission's jobs list have a tag filter. Click **Tags** to open a searchable list of the tags. Select a tag to show it. Select **Exclude** on a tag to hide every job that has it. The filter shows your picks as chips, such as "Tag is any of billing, urgent" and "Tag is not review". Click **is any of** to switch to **is all of**.
+
 ### From Claude or ChatGPT
 
 With the [Supervaize MCP connector](../mcp-connector/install.mdx) and the **Write** permission, ask:

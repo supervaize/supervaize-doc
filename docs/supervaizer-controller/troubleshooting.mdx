@@ -15,6 +15,15 @@ If startup reports `Studio-registered Supervaizer v2 A2A requires workspace auth
 
 If fetching the JWKS URL returns `404`, use the Django API origin and the `/w/<workspace-slug>/api/v1/workspace-agent-grants/jwks/` route. The production issuer is `https://studio.supervaize.com`; the production API origin is `https://app.supervaize.com`. The JWKS route and controller-event route share the workspace prefix but have separate endpoints.
 
+### `/a2a` answers the JSON-RPC error `-32030`
+
+The controller refused the workspace authorization of the call. Read `error.data.code` in the answer.
+
+| Code | Cause | What to do |
+| --- | --- | --- |
+| `workspace_authorization_not_configured` | The controller has no `SUPERVAIZER_WORKSPACE_AUTH_*` settings | Set the three variables of the section above, then restart the controller |
+| `workspace_authorization_missing` | The call has no workspace authorization header | Let Studio make the call. For a test on your computer, use `supervaizer start --local` |
+
 ### **Unknown command: supervaizer **
 
 Make sure you virtual environment is active.
@@ -43,7 +52,7 @@ If an API key appeared in logs or a support message, rotate both the Studio work
 
 ### **Port already in use**
 
-Change the port: `sv_server.launch(host="0.0.0.0", port=8010)`.
+Start the server on a different port: `supervaizer start --port 8010`, or set `SUPERVAIZER_PORT=8010`.
 
 ## Environment Configuration
 
@@ -95,7 +104,7 @@ export SUPERVAIZE_API_URL=https://app.supervaize.com
 
 If you're still experiencing issues:
 
-1. Check the [Supervaizer Controller GitHub repository](https://github.com/runwaize/supervaizer) for known issues
-2. Review the [REST API reference](ref/REST_API) for detailed endpoint information
-3. Check the [CLI documentation](ref/CLI) for command-line troubleshooting options
+1. Check the [Supervaizer Controller GitHub repository](https://github.com/supervaize/supervaizer) for known issues
+2. Review the [REST API reference](ref/2025_08_REST_API.md) for detailed endpoint information
+3. Check the [CLI documentation](ref/2025_08_CLI.md) for command-line troubleshooting options
 4. Ensure you're using the latest version of the Supervaizer package
