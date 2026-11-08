@@ -5,6 +5,22 @@ displayed_sidebar: supervaizeFleetSidebar
 slug: developer-account
 ---
 
+## From the terminal {#terminal}
+
+With the Supervaizer SDK installed, one command does all the steps of this page:
+
+```bash
+supervaizer login
+```
+
+The command opens an approval page in your browser. There you sign in or sign up (Google sign-in works), check the code that your terminal shows, choose the workspace and approve. The command then writes your API key and your environment variables to `.env`.
+
+- A new account gets its own workspace, and you are its admin.
+- When the workspace has no Developer access yet, the approval by an admin of the workspace turns it on.
+- The key is in your name. You can see it and delete it on the **Developer** page, with your other keys.
+
+The [quickstart](/docs/supervaizer-controller/quickstart#login) shows each step. The rest of this page is the manual way, in Studio.
+
 ## Quick steps
 
 - Create your account at supervaize.

@@ -27,6 +27,19 @@ ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' f
 
 The `workspace` request header and `/w/<slug>/` URL path come from `SUPERVAIZE_WORKSPACE_ID`. Confirm it is the exact slug of an active Studio workspace, and that the user who owns `SUPERVAIZE_API_KEY` belongs to that workspace and still has Developer access. Also confirm the workspace subscription is active and that `SUPERVAIZE_API_URL` matches the environment where the key was created. If Studio's response body says `Subscription required`, ask a workspace administrator to check the subscription. Never send the API key in a support message.
 
+`supervaizer login` writes the workspace slug, the API address and the key together, from the same Studio. Run it again when you are not sure that these three values agree. See the [Quickstart](quickstart#login).
+
+### **`supervaizer login` does not complete**
+
+| Message | Cause | What to do |
+| --- | --- | --- |
+| `This Studio does not support supervaizer login` | The Studio at `--api-url` does not have the login | Check the address. If it is correct, create the key on the **Developer** page of Studio |
+| `The code expired before the approval` | The approval came more than 15 minutes after the start | Run `supervaizer login` again |
+| `The request was denied in Studio` | Someone selected **Deny** on the approval page | Run `supervaizer login` again and approve it yourself |
+| `Too many login requests` | Too many logins started from your network address | Wait some minutes, then try again |
+| The page says `This code is not valid` | The code is unknown, expired or already used | Run `supervaizer login` again and open the new address |
+| The page shows no **Approve** button | Your account has no workspace with Developer access | Ask an admin of the workspace to approve, or to give you Developer access |
+
 ### **HTTP 400: invalid server.register details**
 
 If the response identifies `details.agents[n].parameters_setup`, that field must be a JSON array of parameter definitions. Omit it or send `[]` when the agent has no parameters; explicit `null` is invalid.
