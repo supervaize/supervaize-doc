@@ -61,7 +61,7 @@ Until an admin saves the parameters, Studio shows the agent as **Pending Setup**
 
 ## Read the values
 
-The controller gets the values from Studio when it starts, and again when an admin changes them. Studio sends them encrypted.
+The controller gets the values from Studio when it starts, after an admin configured the agent. Studio sends them encrypted. After an admin changes a value, restart the controller.
 
 ```python
 import os
@@ -70,7 +70,7 @@ api_key = os.environ["OPENAI_API_KEY"]             # with is_environment=True
 model = agent.parameters_setup.value("MODEL_NAME")  # works for every parameter
 ```
 
-Read the value when you need it, inside your action. Do not copy it into a module constant at import time: the value can change while the controller runs.
+Read the value when you need it, inside your action. Do not copy it into a module constant at import time: the controller loads the values after it starts.
 
 ## Rules
 
@@ -87,5 +87,5 @@ Read the value when you need it, inside your action. Do not copy it into a modul
 
 ## Reference
 
-- Hello World: [`supervaizer_control.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py) declares one parameter and one secret.
+- Hello World: [`supervaizer_control.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py) declares one parameter and one secret.
 - [Model reference](model_reference/model_core): `Parameter` and `ParametersSetup`.

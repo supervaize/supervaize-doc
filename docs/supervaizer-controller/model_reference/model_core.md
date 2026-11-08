@@ -1,6 +1,6 @@
 # Model Reference Core
 
-**Version:** 0.13.0
+**Version:** 1.9.0
 
 ### `account.Account`
 
@@ -110,25 +110,30 @@ _No additional fields beyond parent class._
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `name` | `str` | **required** | Display name of the agent |
-| `id` | `str` | **required** | Unique ID generated from name |
+| `id` | `str` | **required** | Stable ID derived from name via shortuuid.uuid(name=...). Renaming the agent changes this value. |
 | `author` | `str` | `None` | Author of the agent |
 | `developer` | `str` | `None` | Developer of the controller integration |
 | `maintainer` | `str` | `None` | Maintainer of the integration |
 | `editor` | `str` | `None` | Editor (usually a company) |
 | `version` | `str` | '' | Version string |
+| `release_notes_url` | `str` | `None` | URL for release notes matching this agent version |
 | `description` | `str` | '' | Description of what the agent does |
+| `introduction` | `V2AgentIntroduction` | `None` | Optional roster block (tagline, summary, example goals, avatar) |
+| `full_description` | `V2AgentFullDescription` | `None` | Optional long-form markdown or HTML for the agent detail page. The SDK only types and bounds it; Studio sanitizes it. |
+| `billing_catalog` | `list[supervaizer.contracts.BillingCatalogItem]` | `None` | Optional billable SKUs (sku, unit, description) the agent reports consumption for. No prices; Studio prices them per workspace. |
 | `tags` | `list[str]` | `None` | Tags for categorizing the agent |
 | `methods` | `AgentMethods` | `None` | Methods supported by this agent |
 | `parameters_setup` | `ParametersSetup` | `None` | Parameter configuration |
 | `server_agent_id` | `str` | `None` | ID assigned by server - Do not set this manually |
 | `server_agent_status` | `str` | `None` | Current status on server - Do not set this manually |
 | `server_agent_onboarding_status` | `str` | `None` | Onboarding status - Do not set this manually |
-| `server_encrypted_parameters` | `str` | `None` | Encrypted parameters from server - Do not set this manually |
 | `max_execution_time` | `int` | 3600 | Maximum execution time in seconds, defaults to 1 hour |
 | `supervaize_instructions_template_path` | `str` | `None` | Optional path to a custom template file for supervaize_instructions.html page |
 | `instructions_path` | `str` | 'supervaize_instructions.html' | Path where the supervaize instructions page is served (relative to agent path) |
-| `custom_routes` | `Any` | `None` | Optional FastAPI APIRouter with custom routes for this agent |
-| `dynamic_choices_callback` | `Any` | `None` | Callable that returns dynamic choices for method fields. Signature: (method_name: str, context: dict) -> dict[str, list[tuple[str, str]]] |
+| `custom_routes` | `Any` | `None` | Optional FastAPI APIRouter; mounted on the API app at `/api/agents/{slug}/...` |
+| `data_resources` | `list[data_resource.DataResource]` | — | Data resources this agent exposes for Studio CRUD access |
+| `supervaizer_v2_registration` | `SupervaizerV2AgentRegistrationContract` | `None` | Optional Supervaizer v2 registration contract for A2A/A2UI Studio integrations |
+| `v2_methods` | `V2AgentMethods` | `None` | Optional agent-level Supervaizer v2 method declarations |
 
 ### `agent.AgentMethod`
 
@@ -181,10 +186,11 @@ Attributes:
 |---|---|---|---|
 | `name` | `str` | **required** | The name of the method |
 | `method` | `str` | **required** | The name of the method in the project's codebase that will be called with the provided parameters |
-| `params` | `typing.Dict[str, typing.Any]` | `None` | A simple key-value dictionary of parameters what will be passed to the AgentMethod.method as kwargs |
-| `fields` | `typing.List[supervaizer.agent.AgentMethodField]` | `None` | A list of field specifications for generating forms/UI, following the django.forms.fields definition |
+| `params` | `dict[str, typing.Any]` | `None` | A simple key-value dictionary of parameters what will be passed to the AgentMethod.method as kwargs |
+| `fields` | `list[supervaizer.agent.AgentMethodField]` | `None` | A list of field specifications for generating forms/UI, following the django.forms.fields definition |
 | `description` | `str` | `None` | Optional description of what the method does |
 | `is_async` | `bool` | False | Whether the method is asynchronous |
+| `timeout` | `int` | 600 | Maximum automatic job duration in seconds. Use None for jobs that must run until Studio stops them manually. |
 | `nodes` | `CaseNodes` | `None` | The definition of the Case Nodes (=steps) for this method |
 
 #### Example
@@ -242,7 +248,6 @@ field definitions for consistency.
 | `default` | `Any` | `None` | Default value for the field - displayed in the UI |
 | `widget` | `str` | `None` | UI widget to use (e.g. RadioSelect, TextInput) - as a django widget name |
 | `required` | `bool` | False | Whether field is required for form submission |
-| `dynamic_choices` | `str` | `None` | Key name for dynamic choices resolved at runtime via Agent.dynamic_choices_callback. Mutually exclusive with 'choices'. |
 
 #### Examples
 
@@ -310,7 +315,7 @@ ParametersSetup.from_list([
 
 | Field | Type | Default | Description |
 |---|---|---|---|
-| `definitions` | `Dict[str, parameter.Parameter]` | **required** | A dictionary of Parameters, where the key is the parameter name and the value is the parameter object. |
+| `definitions` | `dict[str, parameter.Parameter]` | **required** | A dictionary of Parameters, where the key is the parameter name and the value is the parameter object. |
 
 ### `parameter.Parameter`
 
@@ -397,7 +402,7 @@ public_url: full url (including scheme and port) to use for outbound connections
 | `environment` | `str` | **required** | Environment name (e.g., dev, staging, prod) |
 | `mac_addr` | `str` | **required** | MAC address to use for server identification |
 | `debug` | `bool` | **required** | Whether to enable debug mode |
-| `agents` | `List[agent.Agent]` | **required** | List of agents to register with the server |
+| `agents` | `list[agent.Agent]` | **required** | List of agents to register with the server |
 | `app` | `FastAPI` | **required** | FastAPI application instance |
 | `reload` | `bool` | **required** | Whether to enable auto-reload |
 | `supervisor_account` | `Account` | `None` | Account of the supervisor - can be created at supervaize.com |
@@ -406,7 +411,7 @@ public_url: full url (including scheme and port) to use for outbound connections
 | `public_key` | `RSAPublicKey` | **required** | RSA public key for secret parameters encryption - Used in agent-to-server communication - Not needed by user |
 | `public_url` | `str` | `None` | Public including scheme and port to use for inbound connections |
 | `api_key` | `str` | `None` | Force the API key to access the supervaizer endpoints - if not provided, a random key will be generated |
-| `api_key_header` | `APIKeyHeader` | `None` | API key header for authentication |
+| `workspace_authorization` | `V2WorkspaceAuthorizationSettings` | — | Optional Studio-signed workspace authorization verifier settings |
 
 #### Examples
 
@@ -440,4 +445,4 @@ public_url: full url (including scheme and port) to use for outbound connections
 ```
 
 
-*Uploaded on 2026-04-09 00:25:26*
+*Uploaded on 2026-10-30 09:09:43*

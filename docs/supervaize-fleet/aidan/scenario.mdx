@@ -12,7 +12,7 @@ A scenario is the campaign-specific design of an interview. It says why the inte
 
 - **It is not a full prompt.** Aidan's tone, listening, probing, safety and technical handling are built in. Leave them out.
 - **Start from the outputs.** Every question must serve something the interview has to make knowable.
-- **Keep it short and mostly linear.** The limit is 12,000 characters. Aim for 4,000 to 7,000.
+- **Keep it short and mostly linear.** Aim for 4,000 to 7,000 characters. A size warning applies above about 12,000 characters.
 
 :::tip[Drafting with an AI assistant]
 Point your assistant to this page when you ask it to draft a scenario.
@@ -117,12 +117,14 @@ Placeholders are replaced at interview time. Use only the ones below.
 | --- | --- |
 | Workspace and campaign | `{{ tenant.name }}`, `{{ campaign.name }}`, `{{ campaign.caller_name }}` |
 | Timing | `{{ interview_date }}`, `{{ session.localtime }}` |
-| Participant | `{{ contact.first_name }}`, `{{ contact.email }}`, `{{ contact.city }}`, `{{ contact.country }}`, `{{ contact.timezone }}`, `{{ contact.greeting }}`, `{{ contact.greeting_style }}` |
+| Participant | `{{ contact.first_name }}`, `{{ contact.last_name }}`, `{{ contact.email }}`, `{{ contact.city }}`, `{{ contact.country }}`, `{{ contact.timezone }}`, `{{ contact.greeting }}`, `{{ contact.greeting_style }}` |
 | Participant metadata | `{{ contact.metadata.<key> }}`, defined per campaign |
+
+The variable list of the scenario editor shows the placeholders that are available at call time.
 
 Rules:
 
-1. **Never reference a field that is not in the table.** `{{ contact.role }}` or `{{ contact.company }}` do not resolve, and validation blocks the scenario.
+1. **Never reference a field that is not in the table or the variable list.** `{{ contact.role }}` or `{{ contact.company }}` do not resolve, and validation blocks the scenario.
 2. **Do not write prose placeholders.** "Use the participant's bio as a baseline" makes Aidan invent a bio. If the information is not loaded, ask for it.
 3. **Check metadata for every participant.** A key that is filled for most participants passes testing and breaks in production.
 4. **Memory of earlier sessions is not guaranteed.** A first interview has none. Any "as you mentioned last time" needs a path for both cases.

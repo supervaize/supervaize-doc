@@ -147,7 +147,16 @@ Decide what a refusal does. When `approved` is false, the agent can stop the cas
 }
 ```
 
-With `storage: "studio"`, Studio keeps the file and your agent receives a reference (`file_id`, `filename`, `media_type`, `size`, `sha256`). With `storage: "inline"`, the content travels in the action request, so keep the file small.
+With `storage: "studio"`, Studio keeps the file and your agent receives a reference (`file_id`, `filename`, `media_type`, `size`, `sha256`). With `storage: "inline"`, the answer holds `filename`, `media_type`, `size`, `encoding` and `content`. The whole action request must stay under the request body limit of Studio, so keep the file small.
+
+To show the stored file as an output, put its `file_id` in the output of a step:
+
+```json
+{"id": "report:1", "type": "report", "title": "Quarterly report",
+ "media_type": "text/markdown", "storage": "studio", "file_id": "<studio file id>"}
+```
+
+Studio serves this output from its own storage. It does not call your `artifact.get` action. See the [SDK guide](ref/2026_05_SUPERVAIZER_v2.md).
 
 ### Let the person change the answer
 
@@ -160,12 +169,12 @@ For a text that a person reads and corrects, the surface can return a `DocumentR
 ## Checklist
 
 - [ ] `case.step.awaiting` is in `surfaces` and `step.awaiting.submit` is in `actions`.
-- [ ] The waiting step has `status: "awaiting"` and an `awaiting` object with `reason`, `surface`, `action` and `fields`.
+- [ ] The waiting step has `status: "awaiting"` and an `awaiting` object with `reason`, `surface` and `action`, and with `fields` for a form.
 - [ ] The form shows what the person decides on.
 - [ ] The submit action checks the values, completes the step and returns the job state.
 - [ ] A refusal has a defined result.
 
 ## Reference
 
-- Hello World: the review case in [`agent_v2.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_v2.py) and [`tests/test_hitl.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/tests/test_hitl.py).
+- Hello World: the review case in [`agent_v2.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_v2.py) and [`tests/test_hitl.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/tests/test_hitl.py).
 - To pause a step by a mission rule and not by your own logic, see [Guardrail controls](rule-checkpoints).

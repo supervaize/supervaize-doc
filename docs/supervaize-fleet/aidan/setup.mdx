@@ -65,6 +65,17 @@ State where recordings and transcripts are stored if your organisation requires 
 
 </details>
 
+## Guided setup in the chat
+
+Some agents let you set up in the chat. This shows when the chat is enabled for your workspace.
+
+- A panel beside the chat shows the setup plan. It lists the steps and fields, with the checks on each value and an estimated cost.
+- You can paste a scenario in the chat. The assistant runs a help action of the agent on the draft. It shows the proposed text and the changes. Studio records the text only after you accept it.
+- Click **Review and launch** to check the plan and start the job.
+- Click **Start fresh** to begin a new plan. Your earlier work stays.
+
+[Create a job](../features/job-management#guided-setup-chat) describes the chat in full. The five steps below use the job form.
+
 ## Set up in five steps
 
 ### 1. Create the job
@@ -73,8 +84,8 @@ Open the mission that holds Aidan and click **New Job**. Aidan asks which campai
 
 | Field | What to enter |
 | --- | --- |
-| **Campaign** | **Create new from template** starts a new campaign. **Use existing campaign** connects the job to a campaign you already have. |
-| **Campaign template** | The template the new campaign starts from. It brings the interview script and settings. |
+| **Campaign** | **Create new campaign** starts a new campaign. **Use existing campaign** connects the job to a campaign you already have. |
+| **Campaign template (optional)** | A template brings its settings and a default scenario. Leave it empty to start from scratch. |
 | **Campaign name** | The name your team sees. It must be unique in your workspace. |
 | **Description** | A short note on what the campaign is for. |
 
@@ -124,6 +135,8 @@ Use IANA names for `timezone`, such as `Europe/Paris`.
 Open **Scenario**. The editor holds the campaign-specific part of the conversation. Aidan's tone, safety and conversation handling are already built in.
 
 - **Edit and save.** Clicking **Save** on a changed text creates a new version, and the campaign uses it.
+- **Upload a file.** **Upload file** replaces the text of a block with a `.txt` or `.md` file. The file can be 200 KB at most.
+- **Use the help actions.** The help actions of the agent show as buttons. A proposal is applied only when you select **Use this**. Nothing is saved until you save.
 - **Go back to an earlier version.** Pick it in the **Version** list and save. The list marks the version that is **latest** and the one **in use**.
 - **Read the compiled preview.** It shows your scenario inside the full interview frame.
 - **Fix every blocked line.** Validation shows **Scenario ready**, or **Scenario not ready** with one line per reason, such as an empty text or a placeholder that resolves to nothing.
@@ -166,6 +179,10 @@ Send the invitations from your own mail tool, using the registration link or eac
 ## Test before you go live
 
 Run the whole participant journey on a test campaign first.
+
+:::note[Testing mode]
+When testing mode is enabled for your workspace, a new job starts in testing mode. Its first cases are test cases. A mission manager selects **Go live** when the campaign is ready. See [Testing and production](../features/job-navigation#testing-and-production). Without testing mode, test on a separate job.
+:::
 
 1. Open the registration link, or one personal interview link.
 2. Check the registration details and the terms shown before the interview.

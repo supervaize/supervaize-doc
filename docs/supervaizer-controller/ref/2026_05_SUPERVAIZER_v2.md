@@ -1,0 +1,820 @@
+# Supervaizer v2
+
+
+> **Created:** 2026-05-16
+> **Updated:** 2026-10-11
+
+Supervaizer v2 is the new operation contract between an agent controller and Supervaize Studio.
+
+The goal is simple: Studio should be able to operate many different agents through one generic UI, while each agent keeps ownership of its own business vocabulary and business logic.
+
+## Layering
+
+Supervaizer v2 is layered, not monolithic:
+
+| Layer | Owned by | Role |
+| --- | --- | --- |
+| A2A | protocol/runtime | discovery, Agent Card, JSON-RPC controller endpoint, SSE events |
+| A2UI | protocol/surface payload | UI document shape for forms, dashboards, tables, details, and custom surfaces |
+| Supervaizer v2 | Supervaizer SDK + agent | Jobs, Cases, Steps, Resources, Datasets, Artifacts, Surfaces, Actions, and sync semantics |
+| Studio | Supervaize Studio | authentication, permissions, rendering, persistence, polling, offline policy, and operator workflow |
+| Agent | agent author | business objects, action handlers, validation, resource mutations, artifact content, and state snapshots |
+
+The key rule is: **the universal protocol owns the shape; the agent owns the vocabulary.**
+
+For example, Supervaizer v2 defines that a Case has a `lane`, but the agent decides which lanes exist. Studio knows how to render `setup`, `work`, and `deliverable`, but custom lanes can also be declared and rendered generically.
+
+## Versioning
+
+Supervaizer v2 protocol versions are independent from the Python package version.
+
+| Constant | Meaning |
+| --- | --- |
+| `SUPERVAIZER_V2_CONTRACT_VERSION` | The semantic contract version for Supervaizer v2. |
+| `SUPERVAIZER_V2_A2A_VERSION` | The A2A protocol version the controller advertises. |
+| `SUPERVAIZER_V2_A2UI_VERSION` | The A2UI document version the controller emits. |
+
+Every registration also declares `a2ui_catalog_version`, which is the agent-owned version for its own surface documents. Studio can use this to detect when an agent changed its UI catalog even if the shared A2UI version did not change.
+
+Because A2UI is pre-1.0, agents should pin the supported A2UI version in registration. Studio should reject incompatible versions explicitly instead of guessing.
+
+## Registration
+
+An agent declares v2 support through `supervaizer_v2_registration` on the `Agent`.
+
+The recommended path is `build_v2_agent_registration()`:
+
+```python
+from supervaizer import Agent
+from supervaizer.contracts import (
+    V2ResourceDefinition,
+    build_v2_agent_registration,
+)
+
+registration = build_v2_agent_registration(
+    agent_slug="research-agent",
+    display_name="Research Agent",
+    a2ui_catalog_version="research-agent.2026-05-16",
+    surfaces=[
+        "job.start",
+        "case.step.awaiting",
+        "case.step.detail",
+        "mission.analytics",
+    ],
+    actions=[
+        "job.start",
+        "job.stop",
+        "step.awaiting.submit",
+    ],
+    case_lanes=[
+        {"id": "setup", "label": "Setup"},
+        {"id": "work", "label": "Work", "default": True},
+        {"id": "deliverable", "label": "Deliverables"},
+    ],
+    artifact_types=[
+        {"type": "transcript", "label": "Transcript"},
+        {"type": "synthesis", "label": "Synthesis"},
+    ],
+    job_policy={"sync": {"action": "job.sync"}},
+    resources=[
+        V2ResourceDefinition(
+            id="contacts",
+            label="Contacts",
+            auto_surface=True,
+            operations=["list", "create", "update", "import"],
+        )
+    ],
+)
+
+agent = Agent(
+    name="Research Agent",
+    version="1.0.0",
+    supervaizer_v2_registration=registration,
+    # v1 fields may still exist during transition in older agents,
+    # but new v2 agents should model Studio operation through v2.
+)
+```
+
+Only three arguments are required. `agent_slug` must equal `Agent.slug` (the slugified `name`); a mismatch fails at `Agent` creation. `display_name` is the name Studio shows. `a2ui_catalog_version` is your own version for your surface documents.
+
+The other identity arguments have defaults: `agent_id` is the slug, `controller_url` is `/a2a`, and `agent_card_url` is the unversioned card route `/.well-known/agents/<slug>_agent.json`. `a2ui_version` and `a2a_version` default to the versions this SDK release pins. Pass any of them only to override.
+
+The v2 registration is exposed in the A2A Agent Card under `supervaizer.v2`.
+
+This does not replace the existing Studio server registration process. Server identity, public key exchange, and encrypted payload handling still belong to the normal Studio registration path. The v2 extension tells Studio how to operate the already-registered controller.
+
+### Introduction
+
+An agent may pass `introduction=` to `Agent` (a `V2AgentIntroduction` or a dict). Studio renders the roster entry and the chat opening from this block alone. Without it the agent shows with `name` and `description` only, as before.
+
+| Field | Type | Rule |
+| --- | --- | --- |
+| `tagline` | `str` | required, at most 120 characters, plain text |
+| `summary` | `str` | required, at most 300 characters, what the agent does |
+| `example_goals` | `list[str]` | 1 to 5 items of at most 120 characters each; Studio offers them as suggested first messages |
+| `avatar_url` | `str \| None` | https URL, optional |
+
+```python
+agent = Agent(
+    name="Research Agent",
+    version="1.0.0",
+    supervaizer_v2_registration=registration,
+    introduction={
+        "tagline": "Turns a question into a sourced brief",
+        "summary": "Collects sources, drafts a synthesis and asks for review.",
+        "example_goals": ["Brief me on a market", "Review these three reports"],
+    },
+)
+```
+
+The block travels as the `introduction` key of the agent registration payload (`AgentRegistrationContract.introduction`) and is omitted when unset.
+
+### Full description
+
+An agent may pass `full_description=` to `Agent` (a `V2AgentFullDescription` or a dict) to ship a long-form description of itself: what it does, how it works, its limits, examples. Studio shows it on the agent detail page. `description` stays the one-line summary and `introduction` stays the short roster block; neither is required for `full_description`.
+
+| Field | Type | Rule |
+| --- | --- | --- |
+| `format` | `"markdown"` or `"html"` | defaults to `markdown` |
+| `content` | `str` | required, 1 to 100,000 characters, not whitespace only |
+
+The SDK only types and bounds the content. Studio sanitizes HTML, including the HTML it renders from markdown, before display: scripts, event handlers and unsafe URLs are stripped. Write content that reads well without them.
+
+```python
+agent = Agent(
+    name="Research Agent",
+    version="1.0.0",
+    supervaizer_v2_registration=registration,
+    full_description={
+        "format": "markdown",
+        "content": (
+            "# Research Agent\n\n"
+            "Collects sources, drafts a synthesis and asks for review.\n\n"
+            "## Limits\n\n- Public web sources only\n- One brief per job\n"
+        ),
+    },
+)
+```
+
+The block travels as the `full_description` key of the agent registration payload (`AgentRegistrationContract.full_description`) and is omitted when unset.
+
+### Billing catalog
+
+An agent that bills its work may pass `billing_catalog=` to `Agent` (a list of `BillingCatalogItem` or dicts). Each item names one SKU the agent may report consumption for. The catalog has no prices: the owner workspace prices each SKU in Studio.
+
+| Field | Type | Rule |
+| --- | --- | --- |
+| `sku` | `str` | 1 to 64 characters, `^[a-z0-9_]+$`, unique within the catalog |
+| `unit` | `str` | 1 to 32 characters, for example `minute` or `token` |
+| `description` | `str` | at most 255 characters, defaults to `""` |
+
+```python
+agent = Agent(
+    name="Research Agent",
+    version="1.0.0",
+    supervaizer_v2_registration=registration,
+    billing_catalog=[
+        {"sku": "brief", "unit": "brief", "description": "One sourced brief"}
+    ],
+)
+```
+
+The list travels as the `billing_catalog` key of the agent registration payload (`AgentRegistrationContract.billing_catalog`) and is omitted when unset. The agent then reports `BillableConsumption` records with `Account.report_consumption`. See [Billable consumption](2026_10_BILLABLE_CONSUMPTION.md) for the records, the receipts and the idempotency rules.
+
+### Scheduled start
+
+Set `scheduled_start=True` on `build_v2_agent_registration()` to advertise `capabilities.scheduled_start: true`. The default `False` omits the key, including from existing registrations. This capability is available only to v2 agents. The registration must declare `job.start` in its actions, including actions derived from `job_policy.setup`.
+
+Studio owns the schedule and calls the existing `job.start` action when a firing is due. It sends the same action input as a manual start, with a stable `idempotency_key` for each occurrence. An agent that advertises scheduled start must return the original job when Studio retries the same key. The agent does not declare a `job.schedule` action or run a clock.
+
+Each registration publishes the current value. If an agent later omits the key or sends `false`, Studio pauses its schedules. A mission manager must resume them after the agent advertises `true` again. See [Scheduled start](2026_10_SCHEDULED_START.md) for the complete contract.
+
+## Rule checkpoints
+
+Rule checkpoints are an explicit opt-in for a controller that cooperatively gates an external effect. Agents that do not declare the capability do not advertise checkpoint support or the resume action.
+
+```python
+from supervaizer import RuleCheckpointGate
+from supervaizer.contracts import V2ActionRequest, build_v2_agent_registration
+
+registration = build_v2_agent_registration(
+    agent_id="research-agent",
+    agent_slug="research-agent",
+    display_name="Research Agent",
+    agent_card_url="/.well-known/agents/v1.0.0/research-agent_agent.json",
+    controller_url="/a2a",
+    a2ui_catalog_version="research-agent.2026-09-29",
+    rule_checkpoints={
+        "phases": ["before", "after"],
+        "secret_refs": ["case.metadata.customer_reference"],
+    },
+)
+
+
+async def perform_step(account, case, start_input):
+    # `start_input` is the full V2ActionRequest received by the controller.
+    # Studio supplies the opaque rule_snapshot when this job is governed.
+    job_start = V2ActionRequest.model_validate(start_input)
+    gate = RuleCheckpointGate.from_job_start(
+        account,
+        job_start,
+        secret_refs=("case.metadata.customer_reference",),
+    )
+
+    await case.run_guarded_step(
+        gate=gate,
+        occurrence_id="stable-occurrence-id",
+        step_id="opaque-proposed-step-id",
+        before_context={"operation": "opaque-operation"},
+        effect=perform_external_effect,
+        after_context=lambda result: {
+            "operation": "opaque-operation",
+            "outcome": result,
+        },
+        advance=advance_case,
+    )
+```
+
+`Case.run_guarded_step()` first reports the Case to Studio, then requests a `before` decision, performs the effect only after `allow`, requests an `after` decision, and advances only after that decision is also `allow`. A `pause` waits for the controller's `rule.checkpoint.resume` action; it does not poll. A persisted `before` allow safely continues the effect after restart. The helper records an effect as started before calling it, so recovery never replays an uncertain external effect. When an after response was lost, use `recover_guarded_step()` with the original gate, result, and after-context callback. It verifies that callback produces the same context, retries only the original after checkpoint, then advances once on `allow`.
+
+`rule_snapshot` and its checkpoint token are opaque controller input. Do not construct, alter, log, or place either in agent business context. The gate posts checkpoints only to `{account.api_url}/api/v1/rule-checkpoints/`; it ignores the snapshot's `checkpoint_url`, so a forged snapshot cannot send controller credentials to another host. A `rule.checkpoint.resume` decision is `allow` or `stop`; the controller rejects `pause`, and the checkpoint keeps waiting. A gate belongs to one agent, job, and case, and the controller rejects a resume for another one. A `V2ActionRequest` names its agent; for a v1 `JobStartRequest`, pass `agent_slug` to `RuleCheckpointGate.from_job_start()`. `secret_refs` declares paths whose values Studio must exclude from checkpoint context; declare every business secret path an agent author supplies. Platform credentials are excluded by the platform and must never be propagated as declared business secrets.
+
+## Workspace Authorization
+
+Workspace slugs and tenant slugs are not authorization primitives. They are display and routing hints only.
+
+When Studio operates an agent shared into another workspace, Studio must prove that the recipient workspace admin accepted the agent. The v2 model is a Studio-owned Workspace Agent Grant plus a short-lived Studio-signed workspace authorization token on each Studio-to-agent request.
+
+Agents may be stateless. They do not need to persist grants locally. The agent verifies the token on every request and uses the verified grant context for resource access, dataset queries, `job.start`, `job.sync`, artifacts, and HITL actions.
+
+If an agent requires an agent-side record before accepting a workspace, it can
+declare `workspace_binding` in its v2 registration. Exactly two action ids,
+`workspace_binding.options` and `workspace_binding.create`, plus the
+`workspace_binding.create` surface, are bootstrap capabilities: they still
+require Studio-to-agent transport authentication, but they run before a
+workspace authorization token exists. Custom ids configured in
+`workspace_binding.existing.action` or `create.action` are not exempt. Every
+other action and surface fails closed without a valid workspace authorization
+token, whatever `scope` it declares; the dispatcher does not consult
+`V2ActionDefinition.scope` for authorization.
+
+See [2026_05_WORKSPACE_AGENT_GRANTS.md](2026_05_WORKSPACE_AGENT_GRANTS.md) for the implementation plan.
+
+## Runtime Handlers
+
+Agents register action and surface handlers on the `Server`.
+
+```python
+from supervaizer import Server
+from supervaizer.contracts import V2ActionRequest, V2ActionResult, V2SurfaceRequest
+
+server = Server(agents=[agent])
+
+
+@server.v2_surface("job.start", agent_slug="research-agent")
+def load_job_start(request: V2SurfaceRequest) -> dict:
+    return {
+        "surface": request.surface,
+        "document": {
+            "type": "Form",
+            "fields": [
+                {"id": "topic_id", "label": "Topic", "type": "string"},
+            ],
+            "submit": {"label": "Start research", "action": "job.start"},
+        },
+    }
+
+
+@server.v2_action("job.start", agent_slug="research-agent")
+def start_job(request: V2ActionRequest) -> V2ActionResult:
+    topic_id = request.input["topic_id"]
+    return V2ActionResult(
+        status="ok",
+        effects=[{"type": "job.started", "data": {"topic_id": topic_id}}],
+    )
+```
+
+Surface handlers return A2UI documents. Action handlers perform business logic and return typed effects, optionally with a full `job_state` snapshot for sync convergence.
+
+A handler can return the typed model or a plain dict; the SDK validates both. A surface result needs `surface` and `document`; `a2ui_version` and `a2ui_catalog_version` are optional. An action result needs `status` (`ok` or `error`).
+
+`agent_slug` on the decorator is optional only when the server holds one agent. Local mode adds the built-in Hello World agent, so pass `agent_slug` if you use `supervaizer start --local`.
+
+## Core Model
+
+### Job
+
+A Job is committed work Studio tracks for an agent.
+
+Studio may load `job.start` before a Job exists. In that case the request can include `draft_session_id`. Agents should treat this as transient UI context. Persistent business state should be created on `job.start`, not on surface load.
+
+Status convergence happens through `job.sync`. `job.sync` does not need to be strictly idempotent in the sense of byte-for-byte identical responses. It should be **convergent**: repeated calls for the same external state should lead Studio to the same Job/Case/Step projection.
+
+The job snapshot (`job_state.job`) is an open model. Studio reads two optional keys from it:
+
+- `information.cost.total_cost`: the cost of the job. Studio adds step costs up into each case cost, but it takes the job cost from this value.
+- `display`: agent vocabulary for job lists and the job title row. The keys are `entity_label`, `state_label` and `primary_action_label`, each a string of at most 120 characters. Studio replaces them on every `job_state` it receives and falls back to its own vocabulary when the job status has moved on since.
+
+### Case
+
+A Case is a unit of work inside a Job. Cases declare a `lane`, which is a rendering hint.
+
+The default lane is `work`. Agents can declare standard or custom lanes:
+
+- `setup`: preparation and pre-flight review
+- `work`: primary execution
+- `deliverable`: final outputs and reviews
+- custom lanes such as `extract`, `transform`, `load`, `verify`
+
+Studio renders unknown lanes generically.
+
+### Step
+
+A Step is an observable activity inside a Case.
+
+In the current SDK model:
+
+- `activity` is `operation` or `delegation`
+- `status` carries lifecycle state such as pending, active, awaiting, completed, failed, or cancelled (a free-form string; these values are the convention Studio renders)
+- `awaiting` carries HITL state when Studio must collect operator input: a required `reason`, the `surface` and `action` to use, `fields`, and `reopenable` (default `False`) declaring whether an answered step may be reopened and resubmitted
+- `outputs` carries produced artifacts
+
+HITL is therefore not a Step kind. It is represented by `status="awaiting"` plus an `awaiting` object with a surface, action, and fields.
+
+The awaiting `surface` can return any valid A2UI document through `V2SurfaceResult.document`. For mounted review workflows, agents can return a generic `DocumentReview` document that contains document content, submit metadata, and typed fields. Supervaizer does not interpret document-review semantics; Studio renders the A2UI document and invokes the declared action, usually `step.awaiting.submit`.
+
+Example:
+
+```python
+V2SurfaceResult(
+    surface="case.step.awaiting",
+    a2ui_version="v0.8",
+    document={
+        "type": "DocumentReview",
+        "document": {
+            "title": "Review",
+            "field": "review_text",
+            "language": "markdown",
+            "value": "# Draft\n\nReview this content.",
+            "validation": [
+                {"id": "readiness", "label": "Ready for approval", "status": "review"}
+            ],
+        },
+        "submit": {"action": "step.awaiting.submit", "label": "Approve"},
+        "fields": [
+            {
+                "id": "review_text",
+                "label": "Review text",
+                "type": "text",
+                "multiline": True,
+                "required": True,
+            },
+            {
+                "id": "approve_review",
+                "label": "Approve review",
+                "type": "boolean",
+                "required": True,
+            },
+        ],
+    },
+)
+```
+
+#### File fields
+
+An awaiting step can ask the operator for a file. The agent declares a field with `type: "file"` in the `fields` list. The `id` and `label` are chosen by the agent; the other keys are protocol keys:
+
+```json
+{"id": "report_file", "label": "Insights report (.md)", "type": "file",
+ "accept": ".md,text/markdown", "max_bytes": 1048576, "storage": "studio",
+ "required": true}
+```
+
+- `accept` lists the allowed extensions and media types.
+- `max_bytes` is the largest file size Studio accepts for this field.
+- `storage` selects where the bytes live and what the agent receives (see the table).
+
+| `storage` | Value in the HITL answer | Who keeps the bytes |
+| --- | --- | --- |
+| `studio` | `{"storage": "studio", "file_id", "filename", "media_type", "size", "sha256"}` | Studio, in private storage. The agent receives a reference only. |
+| `inline` | `{"storage": "inline", "filename", "media_type", "size", "encoding", "content"}` inside the action JSON | The agent. The content travels in the action request. |
+
+With `storage: "inline"`, the whole action JSON, content included, must stay under Studio's request body limit. Choose `studio` for files that can approach that limit.
+
+File fields are supported in `case.step.awaiting` steps and in the `Form` components of a `job.configurator` document. The contract models already accept these keys as extra keys, so agents need no SDK change.
+
+### Artifact
+
+Artifacts are agent-owned outputs. The protocol only defines the reference shape:
+
+- `id`
+- `type`
+- optional `title`, external id, and media type
+
+#### Studio-stored artifacts
+
+An agent can emit an artifact whose bytes Studio already holds, for example a file the operator uploaded through a `storage: "studio"` file field. The ref carries the normal keys plus two more: `"storage": "studio"` and `"file_id"` (the Studio file id):
+
+```json
+{"id": "report:<report_id>", "type": "report", "title": "Quarterly report",
+ "media_type": "text/markdown", "storage": "studio", "file_id": "<studio file id>"}
+```
+
+Studio serves such an artifact from its own storage. It does not call the agent's `artifact.get` action for it. Access control is unchanged: the caller still needs the `artifact.get` grant to read the artifact.
+
+Artifact types such as `transcript`, `synthesis`, `report`, `metric`, or `decision` belong to the agent registration. Studio can render known artifact types richly and fall back to generic previews for unknown types.
+
+## Resources
+
+Resources are agent-owned business objects Studio can manage generically.
+
+Examples:
+
+- projects
+- contacts
+- prompts
+- scenarios
+- project_contacts
+
+A resource declaration can include:
+
+- operations such as `list`, `get`, `create`, `update`, `delete`, `import`
+- `scope` (`workspace`, `mission`, or `job`) and `requires_context` (default `["workspace.id"]`)
+- display metadata for title, columns, and search fields
+- simple form fields
+- typed resource-backed option sources
+- mounted custom views for cases where generic CRUD is not enough
+
+Dynamic behavior should not be implemented as opaque Python callbacks. It should reduce to:
+
+- A2UI-local declarative behavior inside the surface document, or
+- typed action calls such as `resource.contacts.list`, `resource.contacts.create`, or an agent-specific validation action.
+
+This avoids repeating the v1 dynamic-choice callback model.
+
+### Mission context on DataResource calls
+
+Studio sends the DataResource context in headers: `X-Supervaize-Workspace-Id`, `X-Supervaize-Workspace-Slug`, `X-Supervaize-Mission-Id`, `X-Supervaize-Agent-Slug`, and `X-Supervaize-Request-Id`. Since 1.8.0, a call in a mission scope can also send `X-Supervaize-Mission-Metadata`: the Studio `Mission.metadata` JSON object, UTF-8, base64url-encoded (padding optional), at most 4096 bytes encoded. Use `build_data_resource_context_headers(..., mission_metadata=...)` to write it.
+
+The SDK sets `DataResourceContext.mission` (a `V2MissionContext` with `id` from `X-Supervaize-Mission-Id` and the decoded `metadata`). Without the metadata header, `context.mission` is `None`. The route returns HTTP 400 and does not call the callback when the metadata header is present without `X-Supervaize-Mission-Id`, does not decode to a JSON object, or is too large.
+
+The header is not signed. Use mission metadata to scope results, not as an access boundary.
+
+## Datasets
+
+Datasets are read-oriented tables or metric streams that Studio can query through typed actions.
+
+A dataset declares:
+
+- `id`
+- `label`
+- display columns
+- `scope` (`workspace`, `mission`, or `job`; default `workspace`)
+- `auto_surface=True` to get a Studio-generated `mission.agent.dataset.<id>` surface
+
+The SDK derives a `dataset.<id>.query` action (`mutating=False`) for every dataset, auto-surfaced or not. Studio can render the result in generic tables and dashboards, including `mission.analytics` surfaces.
+
+## Dashboards
+
+Dashboards are declarative registration metadata for Studio-rendered views. They do not create AnalyticsResource routes and they do not imply agent-specific analytics business logic.
+
+A dashboard declares:
+
+- `id`
+- `label`
+- `surface`, defaulting to `mission.analytics`
+- `widgets`
+
+Each widget can reference data from a dataset, typed action, or inline sample data. Widgets carry a `visualization` object whose `type` is `table`, `metric`, `vega-lite`, or `custom`. For Vega-Lite charts, use `visualization.type = "vega-lite"` and place the Vega-Lite JSON spec in `visualization.spec`. Studio is responsible for rendering and validating the visualization; Supervaizer only transports the typed contract.
+
+The `mission.analytics` and `job.analytics` surfaces return a `Dashboard` A2UI document with `datasets` (each with optional KPI `metrics`), `controls` and `widgets`. Studio queries each dataset through its `dataset.<id>.query` action and reads the rows from the `dataset.queried` effect (`dataset`, `count`, `rows`). On `job.analytics` the request carries the `job_id`; the agent scopes each dataset to that job. The document shape, the metric reducers and the control types are in the [Job and mission analytics guide](https://docs.runwaize.com/docs/supervaizer-controller/job-analytics).
+
+Example:
+
+```python
+registration = build_v2_agent_registration(
+    # ...
+    datasets=[
+        {
+            "id": "progress_metrics",
+            "label": "Progress Metrics",
+            "auto_surface": True,
+            "display": {"columns": ["label", "value"]},
+        }
+    ],
+    dashboards=[
+        {
+            "id": "mission_overview",
+            "label": "Mission Overview",
+            "widgets": [
+                {
+                    "id": "progress_chart",
+                    "title": "Progress",
+                    "data": {"mode": "ref", "datasetId": "progress_metrics"},
+                    "visualization": {
+                        "type": "vega-lite",
+                        "spec": {
+                            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                            "mark": "bar",
+                            "encoding": {
+                                "x": {"field": "label", "type": "nominal"},
+                                "y": {"field": "value", "type": "quantitative"},
+                            },
+                        },
+                    },
+                }
+            ],
+        }
+    ],
+)
+```
+
+## Surfaces
+
+Surfaces are named UI entry points. A surface handler returns an A2UI document.
+
+Common surface IDs:
+
+| Surface | Purpose |
+| --- | --- |
+| `job.start` | Form used before `job.start`. |
+| `case.step.awaiting` | HITL form or review UI for an awaiting step. |
+| `case.step.detail` | Rich detail view for a step or artifact. |
+| `mission.analytics` | Mission-scoped dashboard over agent datasets. |
+| `job.analytics` | Job-scoped dashboard, shown on each job page. |
+| `job.configurator` | Agent-defined Configure screen of a job. |
+| `mission.agent.overview` | Optional agent overview and quick links. |
+| `mission.agent.resource.<resource_id>` | Studio-generated resource CRUD surface. |
+| `mission.agent.dataset.<dataset_id>` | Studio-generated dataset surface. |
+
+`job.configurator` returns a `Configurator` document: sections of trusted Studio components (`Form`, `ResourceList`, `TemplateComposer`, `Review`, `Table`), each wired to declared job-scoped actions by explicit bindings. Supervaizer transports the document untyped in `V2SurfaceResult.document`; Studio validates it and refuses a document that breaks its contract. The document shape, the revision and conflict rules and the schema versions are in the [Job Configurator guide](https://docs.runwaize.com/docs/supervaizer-controller/job-configurator).
+
+Mounted resource views use a resource-shaped URL in Studio but let the agent replace a whole view, such as `edit` or `import`, with a custom A2UI surface.
+
+For imports, agents should use the `ResourceImport` A2UI document shape. The document declares:
+
+- `resource`, such as `campaign_contacts`
+- `accepted_formats`, currently `csv` and optionally `xlsx`
+- contextual `fields`, such as a required campaign picker
+- row `columns`, such as `email` and `phone_number`
+- `submit.action`, such as `resource.campaign_contacts.import`
+
+Studio reads this document to show the required format, validate CSV rows before submit, and route the typed action. The agent remains responsible for tenant checks, business validation, persistence, and returning typed effects. If an import changes an existing Job, the action can return a top-level `job_state`; Studio treats that like `job.sync` and upserts the returned cases and steps.
+
+## Actions
+
+Actions are typed commands invoked through A2A JSON-RPC.
+
+Common action IDs:
+
+| Action | Purpose |
+| --- | --- |
+| `job.start` | Commit a new Job and start agent work. |
+| `job.stop` | Stop or cancel agent work. |
+| `job.sync` | Return a convergent state snapshot for Studio. |
+| `step.awaiting.submit` | Submit operator input for a HITL step. |
+| `context.assign` | Assign a frozen Studio context selection to a job; agent fetches content via `ContextClient` and stores provenance (`ref`, `version`, `hash`, `synced_at`). |
+| `resource.<id>.<operation>` | Run a resource operation. |
+| `dataset.<id>.query` | Query an agent-owned dataset. |
+| `artifact.get` | Load artifact content by reference. |
+| `job.start.preview` | Preview a job setup plan before `job.start`; declared through `job_policy.setup`. |
+| `workspace_binding.options`, `workspace_binding.create` | Bootstrap actions that bind an agent-side record to a Studio workspace. |
+| `agent.refresh`, `agent.custom.<method>` | Agent-level methods declared through `V2AgentMethods`. |
+
+Action requests include `request_id`, `actor`, `workspace`, `mission_id`, `agent_slug`, `surface`, `action`, `input`, and optional correlation fields such as `job_id`, `case_id`, `step_id`, `draft_session_id`, and `idempotency_key`. After verification the SDK injects `workspace_authorization` (a `V2VerifiedWorkspaceContext`) so handlers use verified claims rather than headers.
+
+### Mission context
+
+Since 1.8.0, `V2ActionRequest` and `V2SurfaceRequest` have an optional `mission` (`V2MissionContext`: `id`, `name`, `metadata`). `metadata` is the Studio `Mission.metadata` JSON object. The SDK carries it without reading its keys; the agent owns any convention inside it (for example, Agent Interviewer reads `metadata.filter.contact`). Validation requires `mission.id == mission_id` and refuses a `metadata` that is not a JSON object, including a JSON-encoded string. Studio sends the current mission metadata on each request. Agents must not cache it in the job.
+
+### Action metadata
+
+Since 1.6.0, `capabilities.actions` serializes as a list of `V2ActionDefinition` objects, each with `id`, `mutating` (does invoking it change agent-side state?), and `scope` (`workspace`, `mission`, or `job`). Consumers authorize and group actions from this metadata instead of pattern-matching ids.
+
+- Bare strings are still accepted in `build_v2_agent_registration(actions=...)` and coerce to `mutating=True, scope="job"`, the fail-closed reading.
+- Derived actions inherit metadata from their definition: resource operations take `V2ResourceDefinition.scope` and stay `mutating=True` unless declared otherwise, dataset queries are `mutating=False`, `job_policy.setup.preview_action` is `mutating=False`, and workspace binding actions are `workspace`-scoped.
+- Precedence is explicit > derived > bare: an explicit `V2ActionDefinition` in `actions=` overrides derived metadata regardless of position, and the earliest mention fixes the order.
+- `job_policy.setup` (`V2JobSetupPolicy`) declares `preview_action`, `start_action`, and `submit_action` (defaults `job.start.preview`, `job.start`, `step.awaiting.submit`), the `action_scopes` they apply to (default empty), and a `plan`. `V2ActionResult.setup_plan` carries the plan back to Studio. Both accept a `V2SetupPlan` or a dict: a dict passes through untouched; a `V2SetupPlan` serializes to `confirmation_required` (default `true`), `steps[]` and an optional `cost_estimate`. See [Setup plan and field schema](#setup-plan-and-field-schema).
+
+### Setup plan and field schema
+
+A `V2SetupPlan` is the typed form of `job_policy.setup.plan` and of `V2ActionResult.setup_plan`. Each `V2SetupStep` has `id` (unique in the plan), `title` (at most 120 characters), optional `description` (at most 300), `status` (`pending` default, `awaiting`, `done`, `skipped`), `fields` and `help_actions`. Every id in `help_actions` must be declared in `capabilities.actions` with `kind="help"`; the registration validator checks this once declared and derived actions are merged.
+
+`V2SetupFieldDefinition` describes one input. `V2AwaitingFieldDefinition` and `V2ResourceFieldDefinition` accept the same optional keys; unset keys stay off the wire, so existing registrations serialize as before.
+
+| Key | Rule |
+| --- | --- |
+| `id`, `label` | required |
+| `type` | default `string`. Known: `string`, `text`, `boolean`, `integer`, `number`, `date`, `select`, `multi_select`, `resource_ref`, `file`, `list`. Unknown types render as `string`. |
+| `item_fields` | required when `type="list"`, rejected otherwise. One nesting level: an item field cannot be a `list`. The value of a `list` field is a list of dicts keyed by item field id, never free text. |
+| `required` | default `false` |
+| `default`, `placeholder` | optional |
+| `description` | at most 300 characters, shown as a tooltip |
+| `multiline`, `min_rows` | `min_rows` is at least 1 and allowed only with `multiline` |
+| `options` | `[{"value", "label"}]`; bare strings are rejected |
+| `options_source` | `V2ResourceFieldOptionsSource`, unchanged |
+| `depends_on` | `{"field": "<parent id>", "in": [<stringified parent values>]}`; the field is active only while the parent's value is listed, and parents chain |
+| `validation` | `V2FieldValidation`: `min_length`, `max_length`, `pattern` fit `string`, `text` and unknown types; `min`, `max` fit `integer` and `number`; `min_items`, `max_items` fit `multi_select` and `list`; `message` replaces the generic error. A rule that does not fit the field type is rejected. |
+
+`V2CostEstimate` carries `status` (`estimated` or `unknown`), `unit` (a free label such as `USD`, `tokens` or `credits`, shown verbatim), `min`, `max` (at least `min`, both at least 0) and `basis` (plain text, at most 300 characters). With `status="unknown"`, `unit`, `min` and `max` must be absent. Clients render a range or "unknown", never a single number.
+
+```python
+from supervaizer import V2CostEstimate, V2SetupFieldDefinition, V2SetupPlan, V2SetupStep
+
+plan = V2SetupPlan(
+    steps=[
+        V2SetupStep(
+            id="scope",
+            title="Scope",
+            fields=[
+                V2SetupFieldDefinition(
+                    id="goal",
+                    label="Goal",
+                    type="text",
+                    multiline=True,
+                    min_rows=4,
+                    required=True,
+                ),
+                V2SetupFieldDefinition(
+                    id="mode",
+                    label="Mode",
+                    type="select",
+                    options=[
+                        {"value": "fast", "label": "Fast"},
+                        {"value": "custom", "label": "Custom"},
+                    ],
+                ),
+                V2SetupFieldDefinition(
+                    id="budget",
+                    label="Budget",
+                    type="number",
+                    depends_on={"field": "mode", "in": ["custom"]},
+                    validation={"min": 0, "message": "Budget cannot be negative"},
+                ),
+            ],
+            help_actions=["goal.suggest"],
+        )
+    ],
+    cost_estimate=V2CostEstimate(
+        status="estimated", unit="credits", min=5, max=20, basis="for 50 runs"
+    ),
+)
+registration = build_v2_agent_registration(
+    ...,
+    actions=[
+        {
+            "id": "goal.suggest",
+            "kind": "help",
+            "mutating": False,
+            "target_field": "goal",
+        }
+    ],
+    job_policy={"setup": {"plan": plan}},
+)
+```
+
+Two Studio behaviors apply to these fields:
+
+- A required `select` field has no empty choice. Studio shows its `placeholder` until the user chooses.
+- For an agent that declares a setup plan, Studio adds the job name to the preview input as `name`, so the plan need not ask for one. A `name` value from the plan's own fields wins.
+
+### Help actions and dry runs
+
+`V2ActionDefinition` has three optional keys, all omitted from the wire at their default:
+
+- `kind`: `"command"` (default) or `"help"`. A help action proposes or checks a draft for one setup field during guided setup. It must declare `mutating=False`; the SDK rejects a help action that mutates.
+- `target_field`: the setup field id whose draft the result fills. Allowed only with `kind="help"`.
+- `dry_run`: `False` by default. A dry-run action is a test run defined by its outcome, not by where it stores data. It MAY create temporary agent-side data and MAY incur model cost. It MUST NOT send any external communication. It MUST NOT appear in results, datasets, dashboards or `job.sync` counts.
+
+A help action receives `input = {"field": "<target field id>", "values": {<current draft values>}}` and answers with `V2ActionResult.draft` (`V2FieldDraft`): `field`, `value` (the proposed value, `None` for a validate-only check) and `suggestions` (`V2Suggestion`: `message`, `severity` `info`, `warning` or `error`, optional `field` and `proposed_value`). Studio shows `value` as an editable draft of the target field and never applies it on its own. For a `list` field, `draft.value` has the field's value shape: a list of dicts keyed by item field id.
+
+A dry-run action answers with `V2ActionResult.dry_run` (`V2DryRunOutcome`): `expires_at`, `deletable` and `cost_incurred` (a `V2CostEstimate`, shown when present). Studio labels dry-run actions distinctly.
+
+```python
+actions = [
+    {"id": "goal.suggest", "kind": "help", "mutating": False, "target_field": "goal"},
+    {"id": "job.test", "dry_run": True, "label": "Test run"},
+]
+```
+
+### Display text
+
+Surfaces and actions may carry an optional `label` (a caption) and `description` (plain-language help text, such as a tooltip), so Studio can show the agent's own wording on the buttons it renders for them. Both are plain text, at most 300 characters, and display only: they are never an authorization input.
+
+```python
+registration = build_v2_agent_registration(
+    ...,
+    surfaces=[
+        "case.step.detail",
+        {
+            "id": "mission.agent.overview",
+            "label": "Overview",
+            "description": "Summary of what this agent manages for the mission.",
+        },
+    ],
+    actions=[
+        {
+            "id": "job.stop",
+            "mutating": True,
+            "scope": "job",
+            "label": "Stop",
+            "description": "Stop the job; work already done is kept.",
+        },
+    ],
+)
+```
+
+- `capabilities.surfaces` stays a list of id strings. Surface text is serialized in the sibling list `capabilities.surface_definitions` (`V2SurfaceDefinition`: `id`, `label`, `description`), at most one entry per declared id.
+- Action text is serialized on each `capabilities.actions` entry.
+- Unset text is omitted, so a registration without text serializes as before.
+- An auto-derived surface such as `mission.agent.resource.<id>` is described by declaring it explicitly in `surfaces=`. An explicit `V2ActionDefinition` still replaces derived metadata, so restate `mutating` and `scope` when adding text to a derived action.
+
+### Context assignment semantics
+
+`context.assign` carries a `V2ContextAssignment` payload: the selected items (`ref`, `version`, `scope`, `title`), the `job_id`, an optional `mission_id`, and a Studio-stamped `assigned_at`. An empty `items` list is an explicit "no context" assignment, not an error. `mission_id` is required when any item is mission-scoped.
+
+The payload intentionally contains references, not content. On receipt the agent fetches each item once through `ContextClient.open()` and freezes the returned content as its own snapshot with provenance (`ref`, `version`, content `hash`, `synced_at`). `ContextClient.open()` returns the item's current `version`; the agent MUST compare it against the assigned `version` and fail the whole assignment with an explicit error when they differ — the item changed between selection and sync, and the operator should re-assign. Agents must not silently store content under a version it does not match, and must not re-read Studio context during job execution; a new `context.assign` is the only refresh path.
+
+## Sync and Offline Semantics
+
+Studio owns operator-facing job lifecycle, but the agent owns actual business state. `job.sync` is the reconciliation point between the two.
+
+Recommended behavior:
+
+- new starts go through `job.start`
+- already-started external work can be loaded by creating a Studio Job and calling `job.sync`
+- repeated sync calls should be convergent
+- offline agents block new starts
+- if Studio marks a running Job failed because the agent is offline, resuming later should use a new Job plus `job.sync`
+
+## Idempotency
+
+Confirming a setup (`job.start`) must be safe to retry. These rules are part of the v2 contract; they add no field.
+
+- The **operation key** is `V2ActionRequest.idempotency_key`. Studio's `job_setup` already requires it on preview and confirm; it stays the same value across preview, confirm and every retry.
+- The **identities** are `mission_id` and `job_id`, allocated by Studio before confirm and sent unchanged on every retry.
+- Agent rules for `job.start`: same key + same identities → return the original result, create nothing. Same key + different input or identities → `status: "error"` with `errors[0].code = "idempotency_conflict"`. Result sets `replay_safety.strictly_idempotent_response = True`.
+- Client rules after an uncertain result (timeout, expired token): reuse the same key and identities. Never mint a new key for a retry. Resolve the outcome before offering a new setup.
+- Conformance helper in the SDK test utilities: `assert_confirm_idempotent(handler, request)` (exported from `supervaizer`, implemented in `supervaizer.testing`) calls the handler twice and asserts equal results and no new effects on the second call. Agents must ship a test that calls it.
+
+```python
+from supervaizer import assert_confirm_idempotent
+
+
+def test_job_start_is_idempotent() -> None:
+    assert_confirm_idempotent(start_job, request_with_idempotency_key)
+```
+
+## A2A, A2UI, and AG-UI
+
+Supervaizer v2 currently uses:
+
+- A2A for Agent Card discovery, `/a2a` JSON-RPC calls, and `/a2a/events` SSE observation
+- A2UI for Studio-rendered surface documents such as `job.start`, `case.step.awaiting`, `case.step.detail`, and `mission.analytics`
+- Supervaizer v2 semantics for Jobs, Cases, Steps, Resources, Datasets, Actions, Artifacts, and sync/offline policy
+
+The current transport advertises JSON-RPC and SSE, not A2A push notifications.
+
+AG-UI is not required for the MVP. It is the right layer for future live streaming agent-user sessions where Studio needs bidirectional events, streaming messages, tool-call visualization, live state synchronization, or interrupt/approval flows. Registrations can include `ag_ui_version` metadata for that future runtime, but the implemented v2 flow works through A2UI surface documents and typed actions.
+
+## Migration From v1
+
+The v2 model intentionally replaces v1 field/dynamic-choice/job-poll behavior.
+
+| v1 concept | v2 replacement |
+| --- | --- |
+| `AgentMethodField` for Studio job start | A2UI `job.start` surface |
+| `dynamic_choices_callback` (removed in 1.0.0; passing it raises) | typed resource option sources or typed actions |
+| `job_poll` (removed; passing it raises) | `job.sync` |
+| controller-specific HITL payloads | `case.step.awaiting` surface plus `step.awaiting.submit` |
+| fixed Studio assumptions about agent outputs | agent-declared artifact types and `case.step.detail` surfaces |
+
+New agents should model Studio integration through v2 from the start.
+
+## Minimal Checklist For A v2 Agent
+
+- Declare `supervaizer_v2_registration`.
+- Set `a2ui_catalog_version`. `a2ui_version` and `a2a_version` default to the SDK-pinned versions.
+- Declare at least one surface, usually `job.start`.
+- Register `job.start`.
+- Register `job.sync` if Studio needs status convergence or catch-up.
+- Declare resources and datasets that Studio should manage generically.
+- Register handlers for every declared action.
+- Use `awaiting` state for HITL.
+- Return stable external ids in Job/Case/Step/Artifact snapshots.
+- Keep business validation inside agent actions, not inside Studio-specific code paths.
+
+## Design Rules
+
+These decisions are fixed for v2 and apply to every agent built on the SDK:
+
+- v2 does not preserve v1 dynamic-choice, job-poll, or legacy case-update behavior. When the Supervaize controller path is active, workspace operations go through v2.
+- No guessing and no implicit fallback: missing workspace authorization, missing workspace binding, mismatched server or agent id, and missing scopes fail with explicit errors that name the missing configuration.
+- Studio owns generic rendering and acceptance records. Agents own business vocabulary and validate every business mutation.
+- `server.register.details.server_id` is the controller identity Studio keys on. It comes from `SUPERVAIZER_SERVER_ID`, or a new UUID per process when unset, so set the variable in every deployed environment to keep grants stable across restarts and instances.
+- If `SUPERVAIZER_API_KEY` is unset, the SDK generates a key at startup and logs only its fingerprint. Startup verifies that Studio persisted the effective key, and a mismatch fails startup instead of producing repeated `/a2a` 401s later.
+- Agent-specific configuration errors are surfaced before work starts, as configuration errors rather than transport failures.
+- Action results may return a top-level `job_state` snapshot so Studio can materialize cases immediately, then converge through `job.sync`.
+
+
+*Uploaded on 2026-11-06 15:07:19*

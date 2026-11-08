@@ -104,8 +104,27 @@ Your agent does not call Studio for each change. It returns a **job state** from
 
 - **Statuses** are `pending`, `active`, `awaiting`, `completed`, `failed` and `cancelled`. A failure is a status, not a kind of step.
 - **`lane`** groups cases on the job page. The default lane is `work`. Agents often add `setup` and `deliverable`.
+- **`activity`** of a step is `operation` or `delegation`.
 - **`awaiting`** on a step means that it waits for a person. See [Human in the loop](human-in-the-loop).
 - **`cost`** and **`outputs`** are explained in [Cost reporting](cost-reporting).
+
+### Declare lanes and output types
+
+Declare your lanes and output types in the registration:
+
+```python
+build_v2_agent_registration(
+    ...,
+    case_lanes=[{"id": "work", "label": "Work", "default": True}, {"id": "deliverable", "label": "Deliverables"}],
+    artifact_types=[{"type": "greeting_card", "label": "Greeting card"}],
+)
+```
+
+Studio loads the content of an output with the `artifact.get` action. Declare `artifact.get` with `mutating=False`. A job can also start from external work: set `job.source` to `{"type": "external"}` in place of `fresh_start`.
+
+### Mission context
+
+Studio can send the mission with each request. `request.mission` holds the mission `id`, `name` and `metadata`. The SDK does not read the metadata keys. Your agent owns their meaning. Do not copy the metadata into the job. See the [SDK guide](ref/2026_05_SUPERVAIZER_v2.md).
 
 ## How Studio talks to your agent
 

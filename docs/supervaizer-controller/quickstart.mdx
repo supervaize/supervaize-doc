@@ -29,10 +29,10 @@ The Supervaizer Controller currently supports **Python-based** agents.
 :::
 
 The **Supervaize Hello World** repository is a complete, tested agent. It shows every feature of these guides:
-[<i className="bi bi-github"></i> GitHub Repository](https://github.com/runwaize/supervaize_hello_world)
+[<i className="bi bi-github"></i> GitHub Repository](https://github.com/supervaize/supervaize_hello_world)
 
 ```bash title="Clone the repo"
-git clone https://github.com/runwaize/supervaize_hello_world.git
+git clone https://github.com/supervaize/supervaize_hello_world.git
 cd supervaize_hello_world
 ```
 
@@ -121,7 +121,7 @@ The Hello World example includes a pre-configured `supervaizer_control.py` that 
 - **The server**: the handlers for each surface and action
 
 ```js reference title="Hello World controller supervaizer_control.py"
-https://github.com/runwaize/supervaize_hello_world/blob/main/supervaizer_control.py#L1-L20
+https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L1-L20
 ```
 
 ### Creating Your Own Controller
@@ -228,11 +228,13 @@ If the agent is not deployed to a publicly accessible server, you need to instal
 Here are the instructions to [setup a tunnel for your local development](tunneling-setup)
 :::
 
-Store your public hostname in `SUPERVAIZER_HOST` environment variable.
+Store the public address of the tunnel in the `SUPERVAIZER_PUBLIC_URL` environment variable. It is a full URL, with the scheme. Studio calls your controller at this address.
 
 ```bash
-export SUPERVAIZER_HOST=silly-peaches-chapter.loca.lt
+export SUPERVAIZER_PUBLIC_URL=https://silly-peaches-chapter.loca.lt
 ```
+
+`SUPERVAIZER_HOST` is a different variable: the address that the server binds to (`0.0.0.0` by default).
 
 ### Start the server 🚀 {#start}
 
@@ -275,9 +277,9 @@ uv run python supervaizer_control.py
 INFO     | supervaizer.storage:__init__ - [StorageManager] 🗃️ Local DB initialized
 INFO     | supervaizer.server:__init__ - [Server launch] 🚀 Deploy Supervaizer routes
 INFO     | supervaizer.server:__init__ - [Server launch] 📢 Deploy A2A routes
-INFO     | supervaizer.server:__init__ - [Server launch] 💼 Deploy Admin interface @ http://0.0.0.0:8000/admin
+INFO     | supervaizer.server:__init__ - [Server launch] 💼 Deploy admin interface @ http://0.0.0.0:8000/manage
 INFO     | supervaizer.server:__init__ - [Server launch] API Key authentication enabled
-WARNING  | supervaizer.server:__init__ - [Server launch] Using auto-generated API key: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+WARNING  | supervaizer.server:__init__ - [Server launch] Using auto-generated API key fingerprint=xxxxxxxx
 INFO     | [Server launch] Starting Supervaize Controller API
 SUCCESS  | ✅ POST Event SERVER_REGISTER sent
 INFO     | [Server launch] Updated agent Hello World Agent
@@ -299,7 +301,7 @@ Once the server is running, you'll have:
 
 - **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`
 - **A2A discovery**: `/.well-known/agents.json`
-- **Admin interface**: `http://127.0.0.1:8000/admin`
+- **Admin interface**: `http://127.0.0.1:8000/manage`. It opens only from a Tailscale network, or from your own computer in local mode. See the [admin documentation](ref/2025_08_ADMIN_README.md).
   :::
 
 ---
@@ -320,7 +322,7 @@ If you run into issues, check the **[Troubleshooting Guide](troubleshooting)** f
 ## Reference
 
 - **Parameters**: see [Agent parameters and secrets](parameters)
-- **Protocol Support**: See the [Protocols documentation](ref/PROTOCOLS) for A2A protocol details
+- **Protocol Support**: See the [Protocols documentation](ref/2026_05_PROTOCOLS.md) for A2A protocol details
 - **API docs**: visit `/docs` and `/redoc` when the server is running
 
 :::note

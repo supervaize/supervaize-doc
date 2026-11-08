@@ -52,9 +52,11 @@ registration = build_v2_agent_registration(
     a2ui_catalog_version="my-agent-ui.1",
     surfaces=["job.start", "case.step.awaiting"],
     actions=["job.start", "job.sync", "job.stop", "step.awaiting.submit"],
-    rule_checkpoints={"phases": ["before", "after"]},
+    rule_checkpoints={"phases": ["before", "after"], "secret_refs": ["case.metadata.customer_reference"]},
 )
 ```
+
+`secret_refs` is optional. It lists the paths of business secrets in your step data. Each path starts with `job.fields.`, `case.metadata.`, `step.payload.` or `context.`. Pass the same list to `RuleCheckpointGate.from_job_start(account, request, secret_refs=...)`.
 
 The SDK adds the `rule.checkpoint.resume` action to the registration. Register a handler for it (step 4).
 
@@ -114,11 +116,12 @@ async def run_guarded_step(gate: RuleCheckpointGate, job_id: str, case: dict, st
 - **`occurrence_id`** identifies this run of the step. Use a stable value, so a retry asks about the same occurrence.
 - A paused step shows as `awaiting` with the reason `rule_checkpoint`. The person decides in the **Rule activity** panel of the job page, not in a form of your agent.
 
-`wait_for_resume` waits inside your process. A real agent does not block a request on it: it returns the job state with the paused step and continues when the decision arrives. The Hello World file [`agent_rules.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_rules.py) shows this complete flow.
+`wait_for_resume` waits inside your process. A real agent does not block a request on it: it returns the job state with the paused step and continues when the decision arrives. The Hello World file [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) shows this complete flow.
 
 ## 4. Receive the decision
 
 ```python
+from supervaizer import RuleCheckpointRecoveryRequired
 from supervaizer.contracts import RuleCheckpointResume
 from supervaizer.rule_controls import resume_rule_checkpoint
 
@@ -127,19 +130,25 @@ async def resume(request: V2ActionRequest) -> dict:
     decision = RuleCheckpointResume.model_validate(
         request.input | {"job_id": request.job_id, "case_id": request.case_id, "agent_slug": request.agent_slug}
     )
-    if resume_rule_checkpoint(decision) is None:  # no step of this process waits for it
+    try:
+        resume_rule_checkpoint(decision)
+    except (ValueError, RuleCheckpointRecoveryRequired) as error:  # no matching checkpoint
         return {"status": "error", "effects": [{"type": "rule.checkpoint.rejected", "job_id": request.job_id,
-                                                "message": "No checkpoint waits for this decision"}]}
+                                                "message": str(error)}]}
     job_state = JOBS[request.job_id]
     return {"status": "ok",
             "effects": [{"type": "rule.checkpoint.resumed", "job_id": request.job_id}],
             "job_state": job_state}
 ```
 
-`resume_rule_checkpoint` matches the decision to the waiting gate and wakes `wait_for_resume`. A decision for an unknown gate must fail: never apply it by guess.
+`resume_rule_checkpoint` matches the decision to the waiting gate and wakes `wait_for_resume`. It returns `None` when the decision arrives before the step waits. The SDK keeps the decision for that step. It raises `ValueError` when the decision matches no checkpoint. It raises `RuleCheckpointRecoveryRequired` when no waiter of this process holds the gate. Return an error for both: never apply a decision by guess.
 
-:::warning[Ask Studio for a sync after the decision]
-Studio delivers the decision and does not read a job state from the answer. When the step continues, ask Studio for a sync again: Studio then calls `job.sync` and shows the new state. Without this request, the job stays **Awaiting** in Studio until an operator selects **Update** on the job page. The function `schedule_refresh` in the Hello World file [`agent_rules.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_rules.py) shows the request.
+:::warning[Return the job state with the decision]
+Studio applies the `job_state` that the handler returns, as for any other action. Return the state that the job has after the decision. Without it, the job stays **Awaiting** in Studio until the next `job.sync`.
+
+Studio does not apply a state that it refuses, or a state that arrives after the agent was paused. The job then keeps its stored state until the next `job.sync`.
+
+When the step continues after the answer, ask Studio for a sync: Studio then calls `job.sync` and shows the new state. The function `schedule_refresh` in the Hello World file [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) shows the request.
 :::
 
 ## Keep the gate across restarts
@@ -154,11 +163,11 @@ The SDK also has a helper, `Case.run_guarded_step()`, that does the whole sequen
 - [ ] Every step with an outside effect asks `before`.
 - [ ] The effect runs only after `allow`.
 - [ ] `stop` fails the step and is final. `pause` shows the step as `awaiting`.
-- [ ] After a decision, the agent asks Studio for a sync.
+- [ ] The decision handler returns the job state. The agent asks Studio for a sync when the step continues later.
 - [ ] The `context` has the facts a rule needs, and no secret.
 - [ ] Jobs in a mission without rules run as before.
 
 ## Reference
 
-- Hello World: [`agent_rules.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/agent_rules.py) and [`tests/test_rule_checkpoints.py`](https://github.com/runwaize/supervaize_hello_world/blob/main/tests/test_rule_checkpoints.py).
+- Hello World: [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) and [`tests/test_rule_checkpoints.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/tests/test_rule_checkpoints.py).
 - SDK guide: [Rule checkpoints](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#rule-checkpoints).
