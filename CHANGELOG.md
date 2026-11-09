@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Agent-first entry points: the quickstart opens with the Supervaizer integration skill, each controller guide has a skill tip with a ready prompt, and `/llms.txt` indexes the guides for coding agents.
 - Controller guides for Supervaizer v2: parameters, human in the loop, shared resources, cost reporting, guardrail controls, Job Configurator, job and mission analytics.
 - Controller guide sections: agent introduction and full description, scheduled start, guided setup, mission context, billable consumption receipts, Studio-stored artifacts.
 - Reference pages from the SDK in the sidebar: v2 contract, workspace agent grants, guided setup contract, scheduled start, billable consumption, parameter validation, changelog.

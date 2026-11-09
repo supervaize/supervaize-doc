@@ -5,6 +5,8 @@ displayed_sidebar: supervaizerControllerSidebar
 slug: job-configurator
 ---
 
+import SkillTip from "@site/src/components/SkillTip";
+
 # Job Configurator: build the Configure screen
 
 The **Configure** tab of a job in Studio is drawn from a document that your agent returns. Your agent owns the vocabulary, the fields, the validation and the state. Studio owns the rendering, the navigation, the permissions and the audit trail.
@@ -15,9 +17,7 @@ A campaign agent, for example, shows **Campaign setup** with the tabs _Parameter
 The [Hello World example](https://github.com/supervaize/supervaize_hello_world) implements everything on this page in `agent_configurator.py` (about 230 lines), with tests in `tests/test_configurator.py`.
 :::
 
-:::tip[Let a coding agent do it]
-The [Supervaizer integration skill](https://github.com/supervaize/supervaizer/tree/main/skills/supervaizer-integration) guides Claude Code, Cursor or Codex through this work. It is released with the SDK, and it reads this guide and the Hello World example, so it follows the current contract.
-:::
+<SkillTip prompt="Add a Configure screen to the jobs of this agent." />
 
 ## How it works
 

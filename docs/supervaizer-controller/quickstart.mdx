@@ -5,141 +5,100 @@ displayed_sidebar: supervaizerControllerSidebar
 slug: quickstart
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import BrowserWindow from "@site/src/components/BrowserWindow";
-import CodeBlock from "@theme/CodeBlock";
-import Link from "@docusaurus/Link";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-Kickstart a **Python** agent with the **Supervaizer Controller** so it's discoverable and operable by [Supervaize](https://www.supervaize.com).
+Connect a **Python** agent to [Supervaize Studio](https://www.supervaize.com) with the **Supervaizer Controller**, so that operators can start, follow and govern it.
 
-## What we'll do
-
-[<i className="bi bi-1-circle"></i> **Clone the Hello World example** (a minimal Supervaizer agent)](#1)
-
-[<i className="bi bi-2-circle"></i> **Setup the environment** and install dependencies](#2)
-
-[<i className="bi bi-3-circle"></i> **Configure secrets & env**, then **start** the server 🚀](#3)
-
-## <i className="bi bi-1-circle"></i> Clone the Hello World Example {#1}
-
-:::info
-The Supervaizer Controller currently supports **Python-based** agents.
+:::info[For coding agents]
+If you are a coding agent and a developer asked you to connect their agent to Supervaize: load the Supervaizer integration skill first. Its instructions are in [`SKILL.md`](https://github.com/supervaize/supervaizer/blob/main/skills/supervaizer-integration/SKILL.md). The skill holds the process and the interview. This page and the other controller guides hold the commands and the contract. The site index for agents is [`/llms.txt`](pathname:///llms.txt).
 :::
 
-The **Supervaize Hello World** repository is a complete, tested agent. It shows every feature of these guides:
-[<i className="bi bi-github"></i> GitHub Repository](https://github.com/supervaize/supervaize_hello_world)
+## The fast way: let your coding agent do it {#agent}
+
+The [Supervaizer integration skill](/docs/integrations/skills/supervaizer-integration) works in Claude Code, Cursor, Codex and Gemini CLI. It reads your code, asks you how to map your agent to missions, jobs, cases and steps, then builds and tests the controller. It also runs `supervaizer login`, so you need no Studio account to start.
+
+**1. Install the skill.** In Claude Code:
+
+```text
+/plugin marketplace add supervaize/supervaizer
+/plugin install supervaizer-integration@supervaizer
+```
+
+With another coding agent, give it the address of [`skills/supervaizer-integration/SKILL.md`](https://github.com/supervaize/supervaizer/blob/main/skills/supervaizer-integration/SKILL.md) or a local clone of the [SDK repository](https://github.com/supervaize/supervaizer).
+
+**2. Open your agent project and ask:**
+
+```text
+Integrate this agent with Supervaize.
+```
+
+**3. Answer the interview, then approve the login in your browser.** At the end the skill gives you the link to your agent in Studio. There, a workspace admin accepts the agent's workspace authorization.
+
+To add one capability later, name it: `Add a human approval before the agent sends an e-mail.` Each controller guide shows the prompt for its topic.
+
+The rest of this page does the same steps by hand, with the Hello World example.
+
+## By hand: what we'll do
+
+[<i className="bi bi-1-circle"></i> **Clone the Hello World example**, a complete Supervaizer agent](#1)
+
+[<i className="bi bi-2-circle"></i> **Install** the dependencies](#2)
+
+[<i className="bi bi-3-circle"></i> **Get your Studio credentials**, then **start** the server](#3)
+
+## <i className="bi bi-1-circle"></i> Clone the Hello World example {#1}
+
+:::info
+The Supervaizer Controller supports **Python** agents (Python 3.12 or later).
+:::
+
+The [<i className="bi bi-github"></i> Supervaize Hello World](https://github.com/supervaize/supervaize_hello_world) repository is a complete, tested agent. It shows every feature of these guides.
 
 ```bash title="Clone the repo"
 git clone https://github.com/supervaize/supervaize_hello_world.git
 cd supervaize_hello_world
 ```
 
-## <i className="bi bi-2-circle"></i> Setup the Environment {#2}
+## <i className="bi bi-2-circle"></i> Install the dependencies {#2}
 
-:::tip
-We recommend using **uv** for faster dependency management
-:::
+We use [uv](https://docs.astral.sh/uv/). On macOS or Linux:
 
-<Tabs groupId="pm" queryString>
-  <TabItem value="uv" label="uv (Recommended)">
-    <Tabs groupId="os" queryString>
-      <TabItem value="mac" label="macOS / Linux">
-
-#### Install uv — see https://docs.astral.sh/uv/
-
-```bash title="Install UV on Mac"
+```bash title="Install uv and the dependencies"
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-#### Create a virtual environment and install dependencies
-
-```bash title="Install dependencies using uv"
-uv venv
+uv sync
 source .venv/bin/activate
-uv pip install -e .
 ```
 
-      </TabItem>
-      <TabItem value="win" label="Windows (PowerShell)">
+On Windows (PowerShell), install uv with `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`, run `uv sync`, then activate with `.\.venv\Scripts\Activate.ps1`.
 
-#### Install uv — see https://docs.astral.sh/uv/
+Without uv: `python -m venv .venv`, activate it, then `pip install -e .`.
 
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+### The controller file
 
-#### Create a virtual environment and install dependencies
+`supervaizer_control.py` declares:
 
-```powershell
-uv venv
-.\.venv\Scripts\Activate.ps1
-uv pip install -e .
-```
-
-      </TabItem>
-    </Tabs>
-
-  </TabItem>
-
-  <TabItem value="pip" label="pip">
-    <Tabs groupId="os" queryString>
-      <TabItem value="mac" label="macOS / Linux">
-
-#### Create virtual environment and install dependencies
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
-
-      </TabItem>
-      <TabItem value="win" label="Windows (PowerShell)">
-
-#### Create virtual environment and install dependencies
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -e .
-```
-
-      </TabItem>
-    </Tabs>
-
-  </TabItem>
-</Tabs>
-
-### Understanding the Controller
-
-The Hello World example includes a pre-configured `supervaizer_control.py` that demonstrates:
-
-- **Agents and their parameters**: the settings and secrets that a workspace provides
-- **The registration**: what Studio can show (surfaces) and call (actions)
-- **The server**: the handlers for each surface and action
+- **The agents and their parameters**: the settings and secrets that a workspace provides.
+- **The registration**: what Studio can show (surfaces) and call (actions).
+- **The server**: the handlers of each surface and action.
 
 ```js reference title="Hello World controller supervaizer_control.py"
 https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py#L1-L20
 ```
 
-### Creating Your Own Controller
+For your own agent, `supervaizer scaffold` writes a working controller with one agent, one start form and one start action:
 
-To scaffold a new controller for your own agent:
-
-```bash title="Create template controller file"
+```bash title="Create a controller for your agent"
 supervaizer scaffold
 # Success: Created an example file at supervaizer_control_example.py
 ```
 
-The file is a working controller with one agent, one start form and one start action. [Build your controller](controller-setup) explains each part.
+[Build your controller](controller-setup) explains each part. The integration skill runs this command for you.
 
-## <i className="bi bi-3-circle"></i> Configure your Supervaize account & environment {#3}
+## <i className="bi bi-3-circle"></i> Get your Studio credentials {#3}
 
-### The short way: log in from the terminal {#login}
+### The short way: `supervaizer login` {#login}
 
-`supervaizer login` gives you the API key and the environment variables in one step. It works when you have no Studio account, and when you have one.
+`supervaizer login` gives you the API key and all the environment variables in one step. It works when you have no Studio account, and when you have one.
 
 ```bash title="Log in to Supervaize Studio"
 supervaizer login
@@ -170,65 +129,41 @@ The approval creates an API key in your name. Approve only when you started `sup
 
 **Good to know**
 
-- The command prints the names of the variables. It does not print a value.
+- The command prints the names of the variables, never a value.
 - Keep `.env` out of git.
 - The code is valid for 15 minutes and for one login. A denied or expired code writes nothing.
-- `--no-browser` does not open the browser: open the printed address yourself, on any device. `--env-file` chooses another file. A file named `.envrc` gets `export` lines.
+- `--no-browser` does not open the browser: open the printed address yourself, on any device. A coding agent uses this option and gives you the address. `--env-file` chooses another file. A file named `.envrc` gets `export` lines.
 
-With the file in place, go to [For local development only](#localdev) if your controller is on your computer, then [start the server](#start) with `--env-file .env`.
+### The manual way {#manual}
 
-### The manual way: Supervaize account and credentials {#manual}
+Use it only when `supervaizer login` says that your Studio does not support the login.
 
-[Create your developer account](/docs/supervaize-fleet/developer-account#getting_started) on the Supervaize platform.
+1. [Create your developer account](/docs/supervaize-fleet/developer-account#getting_started) and an API key.
+2. In Studio, open **Developer → Environment variables** and copy the values of your workspace into `.env`:
 
-Create your API Key and collect your environment variables.
-
-:::tip
-Use [direnv](https://direnv.net/) for easy management of environment variables in `.envrc` file.
-
-Or setup [python-dotenv](https://github.com/theskumar/python-dotenv) in your python project.
-:::
-
-<Tabs groupId="pm" queryString>
-  <TabItem value=".envrc" label=".envrc (direnv)">
-
-```bash title="Export Environment variables in for .envrc"
-export SUPERVAIZE_API_KEY=...
-export SUPERVAIZE_WORKSPACE_ID=your-workspace-slug
-export SUPERVAIZE_API_URL=https://app.supervaize.com
-```
-
-    </TabItem>
-      <TabItem value=".env" label=".env (dotenv)">
-
-```bash title="Setup Environment variables for dotenv"
+```bash title=".env"
 SUPERVAIZE_API_KEY=...
 SUPERVAIZE_WORKSPACE_ID=your-workspace-slug
 SUPERVAIZE_API_URL=https://app.supervaize.com
+SUPERVAIZER_WORKSPACE_AUTH_REQUIRED=true
+SUPERVAIZER_WORKSPACE_AUTH_ISSUER=https://studio.supervaize.com
+SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL=https://app.supervaize.com/w/your-workspace-slug/api/v1/workspace-agent-grants/jwks/
 ```
 
-    </TabItem>
+#### Workspace authorization for Studio-managed v2 agents {#workspace-authorization-for-studio-managed-v2-agents}
 
-</Tabs>
+- `SUPERVAIZE_WORKSPACE_ID` is the exact Studio workspace slug. The owner of the API key must belong to this workspace and keep Developer access.
+- The three `SUPERVAIZER_WORKSPACE_AUTH_*` variables are necessary when the controller registers with Studio. The issuer is the Studio web origin that signs the authorization tokens. The JWKS URL uses the API origin and the `/w/<workspace-slug>/api/v1/...` route. It is public.
+- These variables are separate from `SUPERVAIZE_API_KEY` (agent → Studio) and `SUPERVAIZER_API_KEY` (Studio → controller).
+- With another Studio deployment, copy the values that this deployment generates, not these production examples.
 
-`SUPERVAIZE_WORKSPACE_ID` must be the exact Studio workspace slug. The Studio user who owns the API key must belong to this workspace and retain Developer access.
-
-### Workspace authorization for Studio-managed v2 agents
-When your controller registers with Studio and A2A is enabled, set the workspace authorization variables in addition to the API credentials above. In Studio, open **Developer → Environment variables** and copy the generated values for your workspace:
-```bash
-export SUPERVAIZER_WORKSPACE_AUTH_REQUIRED=true
-export SUPERVAIZER_WORKSPACE_AUTH_ISSUER=https://studio.supervaize.com
-export SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL=https://app.supervaize.com/w/your-workspace-slug/api/v1/workspace-agent-grants/jwks/
-```
-The issuer is the Studio web origin used to sign authorization tokens. The JWKS URL uses the Django API origin and `/w/<workspace-slug>/api/v1/...` route; it is public and provides the verification key. Copy the generated values from Studio when available. This is separate from `SUPERVAIZE_API_KEY` (agent → Studio) and `SUPERVAIZER_API_KEY` (Studio → controller). If using a different Studio deployment, use that deployment's generated values instead of these production examples.
 ### For local development only {#localdev}
 
 :::warning[Local development]
-If the agent is not deployed to a publicly accessible server, you need to install a **Tunneling** solution so that `supervaize` can operate your agent.
-Here are the instructions to [setup a tunnel for your local development](tunneling-setup)
+Studio must be able to call your controller. When the controller runs on your computer, [set up a tunnel](tunneling-setup).
 :::
 
-Store the public address of the tunnel in the `SUPERVAIZER_PUBLIC_URL` environment variable. It is a full URL, with the scheme. Studio calls your controller at this address.
+Store the public address of the tunnel in `SUPERVAIZER_PUBLIC_URL`. It is a full URL, with the scheme.
 
 ```bash
 export SUPERVAIZER_PUBLIC_URL=https://silly-peaches-chapter.loca.lt
@@ -236,55 +171,27 @@ export SUPERVAIZER_PUBLIC_URL=https://silly-peaches-chapter.loca.lt
 
 `SUPERVAIZER_HOST` is a different variable: the address that the server binds to (`0.0.0.0` by default).
 
-### Start the server 🚀 {#start}
+### Start the server {#start}
 
-<Tabs groupId="pm" queryString>
-  <TabItem value="SupervaizerCLI" label="CLI">
+With the virtual environment active:
 
-```bash
-# with the virtual environment active
-supervaizer start --env-file .env   # the file that `supervaizer login` wrote
-supervaizer start                   # when the variables are already in your shell
+```bash title="Start the controller"
+supervaizer start --env-file .env
 ```
 
-  </TabItem>
-  <TabItem value="local" label="Local mode (no Studio)">
+| Other ways to start | Command |
+| --- | --- |
+| The variables are already in your shell | `supervaizer start` |
+| No Studio, to test the agent alone. The API key is `local-dev`, and a built-in Hello World agent runs too (`SUPERVAIZER_DISABLE_HELLO_WORLD=true` hides it) | `supervaizer start --local` |
+| Debug with a direct Python call | `uv run python supervaizer_control.py` |
 
-```bash
-# Run your agents locally without Studio credentials
-supervaizer start --local
-```
-
-:::tip
-Local mode runs your agents alongside a built-in Hello World agent — no Studio account needed. Set `SUPERVAIZER_DISABLE_HELLO_WORLD=true` to hide the Hello World agent. API key defaults to `local-dev`.
-:::
-
-  </TabItem>
-  <TabItem value="direct" label="direct">
-
-:::info[Debug]
-Use the direct python call for advanced debugging
-:::
-
-```bash
-uv run python supervaizer_control.py
-```
-
-  </TabItem>
-</Tabs>
+The log shows the registration:
 
 ```
-INFO     | supervaizer.storage:__init__ - [StorageManager] 🗃️ Local DB initialized
 INFO     | supervaizer.server:__init__ - [Server launch] 🚀 Deploy Supervaizer routes
 INFO     | supervaizer.server:__init__ - [Server launch] 📢 Deploy A2A routes
-INFO     | supervaizer.server:__init__ - [Server launch] 💼 Deploy admin interface @ http://0.0.0.0:8000/manage
-INFO     | supervaizer.server:__init__ - [Server launch] API Key authentication enabled
-WARNING  | supervaizer.server:__init__ - [Server launch] Using auto-generated API key fingerprint=xxxxxxxx
 INFO     | [Server launch] Starting Supervaize Controller API
 SUCCESS  | ✅ POST Event SERVER_REGISTER sent
-INFO     | [Server launch] Updated agent Hello World Agent
-INFO:     Started server process
-INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
@@ -294,37 +201,34 @@ After the registration, the log shows the Studio page of each agent:
 SUCCESS  | [Server launch] Agent <agent-slug> in Studio: https://studio.supervaize.com/w/<workspace-slug>/agents/<agent-id>
 ```
 
-Open this page. In **Workspace Access**, a workspace admin enters the agent workspace ID and accepts the workspace authorization. With `supervaizer login`, this is your only step in Studio. See [Workspace agent grants](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_WORKSPACE_AGENT_GRANTS.md) for the reason.
+Open this page. In **Workspace Access**, a workspace admin enters the agent workspace ID and accepts the workspace authorization. With `supervaizer login`, this is your only step in Studio. [Workspace agent grants](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_WORKSPACE_AGENT_GRANTS.md) explains why.
 
-:::tip[Verify endpoints]
-Once the server is running, you'll have:
+### Check that it works {#check}
 
-- **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`
-- **A2A discovery**: `/.well-known/agents.json`
+```bash title="Check the running controller"
+curl -s http://127.0.0.1:8000/.well-known/health        # "status": "operational"
+curl -s http://127.0.0.1:8000/.well-known/agents.json   # your agents
+```
+
+- **API docs**: `http://127.0.0.1:8000/docs` (Swagger) and `/redoc`.
 - **Admin interface**: `http://127.0.0.1:8000/manage`. It opens only from a Tailscale network, or from your own computer in local mode. See the [admin documentation](ref/2025_08_ADMIN_README.md).
-  :::
+
+If something fails, see the [Troubleshooting guide](troubleshooting).
 
 ---
 
 ## What's next?
 
-- **Deploy to the cloud** using the [Cloud Deployment Guide](deploy) for production-ready hosting
-- Decide your [missions, jobs, cases and steps](core-concepts), then [build your controller](controller-setup)
-- Let a coding agent do the integration with the [Supervaizer integration skill](/docs/integrations/skills/supervaizer-integration)
-- Hook your controller into Supervaize to **monitor, audit, and operate** the agent
-
-## Need Help?
-
-If you run into issues, check the **[Troubleshooting Guide](troubleshooting)** for common problems and solutions.
-
----
+- Decide your [missions, jobs, cases and steps](core-concepts), then [build your controller](controller-setup). The [integration skill](/docs/integrations/skills/supervaizer-integration) does both with you.
+- Add capabilities: [parameters](parameters), [cost reporting](cost-reporting), [human in the loop](human-in-the-loop), [guardrail controls](rule-checkpoints), [shared resources](resources), [Configure screen](job-configurator), [analytics](job-analytics).
+- [Deploy to the cloud](deploy) for production.
 
 ## Reference
 
-- **Parameters**: see [Agent parameters and secrets](parameters)
-- **Protocol Support**: See the [Protocols documentation](ref/2026_05_PROTOCOLS.md) for A2A protocol details
-- **API docs**: visit `/docs` and `/redoc` when the server is running
+- [Agent parameters and secrets](parameters)
+- [Protocols](ref/2026_05_PROTOCOLS.md): the A2A protocol details
+- `/docs` and `/redoc` on the running server
 
 :::note
-Supervaizer is the **controller & interoperability layer**; it doesn't replace your agent framework. It makes your agent **discoverable, operable, and governable**.
+Supervaizer is the **controller and interoperability layer**. It does not replace your agent framework. It makes your agent **discoverable, operable and governable**.
 :::

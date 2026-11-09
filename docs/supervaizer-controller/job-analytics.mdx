@@ -5,6 +5,8 @@ displayed_sidebar: supervaizerControllerSidebar
 slug: job-analytics
 ---
 
+import SkillTip from "@site/src/components/SkillTip";
+
 # Job and mission analytics: build the dashboards
 
 Studio can show a dashboard of your agent's data in two places. Your agent returns one `Dashboard` document for each, and Studio draws the KPI cards, the filters and the charts.
@@ -26,9 +28,7 @@ The mission page has the same dashboard for all the jobs of the mission, with on
 The [Hello World example](https://github.com/supervaize/supervaize_hello_world) implements both surfaces in `agent_dashboard.py`.
 :::
 
-:::tip[Let a coding agent do it]
-The [Supervaizer integration skill](https://github.com/supervaize/supervaizer/tree/main/skills/supervaizer-integration) guides Claude Code, Cursor or Codex through this work. It is released with the SDK, and it reads this guide and the Hello World example, so it follows the current contract.
-:::
+<SkillTip prompt="Add an analytics dashboard to the jobs of this agent." />
 
 ## How it works
 

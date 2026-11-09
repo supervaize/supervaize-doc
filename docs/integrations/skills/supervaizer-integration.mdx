@@ -37,7 +37,21 @@ In Claude Code:
 /plugin install supervaizer-integration@supervaizer
 ```
 
-With another coding agent, clone the [SDK repository](https://github.com/supervaize/supervaizer) and point the agent to `skills/supervaizer-integration/SKILL.md`.
+With Cursor, Codex, Gemini CLI or another coding agent, clone the SDK and tell the agent to read the skill:
+
+```bash
+git clone https://github.com/supervaize/supervaizer.git
+```
+
+```text
+Read supervaizer/skills/supervaizer-integration/SKILL.md and follow it to integrate this agent with Supervaize.
+```
+
+An agent that can read the web can also start from the address of [`SKILL.md`](https://github.com/supervaize/supervaizer/blob/main/skills/supervaizer-integration/SKILL.md). A local clone is better: the skill also uses the SDK docs, the examples and its helper script.
+
+:::info[For coding agents]
+Load `SKILL.md` before you change code, and follow its order: read, interview, record, build, test and connect. The skill links to the guides of this site for each topic. Read the guide of a topic before you build it. The site index for agents is [`/llms.txt`](pathname:///llms.txt).
+:::
 
 ## Use it
 
@@ -49,9 +63,18 @@ Integrate this agent with Supervaize.
 
 To add one capability to an agent that is already connected, name it:
 
-```
-Add a human approval before the agent sends an e-mail.
-```
+| You want | Ask |
+| --- | --- |
+| The first integration | `Integrate this agent with Supervaize.` |
+| Workspace settings and secrets | `Move the API keys and settings of this agent to Supervaize parameters.` |
+| A person approves a step | `Add a human approval before the agent sends an e-mail.` |
+| Mission rules decide | `Add guardrail controls to the steps that have an effect outside the agent.` |
+| Costs on the job page | `Add cost reporting to this agent.` |
+| Data that operators edit | `Make the data that several jobs share a Supervaize resource.` |
+| Setup on the job page | `Add a Configure screen to the jobs of this agent.` |
+| Dashboards | `Add an analytics dashboard to the jobs of this agent.` |
+| Production hosting | `Deploy this controller to the cloud.` |
+| A registration that fails | `Studio refuses the registration of my agent. Find out why and fix it.` |
 
 ## What happens
 

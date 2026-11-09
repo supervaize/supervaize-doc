@@ -5,15 +5,15 @@ displayed_sidebar: supervaizerControllerSidebar
 slug: controller-setup
 ---
 
+import SkillTip from "@site/src/components/SkillTip";
+
 # Build your controller
 
 The controller is one Python file, `supervaizer_control.py`. It tells Studio what your agent can show and do, and it connects Studio's calls to your agent's code.
 
 This page builds a complete controller in six steps. Decide your [missions, jobs, cases and steps](core-concepts) first.
 
-:::tip[Let a coding agent do it]
-The [Supervaizer integration skill](/docs/integrations/skills/supervaizer-integration) asks you the design questions and then follows this guide in your project.
-:::
+<SkillTip prompt="Integrate this agent with Supervaize." />
 
 ## 1. Create the file
 
