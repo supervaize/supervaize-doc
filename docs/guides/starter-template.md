@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 
 The template is a working agent that already meets the eight requirements of the [I already have an agent](./make-your-agent-supervaize-ready) guide. You put your logic in a single file; the rest is done.
 
-**[Download the template](/files/supervaize-agent-template.zip)** (code in English, comments and README in English and French).
+**[Get the template on GitHub](https://github.com/supervaize/supervaize-agent-template)**: select **Use this template** to make your own copy, or clone it (code in English, README in English and French).
 
 ## What it contains
 
