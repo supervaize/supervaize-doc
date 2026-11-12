@@ -5,9 +5,13 @@ displayed_sidebar: supervaizerControllerSidebar
 slug: rule-checkpoints
 ---
 
+import SkillTip from "@site/src/components/SkillTip";
+
 # Guardrail controls: let mission rules decide
 
 A mission manager writes rules for a mission in Studio, for example "do not contact a competitor" or "a person must approve each refund above 500 USD". A **rule checkpoint** is the moment when your agent asks Studio: "may I do this step?". Studio judges the step against the rules and answers **allow**, **pause** or **stop**.
+
+<SkillTip prompt="Add guardrail controls to the steps that have an effect outside the agent." />
 
 ## Rule checkpoint or human in the loop?
 

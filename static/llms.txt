@@ -1,0 +1,28 @@
+# Runwaize documentation
+
+> Supervaize Studio operates AI agents: missions, jobs, cases, steps, human in the loop, guardrails and costs. The Supervaizer SDK (Python) connects an agent to Studio.
+
+To connect a Python agent to Studio, use the Supervaizer integration skill. It interviews the developer, then builds and tests the controller from the guides below.
+
+- Skill instructions: https://github.com/supervaize/supervaizer/blob/main/skills/supervaizer-integration/SKILL.md
+- Install in Claude Code: `/plugin marketplace add supervaize/supervaizer`, then `/plugin install supervaizer-integration@supervaizer`
+- Other coding agents: `git clone https://github.com/supervaize/supervaizer.git` and read `skills/supervaizer-integration/SKILL.md`
+- Complete example agent: https://github.com/supervaize/supervaize_hello_world
+
+## Supervaizer Controller guides
+
+- [Integration skill](https://docs.runwaize.com/docs/integrations/skills/supervaizer-integration): install, prompts, what the skill builds
+- [Quickstart](https://docs.runwaize.com/docs/supervaizer-controller/quickstart): install, `supervaizer login`, start, check
+- [Missions, jobs, cases and steps](https://docs.runwaize.com/docs/supervaizer-controller/core-concepts): the mapping to decide first
+- [Build your controller](https://docs.runwaize.com/docs/supervaizer-controller/controller-setup): registration, start form, job state, field definitions
+- [Parameters and secrets](https://docs.runwaize.com/docs/supervaizer-controller/parameters): workspace settings
+- [Human in the loop](https://docs.runwaize.com/docs/supervaizer-controller/human-in-the-loop): steps that wait for a person
+- [Shared resources](https://docs.runwaize.com/docs/supervaizer-controller/resources): data that several jobs use
+- [Cost reporting](https://docs.runwaize.com/docs/supervaizer-controller/cost-reporting): step and job costs
+- [Guardrail controls](https://docs.runwaize.com/docs/supervaizer-controller/rule-checkpoints): rule checkpoints that allow, pause or stop a step
+- [Configure screen](https://docs.runwaize.com/docs/supervaizer-controller/job-configurator): setup on the job page
+- [Analytics](https://docs.runwaize.com/docs/supervaizer-controller/job-analytics): job and mission dashboards
+- [Tunnel for local development](https://docs.runwaize.com/docs/supervaizer-controller/tunneling-setup)
+- [Cloud deployment](https://docs.runwaize.com/docs/supervaizer-controller/deploy): `supervaizer deploy`
+- [Network security](https://docs.runwaize.com/docs/supervaizer-controller/network-security)
+- [Troubleshooting](https://docs.runwaize.com/docs/supervaizer-controller/troubleshooting): registration and authorization errors
