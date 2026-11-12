@@ -1,0 +1,140 @@
+---
+id: setup
+title: Configurer les règles
+description: Configurez le Rule Controller, définissez la politique de règles de l'espace de travail et rédigez les règles que Jev évalue avant ou après chaque étape d'un agent.
+displayed_sidebar: supervaizeFleetSidebar
+slug: setup
+---
+
+# Règles : vérifier le travail de l'agent avant et après chaque étape {#rules-check-agent-work-before-and-after-each-step}
+
+:::caution[Bêta - Aperçu]
+Les règles avec Jev sont en aperçu. La fonctionnalité est activée par espace de travail, sur demande, et son comportement comme ses écrans peuvent changer.
+:::
+
+Une règle est une vérification écrite en langage courant, par exemple « Ne pas divulguer d'informations à diffusion restreinte ». Studio demande à **Jev**, un modèle d'évaluation de TypeSafe, si chaque étape de l'agent la respecte, puis laisse le travail continuer, le met en pause pour qu'une personne décide, ou l'arrête.
+
+- **Vous décidez de ce qui se passe.** Chaque règle est un avertissement, une porte d'approbation ou un arrêt strict.
+- **Les jobs gardent les règles avec lesquelles ils ont démarré.** Modifier une règle ne change jamais un job en cours.
+- **Tout est enregistré.** Chaque évaluation, chaque approbation et chaque modification de règle arrive dans une piste d'audit.
+
+:::info[Disponibilité]
+**Rules** se trouve dans la section **Audit** de la barre latérale. S'il est absent, demandez à Runwaize de l'activer pour votre espace de travail.
+:::
+
+## Qui peut faire quoi {#who-can-do-what}
+
+| Tâche | Rôle requis |
+| --- | --- |
+| Tester le Rule Controller | Workspace Manager ou Settings Manager |
+| Ajouter une clé Jev | Workspace Manager |
+| Définir la politique de règles, créer et modifier des règles | Workspace Manager ou Policy Maker |
+| Lire les règles, l'activité des règles et la piste d'audit | Workspace Manager, Policy Maker, Policy Auditor ou Auditor |
+| Choisir les contrôles de règles au démarrage d'un job | Toute personne qui peut exécuter des jobs |
+| Approuver, refuser ou réévaluer un point de contrôle en pause | Workspace Manager ou Policy Maker qui peut voir la mission |
+
+## Configurer en trois étapes {#set-up-in-three-steps}
+
+### 1. Configurer le Rule Controller {#1-configure-the-rule-controller}
+
+Le Rule Controller est l'identifiant Jev que Studio utilise pour évaluer les règles. Il n'y a rien à sélectionner : Studio le choisit pour vous.
+
+- **Votre espace de travail a une clé Jev active :** elle est utilisée pour chaque appel à Jev. Ouvrez **LLM Integrations** et cliquez sur **Add Jev key** sur la carte **Recommended**. Vous pouvez aussi cliquer sur **Add API key** et choisir le fournisseur **Jev (TypeSafe)**. S'il y a plusieurs clés Jev actives, celle qui a été mise à jour le plus récemment est utilisée.
+- **Votre espace de travail a une clé OpenRouter active et aucune clé Jev :** la clé OpenRouter est utilisée. OpenRouter donne accès à Jev, vous n'avez donc pas besoin d'une deuxième clé.
+- **Votre espace de travail n'a ni l'une ni l'autre :** l'identifiant géré par Runwaize est utilisé, quand Runwaize l'a activé pour votre déploiement.
+
+Pour voir la clé utilisée, ouvrez **Rules** et cliquez sur **Test controller**. La fenêtre **Rule Controller** montre **Status**, **Credential** et **Last check**. Cliquez sur **Test connection** pour lancer une vérification en direct. Le statut affiche **Ready** quand elle réussit, et **Unavailable** avec la raison quand elle échoue. Les jobs qui ont des règles actives ne peuvent pas démarrer tant qu'aucune clé n'est disponible.
+
+Pour les Workspace Managers, la fenêtre renvoie vers **LLM Integrations**. Les autres utilisateurs voient une invitation à s'adresser à un Workspace Manager.
+
+:::info[Carte Recommended]
+La carte Jev **Recommended** reste sur **LLM Integrations** jusqu'à ce que l'espace de travail ait une clé Jev active. Une clé OpenRouter ne la fait pas disparaître, mais elle donne quand même accès à Jev.
+:::
+
+Dans **LLM Integrations**, vous pouvez modifier une clé pour charger les modèles actuels du fournisseur et choisir les modèles que la clé peut utiliser.
+
+:::info[Les jobs en cours gardent leur clé]
+Un job est admis avec la clé disponible à ce moment-là, et il la garde. Ajouter ou désactiver une clé Jev ne touche que les jobs démarrés ensuite.
+:::
+
+### 2. Définir la politique de règles {#2-set-the-rule-policy}
+
+Ouvrez **Rules** et sélectionnez l'onglet **Policy**. Seuls les utilisateurs qui peuvent écrire des règles voient cet onglet. L'onglet montre **Rule policy**. Pour chaque situation, choisissez l'issue par défaut et les alternatives que la personne qui démarre un job peut choisir à la place.
+
+| Situation | Choix | Par défaut |
+| --- | --- | --- |
+| **Must-pass violation** | Stop, Pause | Stop |
+| **Approval-required violation** | Stop, Pause for approval | Pause for approval |
+| **Controller failure** (Jev injoignable, ou résultat incertain) | Stop, Pause for retry | Pause for retry |
+| **Unsupported controller** (l'agent ne peut pas exécuter les points de contrôle) | Refuse, Wait for readiness | Refuse |
+
+Cliquez sur **Save policy**. Les Policy Makers peuvent modifier la politique sans avoir accès à l'identifiant du contrôleur.
+
+### 3. Créer une règle {#3-create-a-rule}
+
+Dans **Rules**, créez une règle et remplissez deux sections.
+
+**Basics**
+
+| Champ | Ce qu'il faut saisir |
+| --- | --- |
+| **Rule name** | Un court énoncé de la règle, par exemple « Ne pas divulguer d'informations à diffusion restreinte ». |
+| **When to evaluate** | **Before a step**, **After a step**, ou **Before and after each step**. |
+| **Severity** | **Warning** enregistre le résultat et laisse le travail continuer. **Approval required** met en pause en attendant une décision autorisée. **Must pass** bloque le travail tant que la règle n'est pas respectée. |
+
+**Applies to**
+
+Une règle d'espace de travail a une section **Applies to**. Choisissez l'un des trois modes :
+
+| Mode | La règle s'applique à |
+| --- | --- |
+| **Compulsory** | Tous les agents et toutes les missions |
+| **Selected** | Seulement les **Agents** et les **Missions** que vous choisissez |
+| **On demand** | Un job, seulement quand la personne qui le démarre active la règle |
+
+Pour **Selected**, choisissez au moins un agent ou une mission. Si vous choisissez à la fois des agents et des missions, un job doit correspondre aux deux listes. Studio ne propose que les agents que votre espace de travail peut utiliser. Si une règle de ce mode n'a plus aucun agent ni aucune mission utilisable, la liste affiche « This rule no longer applies to anything. »
+
+**What to evaluate**
+
+Décrivez la condition sous **What should be checked?**, puis choisissez comment Jev répond :
+
+| Type | À utiliser pour | Comment le verdict est décidé |
+| --- | --- | --- |
+| **Check a condition** | Une question oui/non. Jev renvoie une probabilité de violation. | La règle est respectée à **Pass ≤** ou en dessous (30 % par défaut), et violée à **Violation ≥** ou au-dessus (70 % par défaut). Entre les deux, le résultat est incertain. |
+| **Rate** | Une grille ordonnée de 2 à 10 niveaux. | Vous définissez un **Cutoff** et indiquez si la règle est respectée à ce seuil et au-dessus, ou à ce seuil et en dessous. |
+| **Choose a category** | Des catégories nommées, chacune associée à respectée, violation ou incertain. | L'issue de la catégorie choisie est le verdict. |
+
+**Rate** et **Choose a category** prennent aussi une **Minimum confidence** (70 % par défaut). En dessous, le résultat est incertain. Chaque niveau et chaque catégorie a besoin d'un nom et de critères avant que vous puissiez enregistrer.
+
+Choisissez ensuite :
+
+- **Save draft** pour continuer à travailler. Les brouillons ne sont jamais évalués.
+- **Activate rule** pour l'appliquer aux jobs démarrés à partir de maintenant.
+
+Ajoutez une **Change note** quand vous modifiez une règle. Elle apparaît dans l'historique des révisions de la règle.
+
+## Où une règle s'applique {#where-a-rule-applies}
+
+Une règle appartient à un seul périmètre, et s'applique à tout ce qui se trouve en dessous :
+
+| Créée dans | S'applique à |
+| --- | --- |
+| **Rules** (espace de travail) | Les jobs qui correspondent à son mode **Applies to** |
+| L'onglet **Rules** d'une mission | Tous les jobs de cette mission |
+| L'onglet **Rules** d'un job | Ce job uniquement |
+
+La section **Applies to** n'apparaît que lorsque vous créez ou modifiez une règle d'espace de travail. Le formulaire d'une règle de mission ou d'une règle de job ne l'a pas.
+
+Sur une mission ou un job, les règles d'un périmètre supérieur sont listées comme **Inherited** et y sont en lecture seule. Modifiez-les là où elles ont été créées.
+
+## Tester une règle avant de l'activer {#test-a-rule-before-activating-it}
+
+Dans le formulaire de la règle, l'encadré **Optional test** vous permet de coller un exemple de contexte d'étape, de choisir **Before** ou **After** et de cliquer sur **Run test**. Studio montre le verdict, ou **Needs more context** quand le résultat est incertain.
+
+Le test appelle Jev mais n'exécute aucune action de l'agent, et il n'est jamais obligatoire pour activer une règle.
+
+## Désactiver une règle {#deactivating-a-rule}
+
+Cliquez sur **Deactivate** sur une règle active pour l'arrêter. La règle et ses révisions sont conservées, afin que les jobs qui ont tourné avec elle restent explicables.
+
+Ensuite : [voir ce qui se passe quand un job s'exécute avec des règles](./run-and-review).

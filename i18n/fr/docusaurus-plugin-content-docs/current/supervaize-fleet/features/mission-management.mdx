@@ -1,0 +1,120 @@
+---
+id: mission-management
+title: Créer une mission
+description: Créez une mission dans Supervaize Studio, affectez-y des agents et des collègues, et préparez-la pour son premier job.
+displayed_sidebar: supervaizeFleetSidebar
+slug: mission-management
+---
+
+import MissionCreateDemo from "@site/src/components/StudioDemo/MissionCreateDemo";
+
+# Créer une mission {#create-a-mission}
+
+Une mission regroupe le travail d'un ou de plusieurs agents autour d'un même objectif : ses jobs, ses cases, ses personnes et ses coûts. Vous la créez une fois, puis vous y lancez autant de jobs que nécessaire.
+
+- **Seul le nom est obligatoire.** Tout le reste peut être renseigné plus tard.
+- **Les agents et les personnes sont rattachés à la mission.** Ils déterminent qui peut y lancer des jobs et qui la voit.
+- **Vous arrivez sur la page de la mission**, prêt à lancer le premier job.
+
+## La créer en trois étapes {#create-it-in-three-steps}
+
+Essayez d'abord le parcours ici. Les boutons fonctionnent.
+
+<MissionCreateDemo />
+
+### 1. Ouvrir le formulaire {#1-open-the-form}
+
+Dans la barre latérale, ouvrez **Missions** et cliquez sur **New Mission** en haut à droite.
+
+:::info[Vous devez avoir le droit de gérer les missions]
+Le bouton **New Mission** n'apparaît que pour les membres qui peuvent gérer les missions. Si vous ne le voyez pas, adressez-vous à un administrateur de l'espace de travail.
+:::
+
+### 2. Remplir le formulaire {#2-fill-in-the-form}
+
+| Champ | Ce qu'il faut saisir | Valeur par défaut |
+| --- | --- | --- |
+| **Name** | Le seul champ obligatoire | |
+| **Description** | À quoi sert la mission | Vide |
+| **Status** | Draft, In Progress, Completed, On Hold ou Cancelled | Draft |
+| **Priority** | Low, Medium ou High | Low |
+| **Budget (USD)** | Le montant que vous prévoyez de dépenser | 0.00 |
+| **Start Date / End Date** | La période prévue | Vide |
+| **Progress (%)** | Un nombre de 0 à 100 que vous réglez à la main | 0 |
+| **Tags** | Saisissez un tag, puis appuyez sur Entrée ou tapez une virgule | Aucun |
+| **Agents** | Cherchez par nom ou par slug et choisissez-en un ou plusieurs | Aucun |
+| **Users** | Cherchez par nom ou par e-mail et choisissez les collègues concernés | Aucun |
+| **Default messaging channel** | Où vont les messages de la mission | Aucun canal par défaut |
+
+:::tip[Ajoutez au moins un agent]
+Un job exécute toujours un agent de la mission. Sans agent sur la mission, il n'y a rien à lancer.
+:::
+
+### 3. Créer {#3-create}
+
+Cliquez sur **Create Mission**. Studio ouvre la page de la nouvelle mission. De là, [lancez un job](./job-management.mdx).
+
+## Raccourci : créer une mission depuis un agent {#shortcut-create-a-mission-from-an-agent}
+
+Sur la page d'un agent, **New Mission** ouvre une boîte de dialogue plus courte, en deux étapes :
+
+1. **Select Objective** : Debug, Experiment, Operate ou Collaborate.
+2. **Confirm Mission** : vérifiez le nom proposé (par exemple _Mission to operate agent Aidan_) et laissez **Create Job** coché ou décochez-le.
+
+Lorsque **Create Job** est coché, Studio crée la mission et un premier job pour cet agent, puis ouvre le job. Lorsqu'il est décoché, Studio ouvre la mission.
+
+## Retrouver et modifier des missions {#find-and-edit-missions}
+
+Sur la page **Missions** :
+
+- **Cherchez et filtrez** par statut, par agent ou par utilisateur.
+- **Changez la disposition** entre **Card view** et **List view**.
+- **Triez** par Name, Status, Created date ou Updated date. Le tri par défaut est Updated date, du plus récent au plus ancien.
+
+Pour modifier une mission, ouvrez-la, ouvrez le menu **Actions** et choisissez **Edit**. Le même formulaire s'ouvre, sans **Tags**, avec en plus les interrupteurs d'évaluation : **Rate this mission**, **Rate jobs** et **Rate cases**. Le menu **Actions** contient aussi **Clone** et **Archive mission**.
+
+:::info[Tags d'une mission existante]
+Utilisez la ligne de titre de la page de la mission. **Add tag** ouvre une liste des tags de l'espace de travail dans laquelle vous pouvez chercher, avec une ligne **Create**. Chaque clic est enregistré immédiatement.
+:::
+
+La liste des missions affiche **Last updated**. Il s'agit de la date de la dernière modification d'un job, d'un case ou d'une étape. Ce n'est pas la date de la dernière modification de la mission. **Updated date** trie sur cette date. Chaque carte montre les agents (avatars carrés), les personnes (avatars ronds), les tags et le nombre de cases.
+
+:::warning[Terminer une mission qui a des jobs actifs]
+Si vous passez le statut à **Completed** alors que des jobs sont encore en cours, Studio vous demande quoi faire : **Complete only** laisse ces jobs tourner, **Complete and close jobs** les clôt immédiatement.
+:::
+
+## La page d'une mission {#the-mission-page}
+
+| Zone | Ce que vous y trouvez |
+| --- | --- |
+| **← Back to Missions** | Un lien au-dessus du titre |
+| Carte **Mission** | Le statut, la priorité, la date de début, le budget et la progression sur une seule ligne. **Show details** ouvre la description complète, le résumé par IA et le canal de messagerie par défaut. |
+| **Agents** et **Users** | Les agents et les personnes de la mission. Les responsables de mission ouvrent ici les **Permissions** des participants. |
+| **Schedules** | Les planifications de la mission, avec un bouton **Schedule**. Cette zone apparaît lorsque la fonctionnalité est activée pour votre espace de travail. |
+| **Jobs** | Les jobs, avec leur nombre. Une bordure gauche colorée indique le statut : vert pour terminé, bleu pour en cours, orange pour en attente ou arrêté, rouge pour en échec. |
+| **Context** | Les éléments de contexte de la mission. Cette zone apparaît lorsque le contexte est activé pour votre espace de travail. Voir [Gestion du contexte](./context-management.mdx). |
+| **Rules** | Les règles de la mission. Cette zone apparaît lorsque les règles sont activées pour votre espace de travail. |
+
+## Depuis Claude ou ChatGPT {#from-claude-or-chatgpt}
+
+Avec le [connecteur MCP Supervaize](../mcp-connector/install.mdx) et la permission **Write**, demandez :
+
+> Crée une mission nommée « Q4 Check-ins » et affectes-y Aidan.
+
+## Dépannage {#troubleshooting}
+
+| Symptôme | Cause | Solution |
+| --- | --- | --- |
+| Pas de bouton **New Mission** | Votre rôle ne permet pas de gérer les missions | Adressez-vous à un administrateur de l'espace de travail |
+| « Mission name is required. » | Le nom est vide | Saisissez un nom |
+| Un agent manque dans la liste **Agents** | L'agent n'est pas disponible dans cet espace de travail | Ajoutez ou partagez d'abord l'agent, voir [Gestion des agents](./agent-management.mdx) |
+| Pas de bouton **New Job** sur la mission | Vous n'êtes pas autorisé à lancer des jobs dans cette mission | Demandez au responsable de la mission de vous ajouter |
+
+## Vocabulaire {#vocabulary}
+
+| Terme | Signification |
+| --- | --- |
+| **Mission** | Regroupe le travail d'un ou de plusieurs agents |
+| **Job** | Une exécution d'un agent à l'intérieur d'une mission |
+| **Case** | L'unité de travail de l'agent à l'intérieur d'un job, par exemple un entretien ou un ticket |
+| **Étape** | Un événement ordonné d'un case ; certaines étapes attendent une réponse humaine |

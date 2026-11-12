@@ -39,11 +39,11 @@ Good for:
 
 - existing webhook workflows
 - quick onboarding
-- no HITL (human approval) steps required
+- no human-in-the-loop (human approval) steps required
 
 ### 2. MCP reporting (advanced)
 
-Use this when you want rich progress reporting and Human-in-the-Loop (HITL).
+Use this when you want rich progress reporting and human-in-the-loop steps.
 
 What you need:
 
@@ -212,7 +212,7 @@ In zero-touch mode:
 In MCP mode:
 
 - progress depends on what your MCP Client nodes report
-- HITL steps can pause the workflow until a user responds in Supervaize
+- Human-in-the-loop steps can pause the workflow until a user responds in Supervaize
 
 ## Human-in-the-Loop (MCP Mode)
 
@@ -280,7 +280,7 @@ Notes:
 
 What it is:
 
-- MCP/HITL example
+- MCP and human-in-the-loop example
 - Includes multiple `MCP Client` nodes and a `Wait` node
 - Shows an advanced pattern for human decision steps
 
@@ -296,13 +296,13 @@ How to use it:
 
 Important:
 
-- This example requires MCP node configuration inside n8n. It will not provide HITL behavior in zero-touch mode.
+- This example requires MCP node configuration inside n8n. It will not provide human-in-the-loop behavior in zero-touch mode.
 
 Recommended onboarding path:
 
 1. Start with `hello_world_zero_touch.json`
 2. Move to `zero_touch_exp_1.json`
-3. Use `HITL_exp.json` when you need approvals/HITL
+3. Use `HITL_exp.json` when you need approvals or human-in-the-loop steps
 
 ## Troubleshooting
 
@@ -331,7 +331,7 @@ Check:
 - n8n server is reachable from Supervaize
 - Agent has `n8n_api_key` configured
 
-### No HITL step appears in Supervaize
+### No human-in-the-loop step appears in Supervaize {#no-hitl-step-appears-in-supervaize}
 
 Check:
 
@@ -343,7 +343,7 @@ Check:
 
 ## Best Practices
 
-- Use zero-touch first unless you specifically need HITL.
+- Use zero-touch first unless you specifically need human-in-the-loop steps.
 - Keep parameter names stable (`API_KEY`, `PHONE_NUMBER`, etc.) so existing Agent config remains reusable.
 - Mark secrets as secret parameters in the link form.
 - Add a simple webhook-based smoke test workflow before linking a production workflow.

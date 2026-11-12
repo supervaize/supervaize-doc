@@ -1,0 +1,204 @@
+---
+id: setup
+title: Configurer une campagne Aidan
+description: Préparez le contenu d'une campagne d'entretiens Aidan, puis créez-la, configurez-la et lancez-la depuis Supervaize Studio.
+displayed_sidebar: supervaizeFleetSidebar
+slug: setup
+---
+
+# Configurer une campagne d'entretiens Aidan {#set-up-an-aidan-interview-campaign}
+
+**Aidan** est l'intervieweur IA de Runwaize. Une campagne inscrit des participants, Aidan mène un entretien avec chacun d'eux, à la voix ou sur le web, et chaque entretien devient une transcription et un résumé qui alimentent une synthèse de campagne unique.
+
+Vous pilotez toute la campagne depuis un job Studio :
+
+- **Un job, c'est une campagne.** La page du job est l'endroit où vous la configurez, la lancez, la suivez et la clôturez.
+- **La configuration est verrouillée au lancement.** Les paramètres et le scénario passent en lecture seule dès que la campagne est en ligne. Les participants restent modifiables.
+- **Studio n'envoie aucun e-mail.** Vous partagez un lien d'inscription unique, ou vous exportez le lien personnel de chaque participant et vous envoyez les invitations vous-même.
+
+:::info[Disponibilité]
+Aidan doit être enregistré dans votre espace de travail et ajouté à une mission. Les modèles de campagne sont préparés avec Runwaize. Si Aidan ne figure pas parmi vos agents, contactez Runwaize.
+:::
+
+## Avant de commencer : préparer le contenu {#before-you-start-prepare-the-content}
+
+Rassemblez ces éléments avant d'ouvrir Studio. Runwaize utilise les trois premiers pour préparer votre modèle de campagne.
+
+| Élément | Ce qu'il faut fournir |
+| --- | --- |
+| **Contexte de la campagne** | Une courte présentation de l'organisation concernée par la campagne : ce qu'elle fait, la terminologie et les abréviations que les participants emploient, et tout ce dont Aidan a besoin pour interpréter les réponses. Gardez-le séparé des objectifs. |
+| **Public** | Qui sont les participants (salariés, utilisateurs externes, autre groupe), leur relation avec l'organisation, et ce qu'ils sont censés savoir. |
+| **Avertissement** | Les termes exacts que les participants voient et doivent accepter avant le début de l'entretien. Le responsable de la campagne fournit et valide la formulation. |
+| **Nom et description de la campagne** | Le nom sert de référence à la campagne. La description présente la campagne aux participants en deux ou trois phrases. |
+| **Responsable de la campagne** | Le nom et l'e-mail de la personne responsable. Les deux sont affichés sur les pages d'inscription et d'entretien. |
+| **Dates** | La date de fin, après laquelle les entretiens ne sont plus acceptés. La date de début est le jour de création de la campagne. |
+| **Mode d'inscription** | Inscription libre, invitations individuelles, ou les deux. Voir [Inscrire les participants](#3-enrol-participants). |
+| **Anonymat** | Si les entretiens sont attribués aux participants ou anonymisés. Voir [Anonymat](#anonymity). |
+| **Scénario** | Les questions, les thèmes et l'ordre de la conversation, dans un fichier Markdown. Voir [Rédiger un scénario](./scenario). |
+
+<details>
+<summary>Exemple d'avertissement</summary>
+
+```md
+## Avant de commencer
+
+Vous allez avoir une conversation avec un intervieweur IA, et non avec un humain.
+
+### Enregistrement et utilisation des données
+
+La conversation sera **enregistrée et transcrite**. Ces données serviront à :
+
+- Établir une base pour comprendre le contexte, les priorités et les difficultés actuels de votre organisation
+- Identifier les thèmes pertinents, les opportunités et les sujets à approfondir
+- Nous aider à préparer des analyses, des enseignements et d'éventuelles recommandations de suivi
+
+### Votre participation
+
+Votre participation est **volontaire**.
+
+- Vous pouvez arrêter la conversation à tout moment
+- Vous n'êtes pas obligé de répondre à toutes les questions
+- Évitez de partager des informations confidentielles, sensibles ou personnelles, sauf si la discussion l'exige
+```
+
+Indiquez où les enregistrements et les transcriptions sont stockés si votre organisation l'exige.
+
+</details>
+
+## Configuration guidée dans le chat {#guided-setup-in-the-chat}
+
+Certains agents permettent de faire la configuration dans le chat. Cette possibilité apparaît quand le chat est activé pour votre espace de travail.
+
+- Un panneau à côté du chat montre le plan de configuration. Il liste les étapes et les champs, avec les vérifications faites sur chaque valeur et un coût estimé.
+- Vous pouvez coller un scénario dans le chat. L'assistant exécute une action d'aide de l'agent sur le brouillon. Il montre le texte proposé et les modifications. Studio n'enregistre le texte qu'après votre acceptation.
+- Cliquez sur **Review and launch** pour vérifier le plan et démarrer le job.
+- Cliquez sur **Start fresh** pour commencer un nouveau plan. Votre travail précédent est conservé.
+
+[Créer un job](../features/job-management#guided-setup-chat) décrit le chat en détail. Les cinq étapes ci-dessous utilisent le formulaire du job.
+
+## Configurer en cinq étapes {#set-up-in-five-steps}
+
+### 1. Créer le job {#1-create-the-job}
+
+Ouvrez la mission qui contient Aidan et cliquez sur **New Job**. Aidan demande quelle campagne le job gère :
+
+| Champ | Ce qu'il faut saisir |
+| --- | --- |
+| **Campaign** | **Create new campaign** démarre une nouvelle campagne. **Use existing campaign** relie le job à une campagne que vous avez déjà. |
+| **Campaign template (optional)** | Un modèle apporte ses réglages et un scénario par défaut. Laissez le champ vide pour partir de zéro. |
+| **Campaign name** | Le nom que voit votre équipe. Il doit être unique dans votre espace de travail. |
+| **Description** | Une courte note sur l'objet de la campagne. |
+
+Le même formulaire contient les quatre réglages décrits à l'étape suivante.
+
+:::note[Campagnes existantes]
+Les campagnes déjà gérées par un autre job ne sont pas listées. Relier une campagne déjà en cours place directement le job à l'état en ligne : il n'y a pas d'étape de lancement, et les [sections de suivi](./monitor) sont disponibles aussitôt.
+:::
+
+Le job s'ouvre sur son onglet **Configure**, avec une section pour chacune des étapes ci-dessous.
+
+### 2. Vérifier les paramètres {#2-check-the-parameters}
+
+Ouvrez **Parameters**, ajustez les réglages et cliquez sur **Save parameters**.
+
+| Réglage | Effet | Par défaut |
+| --- | --- | --- |
+| **Allow contact registration** | Les personnes peuvent s'inscrire elles-mêmes par un lien d'inscription public, en plus des participants que vous ajoutez. | Désactivé |
+| **Anonymized** | Les participants apparaissent sous la forme « Participant 1 », « Participant 2 » et les transcriptions ne sont pas affichées. | Désactivé |
+| **Session links expire after use** | Activé : chaque lien d'entretien fonctionne une seule fois. Désactivé : les participants peuvent rouvrir leur lien après l'entretien. | Activé |
+| **End date** | La campagne se clôture automatiquement quand cette date est atteinte (minuit UTC). Laissez le champ vide pour clôturer la campagne vous-même. | Vide |
+
+**Name**, **Description**, **Created (start date)** et **Campaign owner** sont affichés en lecture seule.
+
+### 3. Inscrire les participants {#3-enrol-participants}
+
+Ouvrez **Participants**. Il y a trois façons de faire entrer des personnes, et vous pouvez les combiner.
+
+| Méthode | Comment | Quand l'utiliser |
+| --- | --- | --- |
+| **Enrol contact** | Cherchez parmi les contacts de votre espace de travail, par nom ou par e-mail, et choisissez-en un. | Vous ajoutez quelques personnes qui sont déjà des contacts. |
+| **Import contacts** | Collez un texte CSV avec une ligne d'en-tête. Les nouveaux e-mails deviennent des contacts de l'espace de travail, et chaque ligne est inscrite. | Vous avez une liste de participants définie. |
+| **Inscription libre** | Activez **Allow contact registration** et partagez le lien d'inscription. Les participants s'inscrivent avec leur prénom, leur nom et leur adresse e-mail. | Vous voulez diffuser un seul lien commun. |
+
+Colonnes du CSV : `email` est obligatoire. `first_name`, `last_name`, `phone_number`, `language`, `timezone`, `city`, `country` et `title` sont facultatives.
+
+```csv
+email,first_name,last_name,language,timezone,country,title
+jordan.lee@example.com,Jordan,Lee,en,Europe/Paris,FR,Operations Lead
+sam.rivera@example.com,Sam,Rivera,es,America/Bogota,CO,Analyst
+```
+
+Utilisez les noms IANA pour `timezone`, par exemple `Europe/Paris`.
+
+### 4. Rédiger le scénario {#4-write-the-scenario}
+
+Ouvrez **Scenario**. L'éditeur contient la partie de la conversation propre à la campagne. Le ton d'Aidan, la sécurité et la gestion de la conversation sont déjà intégrés.
+
+- **Modifiez et enregistrez.** Cliquer sur **Save** sur un texte modifié crée une nouvelle version, et la campagne l'utilise.
+- **Importez un fichier.** **Upload file** remplace le texte d'un bloc par un fichier `.txt` ou `.md`. Le fichier peut peser 200 Ko au plus.
+- **Utilisez les actions d'aide.** Les actions d'aide de l'agent apparaissent sous forme de boutons. Une proposition n'est appliquée que lorsque vous sélectionnez **Use this**. Rien n'est enregistré tant que vous n'enregistrez pas.
+- **Revenez à une version antérieure.** Choisissez-la dans la liste **Version** et enregistrez. La liste signale la version **latest** et celle qui est **in use**.
+- **Lisez l'aperçu compilé.** Il montre votre scénario à l'intérieur du cadre complet de l'entretien.
+- **Corrigez chaque ligne bloquée.** La validation affiche **Scenario ready**, ou **Scenario not ready** avec une ligne par raison, par exemple un texte vide ou une variable qui ne se résout en rien.
+
+[Rédiger un scénario](./scenario) explique quoi y mettre et quelle longueur il peut avoir.
+
+### 5. Vérifier et lancer {#5-review-and-launch}
+
+Ouvrez **Review & launch**. La liste de contrôle doit être entièrement verte :
+
+1. **Enrol at least one participant** (Participants)
+2. **Save a scenario** (Scenario)
+3. **Campaign is ready to launch**
+
+Cliquez sur **Launch campaign** et confirmez.
+
+:::warning[Le lancement est irréversible]
+Après le lancement, **Parameters** et **Scenario** sont en lecture seule. Testez avant de lancer une campagne avec de vrais participants.
+:::
+
+## Inviter les participants {#invite-participants}
+
+Ouvrez **Links & exports**.
+
+| Élément | Ce que vous obtenez |
+| --- | --- |
+| **Registration link** | La page d'inscription partagée. Listée seulement quand **Allow contact registration** est activé. |
+| **Invite links (CSV)** | Une ligne par participant : `first_name`, `last_name`, `email`, `status`, `interview_url`. |
+
+Envoyez les invitations depuis votre propre outil de messagerie, avec le lien d'inscription ou l'`interview_url` de chaque participant. Décidez à l'avance qui les envoie et ce que dit le message.
+
+## Anonymat {#anonymity}
+
+| Mode | Ce que cela signifie | Comment le régler |
+| --- | --- | --- |
+| **Identifié** | Chaque entretien est rattaché à son participant. | Laissez **Anonymized** désactivé. |
+| **Entièrement anonymisé** | Les participants sont numérotés. Les transcriptions, le prompt utilisé et l'export des données de campagne ne sont jamais disponibles dans Studio. Seuls les résumés le sont. | Activez **Anonymized** avant le lancement. |
+| **Sur demande** | Aidan indique au participant qu'il peut demander la confidentialité pendant l'entretien. Pour ces entretiens, la transcription, le résumé et le prompt ne sont pas communiqués. | Incluez la formulation sur la confidentialité dans l'introduction du scénario. |
+
+## Tester avant la mise en ligne {#test-before-you-go-live}
+
+Parcourez d'abord tout le parcours du participant sur une campagne de test.
+
+:::note[Mode test]
+Quand le mode test est activé pour votre espace de travail, un nouveau job démarre en mode test. Ses premiers cases sont des cases de test. Un responsable de mission sélectionne **Go live** quand la campagne est prête. Voir [Test et production](../features/job-navigation#testing-and-production). Sans mode test, testez sur un job séparé.
+:::
+
+1. Ouvrez le lien d'inscription, ou un lien d'entretien personnel.
+2. Vérifiez les informations d'inscription et les conditions affichées avant l'entretien.
+3. Menez un entretien jusqu'au bout. Évaluez la pertinence, la clarté, le déroulé et la durée.
+4. Essayez chaque chemin du scénario, avec des réponses courtes, typiques et longues.
+5. Révisez le scénario et testez de nouveau.
+6. Confirmez la version validée, la date de lancement et qui envoie les invitations.
+
+## Liste de contrôle {#checklist}
+
+- [ ] Contexte de la campagne, public et date de fin
+- [ ] Nom, description et avertissement de la campagne
+- [ ] Nom et e-mail du responsable de la campagne
+- [ ] Mode d'inscription, et le CSV des participants pour les invitations individuelles
+- [ ] Choix de l'anonymat
+- [ ] Scénario (fichier Markdown)
+- [ ] Message d'invitation et expéditeur
+
+Ensuite : [suivre la campagne une fois en ligne](./monitor).

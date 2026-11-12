@@ -1,0 +1,220 @@
+---
+id: scenario
+title: Rédiger un scénario
+description: Conseils pour rédiger un scénario d'entretien Aidan - résultats attendus, déroulé, embranchements, budget de taille et contexte du participant.
+displayed_sidebar: supervaizeFleetSidebar
+slug: scenario
+---
+
+# Rédiger un scénario Aidan {#write-an-aidan-scenario}
+
+Un scénario est la conception d'un entretien, propre à une campagne. Il dit pourquoi l'entretien existe, qui est interrogé, ce qu'il faut apprendre, dans quel ordre, et comment la conversation se termine.
+
+- **Ce n'est pas un prompt complet.** Le ton d'Aidan, son écoute, ses relances, la sécurité et la gestion technique sont intégrés. Laissez-les de côté.
+- **Partez des résultats attendus.** Chaque question doit servir quelque chose que l'entretien doit permettre de savoir.
+- **Restez court et plutôt linéaire.** Visez 4 000 à 7 000 caractères. Un avertissement de taille s'affiche au-delà d'environ 12 000 caractères.
+
+:::tip[Rédiger avec un assistant IA]
+Indiquez cette page à votre assistant quand vous lui demandez de rédiger un scénario.
+:::
+
+## Laisser de côté le comportement de la plateforme {#leave-platform-behaviour-out}
+
+N'écrivez pas d'instructions sur :
+
+- le ton de la voix, la chaleur, l'empathie ou le style de conversation ;
+- le fait de poser une question à la fois, d'écouter ou de garder des questions concises ;
+- les relances, clarifications, résumés et transitions génériques ;
+- l'adaptation de la langue au participant ;
+- les interruptions, les pauses, la reconnexion ou toute autre gestion technique ;
+- les garde-fous habituels de sécurité, de confidentialité et de consentement ;
+- l'ouverture, la clôture, les remerciements et le retour d'expérience génériques.
+
+Les répéter rend le scénario plus long, plus fragile, et plus susceptible d'entrer en conflit avec les améliorations de la plateforme.
+
+N'ajoutez une telle instruction que pour une **exception précise** : une mention légale obligatoire, un sujet interdit, une formulation exacte validée. Testez d'abord avec les réglages par défaut, observez un échec, puis faites la plus petite modification possible.
+
+## Partir des résultats attendus {#start-from-the-required-outputs}
+
+Avant d'écrire les questions, listez ce que l'entretien doit établir. Pour chaque résultat, définissez :
+
+- le champ, l'enseignement, la décision ou l'hypothèse ;
+- les éléments de preuve nécessaires pour l'étayer ;
+- s'il est obligatoire ou facultatif ;
+- ce qui reste confidentiel, attribuable ou anonymisé.
+
+Supprimez les questions qui sont seulement intéressantes.
+
+## Construire le déroulé {#build-the-flow}
+
+Voici une séquence par défaut. Les entretiens courts peuvent fusionner des phases.
+
+| Phase | Objectif |
+| --- | --- |
+| **1. Contexte et qualification** | Confirmer le rôle du participant et sa pertinence. Ne demandez pas ce qui est déjà connu. |
+| **2. Situation actuelle** | Ce qui se passe aujourd'hui, à travers des exemples récents et concrets. |
+| **3. Expérience et preuves** | Ce qui a fonctionné, ce qui a échoué, à quelle fréquence, avec quelles conséquences. |
+| **4. Besoins, obstacles et arbitrages** | Besoins non satisfaits, causes profondes, contraintes, priorités concurrentes. |
+| **5. État futur ou options** | Résultats souhaités et changements envisagés, seulement une fois la situation actuelle claire. |
+| **6. Priorisation** | Forcer un choix : ce qui compte le plus, ce qui vient en premier. |
+| **7. Clôture** | Vérifier l'interprétation principale, recueillir ce qui a été oublié, annoncer la suite. |
+
+Pour chaque section, écrivez un **objectif**, les **questions essentielles** et les **éléments de preuve à obtenir**. Ne rédigez pas de formulations alternatives. C'est Aidan qui mène la conversation.
+
+Les bonnes questions suivent un chemin de preuve :
+
+- Commencez assez large pour ne pas imposer vos hypothèses.
+- Passez d'une affirmation générale à un exemple récent et précis.
+- Quantifiez quand c'est utile : fréquence, temps, coût, volume.
+- Ne posez des questions hypothétiques qu'une fois les faits établis.
+- Évitez les questions composées, orientées ou qui contiennent la réponse.
+
+## Créer des embranchements à bon escient {#branch-deliberately}
+
+N'ajoutez un embranchement que lorsqu'une réponse doit changer la suite. Chaque embranchement a besoin de son propre test de bout en bout.
+
+Écrivez chaque embranchement ainsi :
+
+> **Condition** → **Objectif** → **Sujets ou preuves à recueillir** → **Point de retour ou sortie**
+
+Embranchements typiques : le participant a utilisé le produit ou non, a une expérience directe ou indirecte, est décideur ou contributeur, ou manque de temps. Chaque embranchement rejoint le déroulé principal ou définit une sortie anticipée claire.
+
+## Maîtriser la taille et la durée {#control-size-and-time}
+
+Une instruction de rythme ne corrige pas un scénario trop gros. Dimensionnez-le avant d'écrire.
+
+| Taille du scénario | Embranchements de premier niveau |
+| --- | --- |
+| Moins de 6 000 caractères | 2 au plus |
+| 6 000 à 9 000 caractères | 3 au plus |
+| Plus de 9 000 caractères | 4 au plus, chacun justifié |
+
+Classez chaque section :
+
+- **À couvrir impérativement** : nécessaire pour un entretien valide. Jamais sautée.
+- **À couvrir si pertinent** : déclenchée par le contexte ou les réponses du participant.
+- **Approfondissement facultatif** : seulement s'il reste du temps.
+
+Une répartition qui fonctionne pour 5 500 caractères :
+
+| Phase | Part |
+| --- | --- |
+| Contexte et qualification | 10 % |
+| Situation actuelle | 30 % |
+| Expérience et preuves | 25 % |
+| Besoins, obstacles, arbitrages | 20 % |
+| Priorisation et clôture | 15 % |
+
+Si une phase demande plus de 35 %, le scénario essaie d'être deux entretiens.
+
+**Estimez la durée à partir du dialogue, pas du nombre de questions.** Chaque thème de fond coûte trois à cinq tours de parole. Un entretien de cinq minutes supporte deux ou trois thèmes.
+
+## N'utiliser que le contexte qui existe {#use-only-the-context-that-exists}
+
+Les variables sont remplacées au moment de l'entretien. N'utilisez que celles ci-dessous.
+
+| Type | Variables |
+| --- | --- |
+| Espace de travail et campagne | `{{ tenant.name }}`, `{{ campaign.name }}`, `{{ campaign.caller_name }}` |
+| Date et heure | `{{ interview_date }}`, `{{ session.localtime }}` |
+| Participant | `{{ contact.first_name }}`, `{{ contact.last_name }}`, `{{ contact.email }}`, `{{ contact.city }}`, `{{ contact.country }}`, `{{ contact.timezone }}`, `{{ contact.greeting }}`, `{{ contact.greeting_style }}` |
+| Métadonnées du participant | `{{ contact.metadata.<key> }}`, définies par campagne |
+
+La liste des variables de l'éditeur de scénario montre les variables disponibles au moment de l'appel.
+
+Règles :
+
+1. **Ne référencez jamais un champ absent du tableau ou de la liste des variables.** `{{ contact.role }}` ou `{{ contact.company }}` ne sont pas résolus, et la validation bloque le scénario.
+2. **N'écrivez pas de variables en prose.** « Utilise la biographie du participant comme base » pousse Aidan à inventer une biographie. Si l'information n'est pas chargée, demandez-la.
+3. **Vérifiez les métadonnées de chaque participant.** Une clé renseignée pour la plupart des participants passe les tests et casse en production.
+4. **La mémoire des sessions précédentes n'est pas garantie.** Un premier entretien n'en a aucune. Tout « comme vous l'avez dit la dernière fois » a besoin d'un chemin pour les deux cas.
+5. **Demander coûte du temps.** Ne recueillez que ce dont dépend un résultat attendu.
+
+## Exemple de scénario {#example-scenario}
+
+Une base neutre de 15 à 20 minutes. Remplacez `[technologie]` et les formulations entre crochets par les vôtres.
+
+````md
+# Pratique professionnelle et technologie émergente
+
+## Objet
+Comprendre comment un participant utilise actuellement [technologie] dans son
+propre travail, au sein de son équipe et avec ses clients. Identifier les usages
+concrets, la valeur démontrée, les limites, les obstacles et la principale
+opportunité pour les six prochains mois.
+
+## Résultats attendus
+- Rôle du participant et contexte de travail.
+- Au moins un exemple concret d'usage actuel, ou la confirmation du non-usage.
+- Valeur observée, limites et critères de décision.
+- Principal obstacle ou besoin non satisfait.
+- Une opportunité priorisée et une première étape plausible.
+
+## Déroulé
+
+### Introduction
+- {{ contact.greeting }}
+- « Merci d'avoir pris ce temps. Je suis Aidan, je vous contacte de la part de
+  [commanditaire]. »
+- Énoncer l'objectif de la discussion.
+- Indiquer comment l'entretien sera utilisé, et que le participant peut demander
+  à tout moment que la discussion reste confidentielle. Demander si tout est
+  clair.
+
+### 1. Rôle et contexte actuel
+Objectif : établir les responsabilités et les priorités du moment.
+- « Quelles responsabilités retiennent le plus votre attention en ce moment ? »
+Preuves : rôle, priorités actuelles, contexte de l'équipe.
+
+### 2. Pratique individuelle
+Objectif : comprendre le comportement réel, la valeur et les limites.
+- « Où [technologie] apparaît-elle aujourd'hui dans votre propre travail, si
+  c'est le cas ? »
+- « Pouvez-vous me décrire un exemple récent ? »
+- « Qu'est-ce qui a changé en conséquence : temps, qualité, coût, risque ? »
+- « Dans quels cas s'est-elle montrée peu fiable ou inadaptée ? »
+Si le participant ne l'utilise pas :
+- « Qu'est-ce qui vous a empêché ou dissuadé de l'utiliser ? »
+Preuves : activité et fréquence, résultat observable, raison du non-usage.
+
+### 3. Pratique de l'équipe
+À poser seulement si le participant a une visibilité sur une équipe.
+- « Comment [technologie] est-elle utilisée dans votre équipe, si elle l'est ? »
+- « Qu'est-ce qui semble favoriser ou freiner un usage efficace ? »
+
+### 4. Obstacles et opportunité
+- « Où se trouve le plus grand besoin ou la plus grande opportunité non
+  traités ? »
+- « Qu'est-ce qui bloque actuellement les progrès ? »
+- « Si un seul changement pouvait être fait dans les six prochains mois, lequel
+  faudrait-il choisir ? »
+Preuves : une opportunité priorisée, l'obstacle principal, la première étape.
+
+### 5. Conclusion
+- Résumer deux ou trois constats pour confirmation.
+- « Quel point important n'avons-nous pas abordé ? »
+
+## Embranchements
+- **Pas d'usage direct :** se concentrer sur les raisons et les conditions d'un
+  essai, puis passer à Pratique de l'équipe.
+- **Pas de visibilité sur l'équipe :** sauter Pratique de l'équipe.
+- **Temps insuffisant :** Pratique individuelle, Obstacles et opportunité,
+  Conclusion.
+
+## Critères de fin
+L'entretien est terminé quand chaque résultat attendu est étayé par des preuves
+concrètes, ou explicitement noté comme inconnu ou sans objet.
+````
+
+## Relecture finale {#final-review}
+
+- [ ] L'objet nomme-t-il la décision que l'entretien éclaire ?
+- [ ] Chaque question est-elle rattachée à un résultat attendu ?
+- [ ] Le déroulé va-t-il des faits vers l'interprétation et la priorisation ?
+- [ ] Chaque embranchement peut-il rejoindre le chemin principal ?
+- [ ] Le périmètre est-il réaliste pour la durée annoncée, et testé avec des réponses courtes, typiques et longues ?
+- [ ] Chaque élément de contexte sur le participant est-il soit chargé, soit demandé ?
+- [ ] Les instructions de ton et de comportement ont-elles été retirées ?
+- [ ] Les résultats seront-ils comparables d'un entretien à l'autre ?
+
+Ensuite : [configurer la campagne dans Studio](./setup).

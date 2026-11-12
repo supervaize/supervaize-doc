@@ -1,0 +1,152 @@
+---
+id: resources
+title: Ressources partagées
+displayed_sidebar: supervaizerControllerSidebar
+slug: resources
+---
+
+# Ressources partagées {#shared-resources}
+
+Une **ressource** est une donnée métier qui appartient à votre agent et que plusieurs jobs utilisent : des contacts, des prompts, des produits, des modèles. Quand vous déclarez une ressource, Studio peut la lister, la modifier et l'importer, et vos formulaires peuvent proposer ses éléments comme choix. Vous n'écrivez aucune interface utilisateur.
+
+![La ressource Contacts de l'agent Hello World dans Studio](/img/controller/resource-contacts.png)
+
+## Quand en ajouter une {#when-to-add-one}
+
+- Les mêmes données sont utilisées par plus d'un job.
+- Les opérateurs doivent voir ou corriger les données sans l'aide d'un développeur.
+- Un formulaire doit permettre à l'opérateur de choisir un élément existant.
+
+Des données qui n'appartiennent qu'à un seul job ne sont pas une ressource. Placez-les dans les cases du job, ou sur l'[écran Configure](job-configurator).
+
+## 1. Déclarer la ressource {#1-declare-the-resource}
+
+```python
+registration = build_v2_agent_registration(
+    agent_slug="my-agent",
+    display_name="My Agent",
+    a2ui_catalog_version="my-agent-ui.1",
+    surfaces=["job.start"],
+    actions=[
+        "job.start", "job.sync", "job.stop",
+        # Une liste ne modifie pas l'état : dites-le, et Studio laisse les lecteurs la consulter.
+        V2ActionDefinition(id="resource.contacts.list", mutating=False, scope="workspace"),
+    ],
+    resources=[
+        {
+            "id": "contacts",
+            "label": "Contacts",
+            "scope": "workspace",
+            "auto_surface": True,
+            "operations": ["list", "create", "update", "delete", "import"],
+            "display": {
+                "title_field": "email",
+                "columns": ["first_name", "last_name", "email", "city"],
+                "search_fields": ["first_name", "last_name", "email", "city"],
+            },
+            "fields": [
+                {"id": "first_name", "label": "First name", "type": "string", "required": True},
+                {"id": "last_name", "label": "Last name", "type": "string"},
+                {"id": "email", "label": "Email", "type": "email"},
+                {"id": "city", "label": "City", "type": "string"},
+            ],
+        }
+    ],
+)
+```
+
+| Clé | Signification |
+| --- | --- |
+| `id` | Le nom de la ressource dans les identifiants d'action et dans les formulaires. |
+| `scope` | Qui partage les données : `workspace` (toutes les missions), `mission` ou `job`. |
+| `operations` | Ce que Studio peut faire : `list`, `get`, `create`, `update`, `delete`, `import`. |
+| `auto_surface` | Studio construit le tableau et les formulaires à partir de `display` et de `fields`. |
+| `display` | Le champ de titre, les colonnes du tableau et les champs de recherche. |
+| `fields` | Les champs du formulaire, avec les [définitions de champs](controller-setup#fields) habituelles. |
+| `requires_context` | Le contexte dont un appel a besoin. La valeur par défaut est `["workspace.id"]`. |
+| `mounted_views` | Remplace une vue générée, comme `edit` ou `import`, par une surface de votre agent : `{"view": "import", "surface": "..."}`. |
+
+Le SDK dérive une action pour chaque opération, nommée `resource.<id>.<operation>`, ainsi que la surface `mission.agent.resource.<id>`.
+
+## 2. Traiter les opérations {#2-handle-the-operations}
+
+Enregistrez un seul gestionnaire pour les actions dérivées, et renvoyez un effet pour chaque opération.
+
+```python
+CONTACT_ACTIONS = [f"resource.contacts.{op}" for op in ("list", "create", "update", "delete", "import")]
+
+def handle_contacts(request: V2ActionRequest) -> dict:
+    workspace_id = request.workspace_authorization.workspace_id  # vérifié par le SDK
+    store = contacts_of(workspace_id)
+    data = request.input
+    operation = request.action.rsplit(".", 1)[1]
+
+    if operation == "list":
+        items = store.all()
+        effect = {"type": "resource.listed", "count": len(items), "items": items}
+    elif operation == "create":
+        effect = {"type": "resource.created", "item": store.create(data)}
+    elif operation == "update":
+        item = store.update(data.get("id"), data)
+        if item is None:
+            return error("Contact not found")
+        effect = {"type": "resource.updated", "item": item}
+    elif operation == "delete":
+        if not store.delete(data.get("id")):
+            return error("Contact not found")
+        effect = {"type": "resource.deleted", "item": {"id": data.get("id")}}
+    else:  # import
+        created = store.create_many(data.get("records") or [])
+        effect = {"type": "resource.imported", "count": len(created), "items": store.all(), "errors": []}
+
+    return {"status": "ok", "effects": [{"resource": "contacts", **effect}]}
+
+
+def error(message: str) -> dict:
+    return {"status": "error", "effects": [{"type": "resource.action.failed", "resource": "contacts", "message": message}]}
+
+
+for action in CONTACT_ACTIONS:
+    sv_server.register_v2_action(action, handle_contacts, agent_slug=agent.slug)
+```
+
+Chaque élément a besoin d'un `id` de type chaîne. Créez l'`id` côté agent et ignorez un `id` fourni avec une création.
+
+## 3. Utiliser la ressource dans un formulaire {#3-use-the-resource-in-a-form}
+
+Un champ `resource_ref` permet à l'opérateur de choisir un élément. Studio charge les choix avec l'action `list`.
+
+```python
+{
+    "id": "contact_id",
+    "label": "Contact",
+    "type": "resource_ref",
+    "required": True,
+    "options_source": {"type": "resource", "resource": "contacts", "value_field": "id", "label_field": "email"},
+}
+```
+
+Votre action reçoit l'`id` de l'élément choisi. Chargez l'élément depuis votre stockage ; ne vous fiez pas aux autres valeurs du formulaire.
+
+## Séparer les données de chaque espace de travail {#keep-the-data-of-each-workspace-apart}
+
+Le même contrôleur peut servir plusieurs espaces de travail. Un gestionnaire de ressource ne doit jamais renvoyer les données d'un autre espace de travail.
+
+- Prenez l'espace de travail dans `request.workspace_authorization`. Le SDK l'a vérifié à partir d'un jeton signé par Studio.
+- N'utilisez pas un identifiant ou un slug d'espace de travail venant de `request.input`. Un appelant peut y écrire n'importe quelle valeur.
+- Pour une portée `mission`, filtrez aussi sur `request.mission_id`.
+- `request.mission`, quand Studio l'envoie, contient les champs `id`, `name` et `metadata` de la mission. Studio envoie les métadonnées courantes à chaque requête. Ne les mettez pas en cache. Utilisez-les pour délimiter les résultats, jamais comme frontière d'accès. Voir le [guide du SDK](supervaizer-controller/ref/2026_05_SUPERVAIZER_v2.md).
+
+## Liste de contrôle {#checklist}
+
+- [ ] La ressource est dans `resources`, avec uniquement les opérations que le gestionnaire prend en charge.
+- [ ] L'action `list` est déclarée avec `mutating=False`.
+- [ ] Chaque opération filtre sur l'espace de travail vérifié.
+- [ ] Chaque opération valide ses données d'entrée et renvoie son effet.
+- [ ] Les formulaires utilisent `resource_ref` avec `options_source`, pas un champ de texte libre.
+
+## Référence {#reference}
+
+- Hello World : [`agent_data_resource.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_data_resource.py) et les actions de contact dans [`agent_v2.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_v2.py).
+- Une liste de lignes qu'un opérateur modifie à l'intérieur d'un seul job : le composant `ResourceList` du [Configurateur de job](job-configurator).
+- Écrans de modification ou d'import personnalisés, et contrat complet des ressources : le [guide du SDK](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#resources).

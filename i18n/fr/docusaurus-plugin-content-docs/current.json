@@ -1,0 +1,278 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.supervaizerControllerSidebar.category.Supervaizer Controller": {
+    "message": "Supervaizer Controller",
+    "description": "The label for category 'Supervaizer Controller' in sidebar 'supervaizerControllerSidebar'"
+  },
+  "sidebar.supervaizerControllerSidebar.category.Supervaizer Controller.link.generated-index.title": {
+    "message": "Documentation du Supervaizer Controller",
+    "description": "The generated-index page title for category 'Supervaizer Controller' in sidebar 'supervaizerControllerSidebar'"
+  },
+  "sidebar.supervaizerControllerSidebar.category.Supervaizer Controller.link.generated-index.description": {
+    "message": "La documentation du Supervaizer Controller",
+    "description": "The generated-index page description for category 'Supervaizer Controller' in sidebar 'supervaizerControllerSidebar'"
+  },
+  "sidebar.supervaizerControllerSidebar.category.Technical Documentation": {
+    "message": "Documentation technique",
+    "description": "The label for category 'Technical Documentation' in sidebar 'supervaizerControllerSidebar'"
+  },
+  "sidebar.supervaizerControllerSidebar.category.Technical Documentation.link.generated-index.title": {
+    "message": "Documentation technique",
+    "description": "The generated-index page title for category 'Technical Documentation' in sidebar 'supervaizerControllerSidebar'"
+  },
+  "sidebar.supervaizerControllerSidebar.category.Technical Documentation.link.generated-index.description": {
+    "message": "Documentation technique avancée pour les développeurs et les contributeurs",
+    "description": "The generated-index page description for category 'Technical Documentation' in sidebar 'supervaizerControllerSidebar'"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Quick Start": {
+    "message": "Démarrage rapide",
+    "description": "The label for the doc item 'Quick Start' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/quickstart"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Missions, Jobs, Cases, Steps": {
+    "message": "Missions, jobs, cases, étapes",
+    "description": "The label for the doc item 'Missions, Jobs, Cases, Steps' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/core-concepts"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Build Your Controller": {
+    "message": "Construire votre contrôleur",
+    "description": "The label for the doc item 'Build Your Controller' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/controller-setup"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Parameters and Secrets": {
+    "message": "Paramètres et secrets",
+    "description": "The label for the doc item 'Parameters and Secrets' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/parameters"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Human in the Loop": {
+    "message": "Validation humaine",
+    "description": "The label for the doc item 'Human in the Loop' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/human-in-the-loop"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Shared Resources": {
+    "message": "Ressources partagées",
+    "description": "The label for the doc item 'Shared Resources' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/resources"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Cost Reporting": {
+    "message": "Déclaration des coûts",
+    "description": "The label for the doc item 'Cost Reporting' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/cost-reporting"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Guardrail Controls": {
+    "message": "Garde-fous",
+    "description": "The label for the doc item 'Guardrail Controls' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/rule-checkpoints"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Job Configurator (Configure screen)": {
+    "message": "Configurateur de job (écran Configure)",
+    "description": "The label for the doc item 'Job Configurator (Configure screen)' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/job-configurator"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Job and Mission Analytics": {
+    "message": "Analyses des jobs et des missions",
+    "description": "The label for the doc item 'Job and Mission Analytics' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/job-analytics"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Cloud Deployment": {
+    "message": "Déploiement dans le cloud",
+    "description": "The label for the doc item 'Cloud Deployment' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/deploy"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Network Security": {
+    "message": "Sécurité réseau",
+    "description": "The label for the doc item 'Network Security' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/network-security"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Troubleshooting": {
+    "message": "Dépannage",
+    "description": "The label for the doc item 'Troubleshooting' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/troubleshooting"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Core Model Reference": {
+    "message": "Référence du modèle principal",
+    "description": "The label for the doc item 'Core Model Reference' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/model_reference/model_core"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Extended Model Reference": {
+    "message": "Référence du modèle étendu",
+    "description": "The label for the doc item 'Extended Model Reference' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/model_reference/model_extra"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Supervaizer v2 Contract": {
+    "message": "Contrat Supervaizer v2",
+    "description": "The label for the doc item 'Supervaizer v2 Contract' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2026_05_SUPERVAIZER_v2"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Protocols": {
+    "message": "Protocoles",
+    "description": "The label for the doc item 'Protocols' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2026_05_PROTOCOLS"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Workspace Agent Grants": {
+    "message": "Autorisations d'agent de l'espace de travail",
+    "description": "The label for the doc item 'Workspace Agent Grants' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2026_05_WORKSPACE_AGENT_GRANTS"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Guided Setup Contract": {
+    "message": "Contrat de configuration guidée",
+    "description": "The label for the doc item 'Guided Setup Contract' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2026_10_GUIDED_SETUP_CONTRACT"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Scheduled Start": {
+    "message": "Démarrage planifié",
+    "description": "The label for the doc item 'Scheduled Start' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2026_10_SCHEDULED_START"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Billable Consumption": {
+    "message": "Consommation facturable",
+    "description": "The label for the doc item 'Billable Consumption' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2026_10_BILLABLE_CONSUMPTION"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Parameter Validation": {
+    "message": "Validation des paramètres",
+    "description": "The label for the doc item 'Parameter Validation' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2025_08_PARAMETER_VALIDATION"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.REST API": {
+    "message": "API REST",
+    "description": "The label for the doc item 'REST API' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2025_08_REST_API"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Command Line Interface": {
+    "message": "Interface en ligne de commande",
+    "description": "The label for the doc item 'Command Line Interface' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2025_08_CLI"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Persistence": {
+    "message": "Persistance",
+    "description": "The label for the doc item 'Persistence' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2025_08_PERSISTENCE"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Admin Documentation": {
+    "message": "Documentation d'administration",
+    "description": "The label for the doc item 'Admin Documentation' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/2025_08_ADMIN_README"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Changelog": {
+    "message": "Changelog",
+    "description": "The label for the doc item 'Changelog' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/CHANGELOG"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.README": {
+    "message": "README",
+    "description": "The label for the doc item 'README' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/README"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.License": {
+    "message": "Licence",
+    "description": "The label for the doc item 'License' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/LICENSE"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Contributing": {
+    "message": "Contribuer",
+    "description": "The label for the doc item 'Contributing' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/ref/CONTRIBUTING"
+  },
+  "sidebar.supervaizerControllerSidebar.doc.Tunneling Setup": {
+    "message": "Configuration d'un tunnel",
+    "description": "The label for the doc item 'Tunneling Setup' in sidebar 'supervaizerControllerSidebar', linking to the doc supervaizer-controller/Tunneling-setup"
+  },
+  "sidebar.supervaizeFleetSidebar.category.Supervaize Studio": {
+    "message": "Supervaize Studio",
+    "description": "The label for category 'Supervaize Studio' in sidebar 'supervaizeFleetSidebar'"
+  },
+  "sidebar.supervaizeFleetSidebar.category.Supervaize Studio.link.generated-index.title": {
+    "message": "Documentation de Supervaize Studio",
+    "description": "The generated-index page title for category 'Supervaize Studio' in sidebar 'supervaizeFleetSidebar'"
+  },
+  "sidebar.supervaizeFleetSidebar.category.Supervaize Studio.link.generated-index.description": {
+    "message": "La documentation de Supervaize Studio",
+    "description": "The generated-index page description for category 'Supervaize Studio' in sidebar 'supervaizeFleetSidebar'"
+  },
+  "sidebar.supervaizeFleetSidebar.category.Features": {
+    "message": "Fonctionnalités",
+    "description": "The label for category 'Features' in sidebar 'supervaizeFleetSidebar'"
+  },
+  "sidebar.supervaizeFleetSidebar.category.Rules (Jev) · Beta Preview": {
+    "message": "Règles (Jev) · Aperçu bêta",
+    "description": "The label for category 'Rules (Jev) · Beta Preview' in sidebar 'supervaizeFleetSidebar'"
+  },
+  "sidebar.supervaizeFleetSidebar.category.Aidan Interview Campaigns": {
+    "message": "Campagnes d'entretiens Aidan",
+    "description": "The label for category 'Aidan Interview Campaigns' in sidebar 'supervaizeFleetSidebar'"
+  },
+  "sidebar.supervaizeFleetSidebar.category.Supervaize MCP (Claude / ChatGPT)": {
+    "message": "Supervaize MCP (Claude / ChatGPT)",
+    "description": "The label for category 'Supervaize MCP (Claude / ChatGPT)' in sidebar 'supervaizeFleetSidebar'"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Introduction": {
+    "message": "Introduction",
+    "description": "The label for the doc item 'Introduction' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/intro"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Platform Overview": {
+    "message": "Vue d'ensemble de la plateforme",
+    "description": "The label for the doc item 'Platform Overview' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/overview"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Agent Management": {
+    "message": "Gestion des agents",
+    "description": "The label for the doc item 'Agent Management' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/agent-management"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Create a Mission": {
+    "message": "Créer une mission",
+    "description": "The label for the doc item 'Create a Mission' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/mission-management"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Context Management": {
+    "message": "Gestion du contexte",
+    "description": "The label for the doc item 'Context Management' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/context-management"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Create a Job": {
+    "message": "Créer un job",
+    "description": "The label for the doc item 'Create a Job' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/job-management"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Navigate a Job": {
+    "message": "Naviguer dans un job",
+    "description": "The label for the doc item 'Navigate a Job' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/job-navigation"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Case Management": {
+    "message": "Gestion des cases",
+    "description": "The label for the doc item 'Case Management' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/case-management"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Rating & Analytics": {
+    "message": "Évaluations et analyses",
+    "description": "The label for the doc item 'Rating & Analytics' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/rating-analytics"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Notifications and Slack": {
+    "message": "Notifications et Slack",
+    "description": "The label for the doc item 'Notifications and Slack' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/features/slack-notifications"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Set Up Rules": {
+    "message": "Configurer les règles",
+    "description": "The label for the doc item 'Set Up Rules' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/rules/setup"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Run and Review": {
+    "message": "Exécuter et contrôler",
+    "description": "The label for the doc item 'Run and Review' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/rules/run-and-review"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Set Up a Campaign": {
+    "message": "Configurer une campagne",
+    "description": "The label for the doc item 'Set Up a Campaign' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/aidan/setup"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Write a Scenario": {
+    "message": "Rédiger un scénario",
+    "description": "The label for the doc item 'Write a Scenario' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/aidan/scenario"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Monitor a Campaign": {
+    "message": "Suivre une campagne",
+    "description": "The label for the doc item 'Monitor a Campaign' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/aidan/monitor"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Installation": {
+    "message": "Installation",
+    "description": "The label for the doc item 'Installation' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/mcp-connector/install"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Example Usage": {
+    "message": "Exemples d'utilisation",
+    "description": "The label for the doc item 'Example Usage' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/mcp-connector/examples"
+  },
+  "sidebar.supervaizeFleetSidebar.doc.Setup Development Environment": {
+    "message": "Configurer l'environnement de développement",
+    "description": "The label for the doc item 'Setup Development Environment' in sidebar 'supervaizeFleetSidebar', linking to the doc supervaize-fleet/developer-account"
+  },
+  "sidebar.skillsCookbookSidebar.doc.Introduction": {
+    "message": "Introduction",
+    "description": "The label for the doc item 'Introduction' in sidebar 'skillsCookbookSidebar', linking to the doc skills-cookbook/intro"
+  },
+  "sidebar.integrationsSidebar.category.Skills": {
+    "message": "Skills",
+    "description": "The label for category 'Skills' in sidebar 'integrationsSidebar'"
+  },
+  "sidebar.integrationsSidebar.doc.Introduction": {
+    "message": "Introduction",
+    "description": "The label for the doc item 'Introduction' in sidebar 'integrationsSidebar', linking to the doc integrations/intro"
+  },
+  "sidebar.integrationsSidebar.doc.n8n Integration": {
+    "message": "Intégration n8n",
+    "description": "The label for the doc item 'n8n Integration' in sidebar 'integrationsSidebar', linking to the doc integrations/n8n-integration"
+  },
+  "sidebar.integrationsSidebar.doc.Supervaizer Integration": {
+    "message": "Supervaizer Integration",
+    "description": "The label for the doc item 'Supervaizer Integration' in sidebar 'integrationsSidebar', linking to the doc integrations/skills/supervaizer-integration"
+  },
+  "sidebar.integrationsSidebar.doc.Supervaize Access": {
+    "message": "Supervaize Access",
+    "description": "The label for the doc item 'Supervaize Access' in sidebar 'integrationsSidebar', linking to the doc integrations/skills/supervaize-access"
+  }
+}

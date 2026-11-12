@@ -1,42 +1,68 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Global styles. Colours, typeface and shapes follow the Runwaize brand book:
+ * https://runwaize.com/brand
+ * The comments give the brand token of each value.
  */
 
-/* Import Outfit font to align with marketing site */
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300..700&display=swap");
 
-/* You can override the default Infima variables here. */
+/* Light theme: for documents. Green text on white must be brand ink. */
 :root {
-  /* Base font + light-mode brand alignment */
-  --ifm-font-family-base: "Outfit", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  --ifm-font-family-base: "Outfit", ui-sans-serif, system-ui, sans-serif; /* --font-brand */
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+  --ifm-heading-font-weight: 600;
 
-  --ifm-color-primary: #4fff3f;
-  --ifm-color-primary-dark: #273e2d;
-  --ifm-color-primary-darker: #273e2d;
-  --ifm-color-primary-darkest: #142031;
-  --ifm-color-primary-light: #89ff7d;
-  --ifm-color-primary-lighter: #a7ff9f;
-  --ifm-color-primary-lightest: #a7ff9f;
+  /* --color-brand-ink. Brand green on white has a contrast of 1.3:1. */
+  --ifm-color-primary: #15803d;
+  --ifm-color-primary-dark: #137337;
+  --ifm-color-primary-darker: #126d34;
+  --ifm-color-primary-darkest: #0f5a2b;
+  --ifm-color-primary-light: #178d43;
+  --ifm-color-primary-lighter: #189346;
+  --ifm-color-primary-lightest: #1ba64f;
 
-  --ifm-color-secondary: #b5e925;
-  --ifm-color-success: #6f9013;
-  --ifm-color-info: #0dcaf0;
-  --ifm-color-warning: #ff6600;
-  --ifm-color-danger: #e92825;
+  /* Signal colours: only for meaning */
+  --ifm-color-success: #15803d; /* brand ink */
+  --ifm-color-info: #3b82f6; /* --color-glow-blue */
+  --ifm-color-warning: #ffd700; /* --color-glow-yellow */
+  --ifm-color-danger: #ef4444; /* --color-glow-red */
 
+  --ifm-font-color-base: #1f1f1f; /* --color-text-on-light */
+  --ifm-heading-color: #1f1f1f;
+  --ifm-background-color: #ffffff;
+  --ifm-navbar-background-color: #ffffff;
+  --navbar-link-color: #1f1f1f;
+
+  --ifm-button-border-radius: 1rem;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-
-  --ifm-background-color: #fafafa;
-  --ifm-navbar-background-color: #ffffff;
-  --navbar-link-color: #273e2d;
 }
 
-body {
-  font-family: var(--ifm-font-family-base);
+/* Dark theme: the default. Dark neutrals, white titles, grey body text. */
+[data-theme="dark"] {
+  --ifm-color-primary: #4fff3f; /* --color-brand */
+  --ifm-color-primary-dark: #27fe14; /* --color-brand-gradient-end */
+  --ifm-color-primary-darker: #27fe14;
+  --ifm-color-primary-darkest: #273e2d; /* --color-brand-muted */
+  --ifm-color-primary-light: #89ff7d; /* --color-brand-light */
+  --ifm-color-primary-lighter: #a7ff9f; /* --color-brand-lighter */
+  --ifm-color-primary-lightest: #a7ff9f;
+  --ifm-color-success: #4fff3f;
+
+  --ifm-font-color-base: #a0a2a0; /* --color-muted */
+  --ifm-heading-color: #ffffff;
+  --ifm-background-color: #141414; /* --color-bg */
+  --ifm-background-surface-color: #1b1b1b; /* --color-surface */
+  --ifm-navbar-background-color: #080808; /* --color-bg-dark */
+  --ifm-footer-background-color: #070707; /* --color-footer-bg */
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  --navbar-link-color: #ffffff91;
+  --ifm-footer-color: #ffffff6b;
+  --ifm-footer-link-color: #ffffff5c;
+  --ifm-footer-link-hover-color: #4fff3f;
+  --ifm-footer-title-color: #ffffff6b;
 }
 
 a {
@@ -48,159 +74,89 @@ a:hover {
   text-decoration: underline;
 }
 
-.card {
-  text-decoration: none !important;
-}
-
+.card,
+.menu__link,
+.navbar__brand,
+.navbar__link,
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  font-weight: 600;
-  color: var(--ifm-color-primary-dark);
   text-decoration: none !important;
 }
 
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] h5,
-[data-theme="dark"] h6 {
-  color: var(--ifm-color-primary-lighter);
-}
 h1 {
   font-size: 2.7rem;
-}
-/* Add trailing line after h1 headings */
-h2::before {
-  content: "";
-  display: block;
-  width: 60%;
-  height: 3px;
-  background-color: var(--ifm-color-secondary);
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-/* Category/index cards use h2 for titles; hide decorative heading line there */
-.card h2::before {
-  content: none;
-  display: none;
 }
 
 h3 {
   font-size: 1.8rem;
 }
 
-/* Increase h4 heading size */
 h4 {
   font-size: 1.4rem;
 }
-.menu__link {
-  text-decoration: none !important;
-}
-.navbar__brand {
-  text-decoration: none !important;
-}
-.navbar__link {
-  text-decoration: none !important;
+
+/* Buttons: rounded, never a pill. Badges: always a pill. */
+.button {
+  transition: transform 0.15s ease, background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
-/* Clear active state for current section in top nav */
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.badge {
+  border-radius: 9999px;
+}
+
+/* Active section in the top navigation: the one green signal of the navbar */
 .navbar__item.navbar__link--active {
-  font-weight: 700 !important;
+  font-weight: 600 !important;
   color: var(--ifm-color-primary) !important;
-  border-bottom: 2px solid var(--ifm-color-secondary);
+  border-bottom: 2px solid var(--ifm-color-primary);
 }
 
+/* The name is live text in Outfit SemiBold. No "ai" underline in text. */
 .navbar__title {
-  font-family: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
   font-weight: 600;
-  color: var(--navbar-link-color) !important;
+  color: var(--ifm-heading-color) !important;
   font-size: 1.8rem;
 }
 
 .navbar__item {
-  font-family: "Outfit", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--navbar-link-color);
 }
 
+/* Mark box is 34 : 32. Keep the mark 32 px high or more on white. */
 .navbar__logo {
-  width: 40px;
-  height: 40px;
-}
-.hero__title {
-  color: var(--ifm-color-primary-lightest) !important;
+  height: 32px;
 }
 
 .hero__subtitle {
   color: var(--ifm-color-content);
 }
 
-[data-theme="dark"] .hero__subtitle {
-  color: var(--ifm-color-content-secondary);
-}
-
-/* Dark theme: align with Runwaize palette */
-[data-theme="dark"] {
-  --ifm-font-family-base: "Outfit", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-
-  --ifm-background-color: #141414; /* --color-bg */
-  --ifm-navbar-background-color: #080808; /* --color-bg-dark */
-  --ifm-footer-background-color: #070707; /* --color-footer-bg */
-
-  --ifm-color-primary: #4fff3f; /* brand */
-  --ifm-color-primary-dark: #273e2d;
-  --ifm-color-primary-darker: #273e2d;
-  --ifm-color-primary-darkest: #121212;
-  --ifm-color-primary-light: #89ff7d;
-  --ifm-color-primary-lighter: #a7ff9f;
-  --ifm-color-primary-lightest: #a7ff9f;
-  --ifm-color-secondary: #4fff3f;
-
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-
-  --navbar-link-color: #ffffff91; /* --color-nav-muted */
-  --ifm-footer-color: #ffffff6b; /* --color-footer-muted */
-  --ifm-footer-link-color: #ffffff5c; /* --color-footer-link */
-  --ifm-footer-link-hover-color: #4fff3f;
-  --ifm-footer-title-color: #ffffff6b;
-}
-
 [data-theme="dark"] .footer__title {
   color: var(--ifm-footer-title-color) !important;
 }
 
-[data-theme="dark"] .footer__link-item {
-  color: var(--ifm-footer-link-color) !important;
-}
-
-[data-theme="dark"] .footer__link-item:hover {
-  color: var(--ifm-footer-link-hover-color) !important;
-}
-
-[data-theme="dark"] .footer__copyright {
-  color: var(--ifm-footer-link-color) !important;
-}
-
+[data-theme="dark"] .footer__link-item,
+[data-theme="dark"] .footer__copyright,
 [data-theme="dark"] .footer__icon-link {
   color: var(--ifm-footer-link-color) !important;
 }
 
+[data-theme="dark"] .footer__link-item:hover,
 [data-theme="dark"] .footer__icon-link:hover {
   color: var(--ifm-footer-link-hover-color) !important;
 }
 
-/* Dark-mode background gradient and surfaces */
+/* Page gradient: --color-bg, --color-bg-dark, --color-bg-mid */
 [data-theme="dark"] body {
   background: linear-gradient(
     180deg,
@@ -208,10 +164,9 @@ h4 {
     #080808 7.31%,
     #101010 50.96%
   );
-  color: #ffffff;
 }
 
-/* Slightly lifted surfaces for main content, navbar, and footer */
+/* Dark glass surfaces for main content, navbar, and footer */
 [data-theme="dark"] .main-wrapper,
 [data-theme="dark"] .navbar,
 [data-theme="dark"] .footer {
@@ -222,7 +177,7 @@ h4 {
 
 /* Optional bento glow helpers for MDX content */
 .bento-glow-green {
-  --bento-glow: #58ff8a;
+  --bento-glow: #4fff3f;
 }
 .bento-glow-blue {
   --bento-glow: #3b82f6;
@@ -231,15 +186,8 @@ h4 {
   --bento-glow: #a855f7;
 }
 
-/* Navbar + footer tweaks to better match marketing site */
-[data-theme="dark"] .navbar__title,
 [data-theme="dark"] .navbar__link {
   color: #ffffff91;
-}
-
-[data-theme="dark"] .navbar__link--active {
-  color: #4fff3f;
-  border-bottom: 2px solid #4fff3f;
 }
 
 [data-theme="dark"] .footer {

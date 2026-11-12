@@ -1,0 +1,134 @@
+---
+id: run-and-review
+title: Exécuter et contrôler des jobs avec des règles
+description: Ce qui se passe quand un job démarre avec des règles actives, comment approuver ou réévaluer un point de contrôle en pause, et comment lire la piste d'audit des règles.
+displayed_sidebar: supervaizeFleetSidebar
+slug: run-and-review
+---
+
+# Exécuter et contrôler des jobs avec des règles {#run-and-review-jobs-with-rules}
+
+:::caution[Bêta - Aperçu]
+Les règles avec Jev sont en aperçu. La fonctionnalité est activée par espace de travail, sur demande, et son comportement comme ses écrans peuvent changer.
+:::
+
+Une fois les [règles configurées](./setup), chaque nouveau job reprend les règles actives qui s'appliquent à lui : les règles de l'espace de travail qui correspondent à son mode **Applies to**, ainsi que les règles de sa mission et les siennes. Cette page décrit ce que vous voyez quand le job démarre, pendant qu'il s'exécute, et après.
+
+## Quand un job démarre {#when-a-job-starts}
+
+Studio fige dans le job les règles applicables et les contrôles de règles choisis. C'est par rapport à cette copie figée que le job est évalué, pendant toute sa vie.
+
+- **Les modifications ultérieures des règles ne le touchent pas.** Seuls les jobs démarrés après la modification utilisent la nouvelle révision.
+- **Ses contrôles de règles ne peuvent pas être modifiés.** Démarrez un nouveau job pour en utiliser d'autres.
+- **Ses données d'entrée ne peuvent pas changer après la vérification de démarrage.** Si elles changent, Studio refuse de continuer et demande un nouveau job.
+
+### Choisir les contrôles de règles {#choose-the-rule-controls}
+
+Le formulaire du job montre une section **Rule controls** avec les quatre situations de la [politique de règles](./setup#2-set-the-rule-policy). Chaque liste ne propose que ce que la politique de l'espace de travail permet, et commence sur la valeur par défaut de l'espace de travail. Sur la page du job, la carte **Rule activity** contient les mêmes contrôles avant le démarrage.
+
+### Choisir les règles facultatives {#choose-optional-rules}
+
+Le formulaire du job, la page du job avant le démarrage et le formulaire de planification peuvent montrer un bloc **Optional rules**. Il liste les règles à la demande qui conviennent à l'agent et à la mission. Cochez les règles qui s'appliquent à cette exécution. Les règles obligatoires s'appliquent toujours. Le bloc est masqué quand aucune règle n'est proposée.
+
+Les choix sont stockés sur le job. Après le démarrage, les choix sont figés. Démarrez un nouveau job pour les modifier.
+
+### Pourquoi un démarrage peut être bloqué {#why-a-start-can-be-blocked}
+
+| Message | Que faire |
+| --- | --- |
+| Set up the Rule Controller before starting a job with rules. | Un Workspace Manager [configure le Rule Controller](./setup#1-configure-the-rule-controller). |
+| Agent must support the required before/after rule checkpoints before this job can start. | L'agent ne déclare pas la prise en charge des points de contrôle. Voir [Exigences pour l'agent](#agent-requirements). |
+| Rule control … is not permitted by this workspace. | Choisissez une valeur que la politique de règles autorise. |
+| Rules or controller settings changed during admission. Retry the start. | Quelqu'un a modifié des règles pendant le démarrage du job. Démarrez-le de nouveau. |
+| Job is waiting for Rule Controller readiness. | Jev ou l'agent n'était pas prêt, et le job a été mis en attente. Corrigez la cause, puis démarrez de nouveau. |
+
+Un job sans règle applicable démarre comme d'habitude, sans avoir besoin d'un contrôleur.
+
+## Pendant que le job s'exécute {#while-the-job-runs}
+
+Avant et après chaque étape, l'agent appelle un point de contrôle. Studio envoie à Jev le contexte de l'étape avec toutes les règles qui s'appliquent à ce moment, et renvoie l'un de ces trois résultats.
+
+| Résultat | Signification |
+| --- | --- |
+| **Allow** | Toutes les règles sont respectées, ou seules des règles **Warning** ont été violées. Le travail continue. |
+| **Pause** | Le job attend une personne. |
+| **Stop** | Le job est arrêté. |
+
+Le résultat que vous obtenez dépend de la sévérité de la règle et des contrôles de règles du job :
+
+| Ce qui s'est passé | Résultat |
+| --- | --- |
+| Une règle **Warning** est violée | Enregistré, le travail continue |
+| Une règle **Approval required** est violée | Pause pour approbation, ou Stop |
+| Une règle **Must pass** est violée | Stop, ou Pause |
+| Jev est injoignable, ou une règle autre qu'un avertissement est incertaine | Pause pour nouvelle tentative, ou Stop |
+
+Quand plusieurs cas s'appliquent en même temps, **Stop** l'emporte sur **Pause**.
+
+:::info[Ce que Jev reçoit]
+Studio envoie les données du job, du case et de l'étape, plus le contexte fourni par l'agent, jusqu'à 256 Ko. Les clés d'API, les paramètres chiffrés et tout champ que l'agent déclare comme secret sont retirés avant que les données ne quittent Studio.
+:::
+
+## Décider d'un point de contrôle en pause {#decide-a-paused-checkpoint}
+
+Ouvrez le job. Le panneau **Rule activity** liste chaque point de contrôle avec sa phase, les règles évaluées, chaque verdict et le modèle qui l'a produit. Il se met à jour en direct.
+
+Chaque action exige un motif écrit, qui est stocké avec la décision.
+
+| Situation | Actions disponibles |
+| --- | --- |
+| Une règle **Approval required** a été violée | **Approve**, **Deny**, **Re-evaluate** |
+| Le résultat est incertain, ou Jev a échoué | **Re-evaluate** |
+| La décision n'est pas parvenue à l'agent | **Retry delivery** |
+
+- **Approve** laisse l'étape continuer.
+- **Deny** arrête le job.
+- **Re-evaluate** exécute de nouveau la même étape, avec le motif que vous avez saisi comme contexte supplémentaire. Utilisez-le pour fournir ce qui manquait à Jev.
+
+Après **Approve** ou **Deny**, l'agent peut répondre avec un nouvel état du job. Studio applique cet état, de sorte que le job quitte **Awaiting** sans mise à jour manuelle. Studio n'applique pas un état qu'il refuse, ni un état qui arrive après la mise en pause de l'agent. Dans ce cas, la décision reste livrée, et le job garde son état stocké jusqu'à la prochaine synchronisation.
+
+:::warning[Les violations Must pass ne peuvent pas être approuvées]
+Une règle **Must pass** violée n'est levée que par une réévaluation réussie. L'approbation est aussi indisponible quand le job a été démarré avec **Stop** pour les violations de règles à approbation requise.
+:::
+
+Seul un Workspace Manager ou un Policy Maker qui peut voir la mission du job peut décider. Les Policy Auditors et les membres en lecture seule peuvent lire le panneau, mais pas agir.
+
+Un job ne peut pas se terminer tant qu'un point de contrôle est en attente, en pause ou arrêté.
+
+## Piste d'audit {#audit-trail}
+
+**Rules** comprend une **Audit trail** de tout ce qui concerne les règles dans l'espace de travail, du plus récent au plus ancien. Filtrez-la par type d'événement, par résultat ou par job.
+
+| Type d'événement | Ce qu'il enregistre |
+| --- | --- |
+| **Rule changes** | Chaque révision d'une règle, avec l'avant et l'après |
+| **Evaluations** | Chaque appel à Jev, ses verdicts et le modèle utilisé |
+| **Decisions** | Les décisions d'autorisation, de pause et d'arrêt, y compris les approbations et leurs motifs |
+| **Readiness** | Les résultats des tests du Rule Controller et les jobs en attente de disponibilité |
+| **Controller changes** | Les modifications de la source du contrôleur, du modèle ou de la politique de règles |
+| **Delivery** | Chaque tentative de renvoi d'une décision à l'agent |
+
+Vous ne voyez que les événements des missions que vous pouvez déjà voir dans Studio.
+
+## Exigences pour l'agent {#agent-requirements}
+
+Les règles fonctionnent sur les agents construits avec le contrat Supervaizer v2. Dans son enregistrement, l'agent doit déclarer :
+
+- la capacité `rule_checkpoints`, version `1`, avec les phases qu'il prend en charge (`before`, `after`) ;
+- une action de portée job avec l'identifiant `rule.checkpoint.resume`, que Studio appelle pour livrer une décision.
+
+L'agent peut aussi lister des `secret_refs` : des chemins dans le contexte du point de contrôle que Studio doit retirer avant l'évaluation.
+
+Si un agent n'a pas ces éléments, les jobs avec règles sont refusés, ou attendent, selon le contrôle de règles **Unsupported controller**.
+
+## Dépannage {#troubleshooting}
+
+| Symptôme | Cause probable |
+| --- | --- |
+| Le formulaire du job indique que le Rule Controller n'est pas configuré | L'espace de travail n'a aucune clé Jev ou OpenRouter active, et aucun identifiant géré n'est activé. Utilisez **Test controller** dans **Rules**. Voir [Configurer le Rule Controller](./setup#1-configure-the-rule-controller). |
+| **Test connection** affiche **Unavailable** | La clé Jev est erronée ou inactive, ou Jev n'a pas répondu dans les 10 secondes. |
+| Une règle n'est pas sur mon job | Elle est **Selected** pour d'autres agents ou missions, ou elle est **On demand** et personne ne l'a cochée dans **Optional rules**. |
+| Une règle que je viens de modifier n'est pas appliquée | Les jobs en cours gardent leurs règles figées. La modification s'applique aux nouveaux jobs. |
+| Une règle n'est jamais évaluée | Elle est encore à l'état de brouillon, ou son moment d'évaluation ne correspond pas à la phase de l'étape. |
+| **Rule activity** est absent sur un job | Vous avez besoin de l'accès en lecture aux règles, et les règles doivent être activées pour l'espace de travail. |
+| Une étape approuvée n'a pas repris | Un autre point de contrôle du même job bloque encore. Elle reprend une fois celui-ci résolu. |

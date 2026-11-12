@@ -1,0 +1,162 @@
+---
+id: supervaize-access
+title: Supervaize Access
+displayed_sidebar: integrationsSidebar
+slug: supervaize-access
+---
+
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Supervaize Access {#supervaize-access}
+
+**Dépôt** : [<i className="bi bi-github"></i> runwaize_skills/supervaize_access](https://github.com/runwaize/runwaize_skills/tree/main/supervaize_access)
+
+Ce skill s'adresse aux **utilisateurs de Supervaize** (les clients). Il indique à votre assistant IA (Claude, ChatGPT, Cursor, Codex) comment piloter votre espace de travail Supervaize. L'assistant utilise le connecteur MCP de Supervaize pour les missions, les jobs, les cases et les réponses humaines. Un utilitaire lit les agents et les événements du contrôleur avec votre clé d'API.
+
+:::info[Quand l'utiliser]
+Utilisez ce skill quand vous voulez qu'un chatbot ou un agent d'IDE **pilote un espace de travail Supervaize existant**.
+:::
+
+C'est un **skill distinct** de [Supervaizer Integration](/docs/integrations/skills/supervaizer-integration), qui connecte un agent Python sur mesure à Supervaize Studio.
+
+---
+
+## Vue d'ensemble {#overview}
+
+| Surface | URL | Capacités |
+| --- | --- | --- |
+| **Connecteur MCP (outils utilisateur)** | `{base_url}/mcp/{team_slug}` | Les missions, les jobs, les cases, les étapes, les réponses humaines et les planifications, au nom de l'utilisateur connecté. Authentification : connexion OAuth. Voir [Connecter Claude ou ChatGPT](/docs/supervaize-fleet/mcp-connector/install). |
+| **API REST** | `{base_url}/w/{team_slug}/api/v1/` | Lire les **agents** et les **événements du contrôleur** avec `Api-Key: <key>`. Voir [API REST](#rest-api-agents). |
+| **Serveur MCP (runtime d'agent)** | `{base_url}/mcp/agent/{team_slug}` | Le compte rendu des cases et des étapes pour un workflow, par exemple n8n. Authentification : jeton Bearer d'une autorisation de runtime de l'espace de travail. Ce skill ne l'utilise pas. |
+
+**Permissions** : les appels s'exécutent avec vos rôles dans l'espace de travail. Un membre qui a un rôle en lecture seule peut lire, et une opération d'écriture renvoie une erreur de permission.
+
+**Limites d'une clé d'API** : une clé d'API ne crée pas de mission, ne démarre pas de job et ne lit pas de case. Elle n'ouvre aucun point d'accès MCP. Utilisez le connecteur MCP pour ces opérations.
+
+---
+
+## Obtenir une clé d'API {#getting-an-api-key}
+
+1. Connectez-vous à Supervaize Studio.
+2. Ouvrez le menu de votre profil et sélectionnez **Developer**. La page nécessite un accès Developer (rôle Workspace Manager ou Developer).
+3. Cliquez sur **Create API Key** et copiez la valeur de la clé (elle s'affiche une seule fois). **Revoke API key** supprime une clé.
+4. La clé est liée à votre utilisateur ; vous accédez seulement aux espaces de travail (équipes) dont vous êtes membre.
+
+---
+
+## API REST (agents) {#rest-api-agents}
+
+- **URL de base** : `https://<your-studio>/w/<team_slug>/api/v1/`
+- **Authentification** : `Authorization: Api-Key <your-key>`.
+
+**Agents** (lecture seule) : `GET .../agents/` (liste), `GET .../agents/{id}/`, `GET .../agents/by-slug/{slug}/`.
+
+**Événements du contrôleur** (lecture) : `GET .../ctrl-events/` (liste), `GET .../ctrl-events/{id}/`. Ajoutez l'en-tête `workspace: <team_slug>`.
+
+Les points d'accès des missions, des jobs et des cases nécessitent une session Studio connectée. Une clé d'API ne les ouvre pas.
+
+Pour les champs des requêtes et des réponses, consultez le schéma OpenAPI à l'adresse `{base_url}/api/doc` ou `{base_url}/api/doc/swagger-ui/`.
+
+---
+
+## Serveur MCP {#mcp-server}
+
+Studio a deux points d'accès MCP. Les deux sont liés à un espace de travail. Aucun des deux n'est sous `/api/`.
+
+| Point d'accès | Pour | Authentification |
+| --- | --- | --- |
+| `https://<your-studio>/mcp/<team_slug>` | Un assistant de chat ou un agent d'IDE qui agit en votre nom. | Connexion OAuth et consentement. Les appels s'exécutent avec vos rôles dans l'espace de travail. |
+| `https://<your-studio>/mcp/agent/<team_slug>` | Un runtime de workflow, par exemple n8n. | Jeton Bearer d'une autorisation de runtime pour l'espace de travail. |
+
+Le point d'accès utilisateur nécessite que le connecteur MCP soit activé pour l'espace de travail. Les étapes, le consentement et la liste des outils : [Connecter Claude ou ChatGPT](/docs/supervaize-fleet/mcp-connector/install).
+
+Une clé d'API ne permet de s'authentifier sur aucun des deux points d'accès MCP.
+
+### Outils du runtime d'agent {#agent-runtime-tools}
+
+| Outil                       | Objectif                                                              |
+| --------------------------- | --------------------------------------------------------------------- |
+| `report_case_start`         | Créer un case pour un job (`job_id`, `execution_id`)                  |
+| `report_case_step`          | Créer ou mettre à jour une étape de case                              |
+| `request_human_input`       | Créer une étape de validation humaine (le case passe en attente)      |
+| `get_case_status`           | Obtenir le statut du case par `execution_id`                          |
+| `report_case_status`        | Mettre à jour le statut du case (par exemple terminé, en échec)       |
+| `register_agent_parameters` | Enregistrer les paramètres d'un workflow n8n pour un agent            |
+
+La page [Intégration n8n](/docs/integrations/n8n-integration) montre comment un workflow les utilise.
+
+---
+
+## Installation {#install}
+
+Dans Claude Code :
+
+```
+/plugin marketplace add runwaize/runwaize_skills
+/plugin install supervaize-access@runwaize-skills
+```
+
+Avec un autre agent de code, clonez le dépôt [runwaize_skills](https://github.com/runwaize/runwaize_skills) et indiquez à l'agent le fichier `supervaize_access/SKILL.md`.
+
+---
+
+## Ce que fait le skill {#what-the-skill-does}
+
+Le skill fait correspondre votre demande à un outil du connecteur MCP, ou à une commande de son utilitaire.
+
+| Vous dites | Avec le connecteur MCP | Avec l'utilitaire (clé d'API) |
+| --- | --- | --- |
+| « Enregistre-toi auprès de Supervaize » | Sans objet | `register-to-supervaize` |
+| « Liste les agents » | `agent_list` | `list-agents` |
+| « Montre les missions » | `mission_list`, `mission_get` | Impossible |
+| « Crée une mission » | `mission_create` | Impossible |
+| « Démarre un job » | `job_setup` | Impossible |
+| « Affiche les cases et les étapes » | `case_list`, `case_get` | `view-cases-steps` (au mieux) |
+| « Réponds à l'agent » | `step_submit` | Impossible |
+| « Statut des jobs de cet agent » | `job_list`, `job_get` | `job-status-for-agent` (au mieux) |
+
+Quand une demande est impossible et que le connecteur n'est pas connecté, l'assistant vous demande de le connecter.
+
+---
+
+## Configuration de l'utilitaire {#helper-setup}
+
+L'utilitaire est facultatif. Utilisez-le quand le connecteur MCP n'est pas connecté.
+
+```bash
+export SUPERVAIZE_API_KEY=...
+export SUPERVAIZE_WORKSPACE_ID=your-workspace-slug
+export SUPERVAIZE_API_URL=https://app.supervaize.com
+
+pip install typer
+python scripts/supervaize_access_helper.py register-to-supervaize --pretty
+```
+
+`register-to-supervaize` lit une page d'agents. Cela valide ensemble la clé, l'URL et le slug de l'espace de travail. La commande enregistre un profil local pour les commandes suivantes. Elle ne crée rien dans Supervaize.
+
+## Commandes de l'utilitaire {#helper-commands}
+
+| Commande | Ce qu'elle fait |
+| --- | --- |
+| `questions` | Affiche les questions que l'assistant pose en premier |
+| `env-status` | Montre quels réglages sont présents |
+| `register-to-supervaize` | Valide la clé et l'espace de travail, et enregistre le profil |
+| `list-agents` | Liste les agents de l'espace de travail |
+| `view-cases-steps` | Reconstruit les cases et les étapes à partir des événements du contrôleur. Filtrez avec `--job-id` ou `--case-id` |
+| `job-status-for-agent` | Résume les événements de job d'un agent (`--agent-slug`) |
+
+```bash
+python scripts/supervaize_access_helper.py view-cases-steps --job-id 01H... --pretty
+python scripts/supervaize_access_helper.py job-status-for-agent --agent-slug my-agent --pretty
+```
+
+Les deux dernières commandes donnent un résultat approximatif. Il dépend des identifiants que l'agent met dans ses événements. Les outils `case_list` et `job_list` du connecteur sont exacts.
+
+---
+
+## Références {#references}
+
+- **Routes REST et outils du connecteur** : [reference.md](https://github.com/runwaize/runwaize_skills/blob/main/supervaize_access/reference.md) dans le skill.
+- [Connecter Claude ou ChatGPT](/docs/supervaize-fleet/mcp-connector/install) : installez le connecteur MCP.
+- [Supervaizer Integration](/docs/integrations/skills/supervaizer-integration) : connectez un agent Python sur mesure à Studio.
+- [Intégration n8n](/docs/integrations/n8n-integration) : utilisez des workflows n8n comme agents.

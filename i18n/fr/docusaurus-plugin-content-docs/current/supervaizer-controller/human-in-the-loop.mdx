@@ -1,0 +1,180 @@
+---
+id: human-in-the-loop
+title: Validation humaine
+displayed_sidebar: supervaizerControllerSidebar
+slug: human-in-the-loop
+---
+
+# Validation humaine {#human-in-the-loop}
+
+Une étape peut attendre une personne. Studio affiche l'étape en attente dans l'Actions Panel de l'opérateur, dessine le formulaire que votre agent décrit, et renvoie la réponse à votre agent.
+
+![Le formulaire d'approbation d'une étape en attente dans Studio](/img/controller/hitl-awaiting.png)
+
+## Quand l'ajouter {#when-to-add-it}
+
+Ajoutez une étape humaine quand l'une de ces conditions est vraie :
+
+- L'étape a un effet irréversible : elle envoie un message, dépense de l'argent, supprime ou publie quelque chose.
+- L'agent n'est pas sûr : la confiance est faible, les sources se contredisent, les données d'entrée sont incomplètes.
+- Une personne est responsable du résultat : contenu juridique, médical, financier ou de marque.
+- L'agent a besoin d'une information que seule une personne détient.
+
+Ne l'ajoutez pas à chaque étape. Un job qui attend toujours est un job que personne ne lance.
+
+## Comment cela fonctionne {#how-it-works}
+
+1. Votre agent renvoie une étape avec `status: "awaiting"` et un objet `awaiting`.
+2. Studio charge la surface nommée dans `awaiting.surface` et dessine le formulaire.
+3. L'opérateur répond. Studio invoque l'action nommée dans `awaiting.action` avec les valeurs.
+4. Votre agent termine l'étape et renvoie le nouvel état du job.
+
+La validation humaine est un statut, pas un type d'étape particulier.
+
+## 1. Déclarer la surface et l'action {#1-declare-the-surface-and-the-action}
+
+```python
+registration = build_v2_agent_registration(
+    agent_slug="my-agent",
+    display_name="My Agent",
+    a2ui_catalog_version="my-agent-ui.1",
+    surfaces=["job.start", "case.step.awaiting"],
+    actions=["job.start", "job.sync", "job.stop", "step.awaiting.submit"],
+)
+```
+
+## 2. Renvoyer une étape en attente {#2-return-a-waiting-step}
+
+```python
+APPROVAL_FIELDS = [
+    {"id": "approved", "label": "Approved", "type": "boolean", "required": True},
+    {"id": "comment", "label": "Comment", "type": "text"},
+]
+
+def review_case(case_id: str) -> dict:
+    return {
+        "id": case_id,
+        "lane": "work",
+        "title": "Human review case",
+        "status": "awaiting",
+        "metadata": {},
+        "steps": [
+            {"id": f"{case_id}-start", "activity": "operation", "status": "completed", "title": "Start"},
+            {
+                "id": f"{case_id}-approval",
+                "activity": "operation",
+                "status": "awaiting",
+                "title": "Human approval",
+                "awaiting": {
+                    "reason": "human_input",
+                    "surface": "case.step.awaiting",
+                    "action": "step.awaiting.submit",
+                    "fields": APPROVAL_FIELDS,
+                },
+            },
+        ],
+    }
+```
+
+Donnez au `status` du job la valeur `awaiting` tant qu'un case attend. Les champs utilisent les [définitions de champs](controller-setup#fields) communes à tous les formulaires.
+
+## 3. Décrire le formulaire {#3-describe-the-form}
+
+Studio appelle la surface avec le `case_id` et le `step_id` de l'étape en attente.
+
+```python
+@sv_server.v2_surface("case.step.awaiting", agent_slug=agent.slug)
+def awaiting_form(request: V2SurfaceRequest) -> dict:
+    return {
+        "surface": request.surface,
+        "document": {
+            "type": "Form",
+            "id": "my_agent.case.step.awaiting",
+            "title": "Human approval",
+            "fields": [
+                {"id": "approved", "label": "Approved", "type": "boolean", "default": True},
+                {"id": "comment", "label": "Comment", "type": "text", "required": False},
+            ],
+            "submit": {"action": "step.awaiting.submit", "label": "Submit"},
+            "state": {"case_id": request.case_id, "step_id": request.step_id},
+        },
+    }
+```
+
+Montrez à la personne ce sur quoi elle décide. Placez le brouillon, le montant ou le destinataire dans le titre du formulaire, dans un champ `read_only` ou dans les `metadata` du case.
+
+## 4. Traiter la réponse {#4-handle-the-answer}
+
+```python
+@sv_server.v2_action("step.awaiting.submit", agent_slug=agent.slug)
+def submit_answer(request: V2ActionRequest) -> dict:
+    job_state = JOBS[request.job_id]
+    for case in job_state["cases"]:
+        if case["id"] == request.case_id:
+            case["status"] = "completed"
+            case["metadata"].update(
+                approved=bool(request.input.get("approved", True)),
+                comment=str(request.input.get("comment") or ""),
+            )
+            for step in case["steps"]:
+                step["status"] = "completed"
+                step.pop("awaiting", None)
+    if all(case["status"] == "completed" for case in job_state["cases"]):
+        job_state["job"]["status"] = "completed"
+    return {
+        "status": "ok",
+        "effects": [{"type": "step.awaiting.submitted", "job_id": request.job_id,
+                     "case_id": request.case_id, "step_id": request.step_id}],
+        "job_state": job_state,
+    }
+```
+
+Décidez de ce que provoque un refus. Quand `approved` vaut false, l'agent peut arrêter le case, réessayer en tenant compte du commentaire, ou poser une seconde question avec une nouvelle étape en attente.
+
+## Options {#options}
+
+### Demander un fichier {#files}
+
+```json
+{
+  "id": "report_file",
+  "label": "Report (.md)",
+  "type": "file",
+  "accept": ".md,text/markdown",
+  "max_bytes": 1048576,
+  "storage": "studio",
+  "required": true
+}
+```
+
+Avec `storage: "studio"`, Studio conserve le fichier et votre agent reçoit une référence (`file_id`, `filename`, `media_type`, `size`, `sha256`). Avec `storage: "inline"`, la réponse contient `filename`, `media_type`, `size`, `encoding` et `content`. La requête d'action entière doit rester sous la limite de taille du corps de requête de Studio : gardez donc le fichier petit.
+
+Pour afficher le fichier stocké comme une sortie, placez son `file_id` dans la sortie d'une étape :
+
+```json
+{"id": "report:1", "type": "report", "title": "Quarterly report",
+ "media_type": "text/markdown", "storage": "studio", "file_id": "<studio file id>"}
+```
+
+Studio sert cette sortie depuis son propre stockage. Il n'appelle pas votre action `artifact.get`. Voir le [guide du SDK](supervaizer-controller/ref/2026_05_SUPERVAIZER_v2.md).
+
+### Laisser la personne modifier la réponse {#let-the-person-change-the-answer}
+
+Ajoutez `"reopenable": true` à l'objet `awaiting`. Studio permet alors à l'opérateur de rouvrir une étape déjà traitée et de soumettre de nouvelles valeurs.
+
+### Relire un document {#review-a-document}
+
+Pour un texte qu'une personne lit et corrige, la surface peut renvoyer un document `DocumentReview` à la place d'un `Form`. Voir le [guide du SDK](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#step).
+
+## Liste de contrôle {#checklist}
+
+- [ ] `case.step.awaiting` est dans `surfaces` et `step.awaiting.submit` est dans `actions`.
+- [ ] L'étape en attente a `status: "awaiting"` et un objet `awaiting` avec `reason`, `surface` et `action`, et avec `fields` pour un formulaire.
+- [ ] Le formulaire montre ce sur quoi la personne décide.
+- [ ] L'action de soumission vérifie les valeurs, termine l'étape et renvoie l'état du job.
+- [ ] Un refus a un résultat défini.
+
+## Référence {#reference}
+
+- Hello World : le case de relecture dans [`agent_v2.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_v2.py) et [`tests/test_hitl.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/tests/test_hitl.py).
+- Pour suspendre une étape par une règle de mission et non par votre propre logique, voir [Garde-fous](rule-checkpoints).

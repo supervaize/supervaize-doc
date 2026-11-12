@@ -1,0 +1,151 @@
+---
+id: job-navigation
+title: Naviguer dans un job
+description: Repérez-vous dans un job de Supervaize Studio et affichez ses cases en tableau, en liste ou en calendrier.
+displayed_sidebar: supervaizeFleetSidebar
+slug: job-navigation
+---
+
+import CasesViewDemo from "@site/src/components/StudioDemo/CasesViewDemo";
+
+# Naviguer dans un job {#navigate-a-job}
+
+La page du job est l'endroit où vous suivez l'exécution d'un agent. Sa section **Cases** affiche tous les cases du job, et vous choisissez comment : en **Board**, en **List** ou en **Calendar**.
+
+Changez ici de vue, de taille de carte et de tri. Il s'agit d'une miniature fonctionnelle.
+
+<CasesViewDemo />
+
+- **Board** répond à « qu'est-ce qui a besoin de moi maintenant ? » : les cases se déplacent d'une colonne de statut à l'autre.
+- **List** répond à « montrez-moi les chiffres » : une ligne par case, avec les dates, le coût et les étapes.
+- **Calendar** répond à « que s'est-il passé, et quand ? » : une colonne par jour.
+
+## La page du job en un coup d'œil {#the-job-page-at-a-glance}
+
+| Zone | Ce que vous y trouvez |
+| --- | --- |
+| **Header** | Un lien **← Back to Mission**, le nom et le statut du job, ses tags, puis ses actions : **Start**, **Stop**, **Job Rating**, **Job comments**, **Edit**, **Clone**, **Delete** et **Tracing** |
+| **Cards** | **Information**, **Instructions**, **Job Fields**, **Job Methods**, **Rule activity**, **Job Metadata**, **Job Definition** et **Dialog Transcript** |
+| **Cases** | Tous les cases du job, dans la vue que vous choisissez |
+
+Vous ne voyez que les actions et les cartes que votre rôle autorise. Certaines cartes n'apparaissent que pour certains agents. **Clone** n'apparaît pas sur les jobs des agents Supervaizer v2.
+
+- **Règles :** le bouton **Rules** se trouve dans l'en-tête de la carte **Rule activity**. Il ouvre les règles de politique du job.
+- **Tags :** les tags se trouvent dans la ligne de titre. **Add tag** ouvre une liste des tags de l'espace de travail dans laquelle vous pouvez chercher, avec une ligne **Create**. Chaque clic est enregistré immédiatement. Les rôles en lecture seule et auditeur ne peuvent pas modifier les tags.
+- **Jetons :** la carte **Information** comporte une ligne **Tokens** lorsque vous pouvez voir les coûts. Elle indique **Total**, **Voice** et **Text**, ainsi que **Unknown** lorsque certains jetons ne sont pas classés. Elle ajoute **Estimated** ou **Mixed sources** lorsque le décompte n'est pas exact.
+
+### Configure et Operations {#configure-and-operations}
+
+Certains agents ajoutent un écran de configuration. Leurs jobs affichent deux onglets, **Configure** et **Operations**. Le job s'ouvre sur **Configure** dans les cas suivants :
+
+- Le job n'a pas démarré.
+- Le job n'a pas encore de case.
+- Vous suivez un lien qui demande **Configure**, par exemple le bouton **Open** d'un plan lancé dans la conversation.
+
+Sinon, le job s'ouvre sur **Operations**, où se trouvent les cases.
+
+### Test et production {#testing-and-production}
+
+Lorsque la fonctionnalité est activée pour votre espace de travail, un job d'un agent Supervaizer v2 a un mode. Un nouveau job démarre en mode test. Un badge à côté du titre indique **Testing** ou **Production**.
+
+| Commande | Ce qu'elle fait |
+| --- | --- |
+| **Go live** | Demande **Go live?** pour confirmer. Les nouveaux cases vont dans le couloir Production. Les cases de test restent dans Testing. |
+| **Back to testing** | Demande **Back to testing?** pour confirmer. Les nouveaux cases vont de nouveau dans le couloir Testing. |
+
+- **Les responsables de mission** utilisent ces commandes.
+- **Un case de test** est un case que l'agent crée pendant que le job est en mode test. Cette marque ne change jamais, même lorsque vous changez de mode.
+- **L'agent** ne voit pas le mode.
+- **Un job créé depuis la conversation, ou importé d'une source existante,** démarre en mode production.
+
+Sur le tableau, les cases de test apparaissent dans un couloir **Testing**. Sur un job qui a un mode, le couloir par défaut s'appelle **Production**.
+
+## Les trois vues des cases {#the-three-case-views}
+
+Ouvrez le menu **Display**, en haut à droite de la section **Cases**, et choisissez une **View**.
+
+### Board {#board}
+
+La vue par défaut. Les cases sont regroupés en **couloirs** (swimlanes), un par type de case, et chaque couloir a cinq colonnes de statut.
+
+| Colonne | Cases qu'elle contient |
+| --- | --- |
+| **Todo** | Pas encore commencés |
+| **In Progress** | En cours de démarrage, d'exécution ou d'annulation |
+| **Waiting for Input** | En attente d'une réponse humaine |
+| **Success** | Terminés |
+| **Anomaly** | En échec ou annulés |
+
+- **Les couloirs viennent de l'agent.** Setup, Testing, Work (ou Production) et Deliverable viennent en premier, puis tous les autres par ordre alphabétique. Un case sans type va dans **Work**.
+- **Cliquez sur le nom d'un couloir pour le replier.** Studio mémorise les couloirs repliés pour chaque job, dans votre navigateur, pendant 180 jours.
+
+:::tip[Commencez par Waiting for Input]
+Ces cases sont bloqués tant que personne ne répond. Ouvrez-en un et répondez à la question de l'agent pour qu'il reprenne.
+:::
+
+#### Dispositions du tableau {#board-layouts}
+
+Dans le menu **Display**, **Layout** change la façon dont le tableau affiche les cases.
+
+| Disposition | Ce qu'elle affiche |
+| --- | --- |
+| **Horizontal** | Des couloirs, avec des colonnes de statut dans chacun (par défaut) |
+| **Vertical** | Une colonne par couloir, avec les cases empilés par statut |
+| **Deliverables only** | Uniquement les cases qui ont des livrables |
+| **Dialog** | Les cases sous forme de fil, du plus ancien au plus récent |
+
+### List {#list}
+
+Un tableau avec une ligne par case : **Name**, **Status**, **Lane**, une date, **Cost** et **Steps**.
+
+- **La colonne de date suit le tri.** Triez par Start date et la colonne affiche les dates de début ; il en va de même pour End date et Last update date.
+- **Group by swimlane**, dans le menu **Display**, découpe le tableau en un bloc repliable par couloir.
+
+### Calendar {#calendar}
+
+Une colonne par jour, du premier jour qui a un case au dernier. Un jour sans rien affiche **No cases** ; les cases sans date sont rassemblés dans une dernière colonne **No date**.
+
+Choisissez la date qui place un case avec **Calendar date**, dans le menu **Display** : **Created date** (par défaut), **Started date** ou **Finished date**.
+
+### Taille des cartes {#card-size}
+
+Dans les vues Board et Calendar, **Cards** bascule entre deux tailles.
+
+| Taille | Ce qu'une carte affiche |
+| --- | --- |
+| **Compact** (par défaut) | Le nom et le statut |
+| **Full** | Le nom, le statut, la référence, le nombre d'étapes, le coût et la date sur laquelle vous triez |
+
+## Filtrer et trier {#filter-and-sort}
+
+Les boutons **Filters** et **Sort** se trouvent à côté du titre **Cases** et s'appliquent aux trois vues.
+
+| Commande | Options |
+| --- | --- |
+| **Filters** | Recherche par texte, **Status**, **Agent**, **Swimlane**. **Clear all** les supprime. |
+| **Sort** | **Case name**, **Start date**, **End date**, **Last update date** ; ordre croissant ou décroissant. **Reset to default** rétablit le tri par défaut. |
+
+Le tri par défaut est **Last update date**, du plus récent au plus ancien.
+
+- **Les compteurs suivent les filtres.** Total, Completed, Waiting et Failed ne comptent que les cases qui correspondent, et une ligne sous les cases indique _Showing 3 of 8 cases_.
+- **Un point vert signale un menu modifié.** Il apparaît sur Filters, Sort ou Display lorsque le menu n'est pas sur ses valeurs par défaut.
+
+:::info[Les réglages de vue ne sont pas enregistrés]
+La vue, la taille des cartes, les filtres et le tri reviennent à leurs valeurs par défaut lorsque vous quittez la page du job. Seuls les couloirs repliés sont mémorisés.
+:::
+
+## Ouvrir un case, ou tous les cases {#open-a-case-or-all-of-them}
+
+- **Cliquez sur un case**, dans n'importe quelle vue, pour l'ouvrir et lire ses étapes.
+- **View all**, à côté du titre **Cases**, ouvre la liste complète des cases du job, avec la pagination et l'export : **Export CSV** vous laisse choisir les colonnes, **Full export** exporte tous les champs.
+
+## Dépannage {#troubleshooting}
+
+| Symptôme | Cause | Solution |
+| --- | --- | --- |
+| « No cases for this job yet. » | L'agent n'a pas encore créé de case | Patientez, ou vérifiez que le job est démarré |
+| « No cases match the current filters. » | Un filtre ou la recherche masque tout | Ouvrez **Filters** et cliquez sur **Clear all** |
+| Un couloir n'affiche que son nom | Il est replié | Cliquez sur son nom pour le déplier |
+| Aucun case sur un job qui a un onglet **Configure** | Vous êtes sur l'écran de configuration | Passez à l'onglet **Operations** |
+| Pas de bouton **Go live** | La fonctionnalité est désactivée pour votre espace de travail, l'agent n'est pas Supervaizer v2, ou vous n'êtes pas responsable de mission | Adressez-vous à un administrateur de l'espace de travail |
+| La vue est revenue à Board | Les réglages de vue ne sont pas enregistrés d'une visite à l'autre | Choisissez de nouveau la vue dans **Display** |

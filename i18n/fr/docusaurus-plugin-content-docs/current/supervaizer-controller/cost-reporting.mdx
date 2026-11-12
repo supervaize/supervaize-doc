@@ -1,0 +1,136 @@
+---
+id: cost-reporting
+title: Déclaration des coûts
+displayed_sidebar: supervaizerControllerSidebar
+slug: cost-reporting
+---
+
+# Déclaration des coûts {#cost-reporting}
+
+Les opérateurs veulent savoir ce que coûte un job. Votre agent déclare le coût de chaque étape et le total du job, et Studio les affiche sur la page du job, sur chaque case et dans ses propres tableaux de bord.
+
+![Les cases d'un job dans Studio, chacun avec son coût](/img/controller/job-cases.png)
+
+## Les trois montants {#the-three-numbers}
+
+| Niveau | Où votre agent le place | Ce que fait Studio |
+| --- | --- | --- |
+| Étape | `cost` sur l'étape | L'affiche sur l'étape |
+| Case | rien | Additionne les coûts des étapes du case |
+| Job | `information.cost.total_cost` sur le job | L'affiche comme coût du job |
+
+Studio n'additionne **pas** les coûts des cases pour obtenir le coût du job. Déclarez vous-même le total du job. Sans lui, le job n'affiche aucun coût.
+
+## Déclarer les coûts {#report-the-costs}
+
+Les coûts sont des nombres en dollars américains.
+
+```python
+def job_snapshot(job_id: str, request: V2ActionRequest, status: str, cases: list[dict]) -> dict:
+    total_cost = round(sum(step.get("cost", 0) for case in cases for step in case["steps"]), 2)
+    return {
+        "id": job_id,
+        "agent_slug": request.agent_slug,
+        "mission_id": request.mission_id,
+        "status": status,
+        "source": {"type": "fresh_start"},
+        "information": {"cost": {"total_cost": total_cost}},
+    }
+
+
+case = {
+    "id": "job-1-case-1",
+    "lane": "work",
+    "title": "Hello Ada (1)",
+    "status": "completed",
+    "steps": [
+        {"id": "job-1-case-1-start", "activity": "operation", "status": "completed", "title": "Start", "cost": 0.10},
+        {"id": "job-1-case-1-say-hello", "activity": "operation", "status": "completed",
+         "title": "Deliver greeting card", "cost": 0.10},
+    ],
+}
+```
+
+![Un case avec le coût de chaque étape](/img/controller/case-steps.png)
+
+## Que compter {#what-to-count}
+
+Décidez-le avec la personne qui paie :
+
+- **Les appels au modèle** : les tokens en entrée et en sortie, au prix de votre fournisseur.
+- **Les outils payants** : recherche, minutes de voix, messages, fournisseurs de données.
+- **Rien d'autre**. Vos propres serveurs et votre marge ne sont pas le coût d'une étape.
+
+Déclarez le coût quand l'étape se termine, avec les chiffres réels. Si une étape peut durer longtemps, mettez son coût à jour à chaque synchronisation.
+
+Déclarez un coût de `0` pour une étape gratuite. Un coût manquant et une étape gratuite se ressemblent pour un opérateur, et un seul des deux est vrai.
+
+## Annoncer le coût avant le lancement du job {#say-the-cost-before-the-job-starts}
+
+Un agent doté d'une configuration guidée peut afficher une estimation avant que l'opérateur confirme. L'estimation est une fourchette, ou elle est inconnue. Ce n'est jamais un faux chiffre exact.
+
+```python
+from supervaizer import V2CostEstimate
+
+V2CostEstimate(status="estimated", unit="USD per interview", min=12, max=20,
+               basis="the middle half of the last 40 completed interviews")
+
+V2CostEstimate(status="unknown", basis="fewer than 3 completed interviews yet")
+```
+
+Renvoyez-la dans le `setup_plan` de votre action `job.start.preview`. [Configuration guidée](controller-setup#guided-setup) montre comment déclarer cette action. Voir « Setup plan and field schema » dans le [guide du SDK](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#setup-plan-and-field-schema).
+
+## Facturer le travail à l'espace de travail {#bill-the-workspace-for-the-work}
+
+La déclaration des coûts informe. La **consommation facturable** facture : l'agent déclare ce qu'il vend, l'espace de travail propriétaire fixe les prix dans Studio, et l'agent déclare les quantités.
+
+```python
+from datetime import UTC, datetime
+from decimal import Decimal
+
+from supervaizer import Agent, BillableConsumption
+
+agent = Agent(
+    name="Research Agent",
+    version="1.0.0",
+    supervaizer_v2_registration=registration,
+    billing_catalog=[{"sku": "brief", "unit": "brief", "description": "One sourced brief"}],
+)
+
+account.report_consumption_sync(
+    [
+        BillableConsumption(
+            sku="brief",
+            quantity=Decimal("1"),
+            unit="brief",
+            job_id=job_id,
+            case_id=case_id,
+            idempotency_key=f"{case_id}:brief",
+            occurred_at=datetime.now(UTC),
+        )
+    ],
+    agent_slug=agent.slug,
+)
+```
+
+Grâce à l'`idempotency_key`, une déclaration répétée n'est comptée qu'une fois. Cette fonctionnalité exige Supervaizer 1.10 ou une version ultérieure.
+
+L'appel renvoie un reçu pour chaque enregistrement, dans l'ordre d'envoi :
+
+- `accepted` : Studio a comptabilisé l'enregistrement.
+- `duplicate` : Studio a déjà cette `idempotency_key`. Rien n'est comptabilisé deux fois.
+- `rejected` : Studio n'a rien comptabilisé. `reason` indique pourquoi. Un rejet est définitif : ne renvoyez pas l'enregistrement.
+
+Un lot contient de 1 à 200 enregistrements. Déclarez le travail quand il est définitif. Studio ne propose ni mise à jour ni suppression d'un enregistrement. Le contrat complet se trouve dans [Billable consumption](supervaizer-controller/ref/2026_10_BILLABLE_CONSUMPTION.md).
+
+## Liste de contrôle {#checklist}
+
+- [ ] Chaque étape a un `cost`, et les étapes gratuites indiquent `0`.
+- [ ] L'instantané du job contient `information.cost.total_cost`.
+- [ ] Le total est recalculé à chaque état du job, pour qu'il suive les étapes.
+- [ ] Une estimation est une fourchette ou elle est inconnue.
+
+## Référence {#reference}
+
+- Hello World : `STEP_COST` et `_job_snapshot` dans [`agent_v2.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_v2.py).
+- Pour tracer les coûts dans le temps sous forme de graphique, ajoutez un jeu de données à votre [tableau de bord analytique](job-analytics).

@@ -1,7 +1,7 @@
 /* Shared styles for the MCP connector demos (ConnectFlow, ChatReplay). */
 
 .demo {
-  --demo-accent: #1f9d3a;
+  --demo-accent: #15803d;
   --demo-accent-soft: rgba(79, 255, 63, 0.14);
   margin-bottom: var(--ifm-leading);
 }

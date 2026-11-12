@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
+import Translate, { translate } from "@docusaurus/Translate";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
@@ -15,20 +16,32 @@ function HomepageHeader() {
     <header className={clsx("hero", styles.heroBanner, styles.heroRunwaize)}>
       <div className={clsx("container", styles.heroContainer)}>
         <Heading as="h1" className={clsx("hero__title", styles.heroTitle)}>
-          <span className={styles.heroTitleMobile}>Runwaize Docs</span>
+          <span className={styles.heroTitleMobile}>
+            <Translate id="homepage.hero.title.mobile">Runwaize Docs</Translate>
+          </span>
           <span className={styles.heroTitleDesktop}>
-            Runwaize <span className={styles.heroTitleGreen}>Documentation</span>
+            Runwaize{" "}
+            <span className={styles.heroTitleGreen}>
+              <Translate id="homepage.hero.title.desktop">Documentation</Translate>
+            </span>
           </span>
         </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className="hero__subtitle">
+          {/* Same text as siteConfig.tagline: Translate needs a static string */}
+          <Translate id="homepage.tagline">AI Agents with confidence</Translate>
+        </p>
         <div className={styles.buttons}>
           <Link
             className={clsx("button button--secondary button--lg", styles.gettingStartedButton)}
             to="/docs/supervaizer-controller/quickstart"
           >
-            <span className={styles.gettingStartedLabelMobile}>Getting started · 10 min</span>
+            <span className={styles.gettingStartedLabelMobile}>
+              <Translate id="homepage.hero.cta.mobile">Getting started · 10 min</Translate>
+            </span>
             <span className={styles.gettingStartedLabelDesktop}>
-              Getting Started with Supervaizer Controller - 10min ⏱️
+              <Translate id="homepage.hero.cta.desktop">
+                Getting Started with Supervaizer Controller - 10min ⏱️
+              </Translate>
             </span>
           </Link>
         </div>
@@ -59,8 +72,14 @@ export default function Home(): ReactNode {
 
   return (
     <Layout
-      title={`${siteConfig.title} Documentation`}
-      description="Documentation for Runwaize"
+      title={translate(
+        { id: "homepage.meta.title", message: "{title} Documentation" },
+        { title: siteConfig.title },
+      )}
+      description={translate({
+        id: "homepage.meta.description",
+        message: "Documentation for Runwaize",
+      })}
     >
       <JsonLd data={jsonLd} />
       <HomepageHeader />

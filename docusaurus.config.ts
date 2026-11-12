@@ -7,7 +7,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 const config: Config = {
   title: "Runwaize Documentation",
   tagline: "AI Agents with confidence",
-  favicon: "img/runwaize.svg",
+  favicon: "img/runwaize-mark.svg",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -43,7 +43,7 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: "en",
-    locales: ["en"],
+    locales: ["en", "fr"],
   },
   themes: ["@saucelabs/theme-github-codeblock", "@docusaurus/theme-mermaid"],
   presets: [
@@ -104,12 +104,18 @@ const config: Config = {
       title: "Runwaize",
       logo: {
         alt: "Runwaize Logo",
-        src: "img/runwaize.svg",
-        srcDark: "img/runwaize.svg",
+        src: "img/runwaize-mark.svg",
         href: "https://www.runwaize.com",
         target: "_self",
       },
       items: [
+        {
+          type: "docSidebar",
+          sidebarId: "guidesSidebar",
+          position: "left",
+          label: "Guides",
+          activeBasePath: "/docs/guides",
+        },
         {
           type: "docSidebar",
           sidebarId: "supervaizerControllerSidebar",
@@ -136,6 +142,7 @@ const config: Config = {
           label: "The Skills Cookbook",
           position: "left",
         },
+        { type: "localeDropdown", position: "right" },
         {
           href: "https://github.com/runwaize",
           label: "GitHub",

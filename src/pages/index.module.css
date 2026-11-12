@@ -15,8 +15,8 @@
 /* Runwaize hero: dark background, grid, green ambient glow */
 .heroRunwaize {
   --hero-bg: #080808;
-  --hero-green: #3fde47;
-  --hero-green-glow: rgba(63, 222, 71, 0.12);
+  --hero-green: #4fff3f; /* --color-brand */
+  --hero-green-glow: rgba(79, 255, 63, 0.12);
   background-color: var(--hero-bg);
   background-image:
     linear-gradient(var(--hero-green-glow) 0%, transparent 50%),
@@ -55,7 +55,7 @@
 
 .heroTitle {
   color: #fff !important;
-  font-weight: 700;
+  font-weight: 600;
   font-size: clamp(1.75rem, 6vw, 2.5rem);
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -101,7 +101,6 @@
 }
 
 .heroRunwaize .buttons .button {
-  border-radius: 9999px;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
 }
@@ -140,7 +139,7 @@
 }
 
 .heroRunwaize .buttons .button--secondary:hover {
-  background: rgba(255, 255, 255, 0.95);
+  background: #e5e5e5; /* --color-hover-light */
   color: #080808;
 }
 

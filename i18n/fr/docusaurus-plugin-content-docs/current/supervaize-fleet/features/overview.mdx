@@ -1,0 +1,93 @@
+---
+id: overview
+title: "Supervaize Studio : vue d'ensemble de la plateforme"
+displayed_sidebar: supervaizeFleetSidebar
+slug: overview
+---
+
+import Link from "@docusaurus/Link";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+Ce guide montre comment utiliser Supervaize Studio. Vous enregistrez des agents, vous regroupez leur travail dans des missions, vous lancez des jobs et vous suivez les cases que les agents créent.
+
+## Vue d'ensemble de la plateforme {#platform-overview}
+
+Studio vous permet de :
+
+- **Connecter** des agents d'IA et régler leurs paramètres
+- **Créer** des missions qui regroupent des jobs, des cases et des personnes
+- **Lancer** des jobs, une seule fois ou selon une planification
+- **Suivre** les cases et répondre aux agents qui attendent une personne
+- **Contrôler** le travail des agents avec des règles
+- **Évaluer** les résultats et rester informé grâce aux notifications
+
+Certaines fonctionnalités n'apparaissent que si elles sont activées pour votre espace de travail. S'il manque une entrée de menu, adressez-vous à un administrateur de l'espace de travail.
+
+## Fonctionnalités principales {#core-features}
+
+### <i className="bi bi-1-circle"></i> [Gestion des agents](/docs/supervaize-fleet/features/agent-management) {#-agent-management}
+
+Les agents s'enregistrent eux-mêmes par l'intermédiaire d'un serveur. La page **Agents** les liste avec un statut : **Active**, **Inactive**, **Suspended**, **Error**, **Inaccessible** ou **Paused**.
+
+- Définissez les secrets et les paramètres dans le panneau **Parameters** d'un agent.
+- Le propriétaire d'un agent peut le mettre en pause et le reprendre plus tard.
+
+### <i className="bi bi-2-circle"></i> [Gestion des missions](/docs/supervaize-fleet/features/mission-management) {#-mission-management}
+
+Une mission regroupe les jobs, les cases, les personnes et les coûts d'un même objectif. Ajoutez-y des agents et des personnes, puis lancez des jobs.
+
+### <i className="bi bi-3-circle"></i> [Gestion des jobs](/docs/supervaize-fleet/features/job-management) {#-job-management}
+
+Un job est une exécution d'un agent. Renseignez les paramètres de l'agent, fixez des limites et lancez.
+
+- Certains jobs démarrent en mode test : vous pouvez les essayer avant de passer en production.
+- Les responsables de mission peuvent aussi lancer des jobs selon une planification.
+
+### <i className="bi bi-4-circle"></i> [Naviguer dans un job](/docs/supervaize-fleet/features/job-navigation) {#-navigate-a-job}
+
+Suivez les cases d'un job en tableau, en liste ou en calendrier. Filtrez-les, triez-les et exportez-les.
+
+### <i className="bi bi-5-circle"></i> [Gestion des cases](/docs/supervaize-fleet/features/case-management) {#-case-management}
+
+Un agent crée des cases à l'intérieur d'un job. Un case comporte des étapes, et certaines étapes attendent une personne.
+
+- Ouvrez l'**Actions Panel** pour voir les cases qui demandent votre intervention, les anomalies et le travail terminé.
+- Ajoutez des tags aux jobs, aux cases et aux étapes, et filtrez les listes par tag.
+
+### <i className="bi bi-6-circle"></i> [Gestion du contexte](/docs/supervaize-fleet/features/context-management) {#-context-management}
+
+Les éléments de contexte sont des fichiers, du texte, des URL et des connexions. Les administrateurs de l'espace de travail les ajoutent à l'espace de travail. Les responsables de mission les ajoutent à une mission.
+
+### <i className="bi bi-7-circle"></i> [Règles](/docs/supervaize-fleet/rules/setup) {#-rules}
+
+Une règle est un contrôle rédigé en langage courant. Jev vérifie chaque étape de l'agent par rapport à cette règle. Une règle peut avertir, mettre le job en pause pour approbation, ou l'arrêter. Voir aussi [Exécuter et contrôler des jobs avec des règles](/docs/supervaize-fleet/rules/run-and-review).
+
+### <i className="bi bi-8-circle"></i> [Évaluations et analyses](/docs/supervaize-fleet/features/rating-analytics) {#-rating--analytics}
+
+Les utilisateurs évaluent les agents, les missions, les jobs et les cases à l'aide de dimensions d'évaluation. Les administrateurs gèrent les dimensions dans **Ratings Setup**. Le **Dashboard** et les analyses d'une mission montrent l'activité et les coûts.
+
+### <i className="bi bi-9-circle"></i> [Notifications](/docs/supervaize-fleet/features/slack-notifications) {#-notifications}
+
+Connectez Slack ou l'e-mail dans **Integrations**. Réglez les événements et la fréquence pour chaque mission et chaque agent. **My notifications** liste les notifications de tous vos espaces de travail.
+
+## Vue d'ensemble du parcours {#workflow-overview}
+
+1. **Connectez** les agents de votre espace de travail.
+2. **Créez** une mission et ajoutez-y des agents et des personnes.
+3. **Ajoutez du contexte** à la mission, si les agents en ont besoin.
+4. **Lancez** un job, ou planifiez-le.
+5. **Suivez** les cases et répondez aux étapes qui vous attendent.
+6. **Évaluez** les résultats.
+
+## Pour commencer {#getting-started}
+
+1. **Vérifiez** les agents sur la page **Agents**.
+2. **Créez** votre première mission avec le guide [Gestion des missions](/docs/supervaize-fleet/features/mission-management).
+3. **Lancez** un job avec le guide [Gestion des jobs](/docs/supervaize-fleet/features/job-management).
+4. **Suivez** ses cases avec [Naviguer dans un job](/docs/supervaize-fleet/features/job-navigation).
+
+## Besoin d'aide ? {#need-help}
+
+- **Communauté** : rejoignez notre [Discord](https://discord.gg/supervaize)
+- **Assistance** : écrivez à support@supervaize.com
+- **Documentation** : consultez les guides détaillés de chaque fonctionnalité ci-dessus

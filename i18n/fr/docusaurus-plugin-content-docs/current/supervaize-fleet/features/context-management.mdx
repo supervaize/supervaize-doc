@@ -1,0 +1,91 @@
+---
+id: context-management
+title: Gérer le contexte
+description: Ajoutez des fichiers, du texte, des URL et des connexions à la bibliothèque de contexte d'un espace de travail ou d'une mission dans Supervaize Studio.
+displayed_sidebar: supervaizeFleetSidebar
+slug: context-management
+---
+
+# Gérer le contexte {#manage-context}
+
+Le contexte est une bibliothèque d'éléments. Un élément est un fichier, un texte, une URL ou une connexion. La page de Studio les décrit comme des éléments mis à la disposition de vos outils d'exécution.
+
+Un élément a un **Scope**. Un élément **Workspace** appartient à tout l'espace de travail. Un élément **Mission** appartient à une seule mission.
+
+Le contexte n'apparaît que s'il est activé pour votre espace de travail. Les pages de contexte nécessitent un abonnement actif.
+
+## Ouvrir la bibliothèque {#open-the-library}
+
+Sélectionnez **Advanced**, puis **Context**. La page a pour titre **Context Items**.
+
+Tous les membres de l'espace de travail peuvent lire la liste et ouvrir le panneau de détail d'un élément. Seuls les administrateurs de l'espace de travail peuvent ajouter, modifier et supprimer des éléments.
+
+| Colonne | Ce qu'elle affiche |
+| --- | --- |
+| **Name** | Le nom de l'élément. |
+| **Type** | **File**, **Text**, **URL** ou **Connection**. |
+| **Scope** | **Workspace** ou **Mission**. |
+| **Status** | L'état de l'élément. |
+| **Size** | La taille de l'élément. |
+| **Parent** | L'objet auquel l'élément appartient. |
+| **Created** | La date de création. |
+
+### Valeurs de statut {#status-values}
+
+| Statut | Signification |
+| --- | --- |
+| **Active** | L'élément est prêt. |
+| **Processing** | Studio prépare encore l'élément. |
+| **Failed** | Studio n'a pas pu préparer l'élément. |
+| **Disabled** | Un administrateur a désactivé l'élément. |
+| **Superseded** | Un élément plus récent l'a remplacé. |
+
+### Filtres {#filters}
+
+Cherchez avec **Search context...**. Vous pouvez aussi filtrer par **Type**, **Status**, **Scope** et **Related Object Type**. Le type d'objet lié est **Workspace**, **Mission** ou **Agent**.
+
+## Ajouter un élément {#add-an-item}
+
+1. Sélectionnez **+ Add Context Item**.
+2. Saisissez un **Name**. Si vous le laissez vide, Studio en crée un.
+3. Choisissez le **Type**.
+4. Choisissez le **Scope**. Pour **Mission**, choisissez la **Mission**.
+5. Fournissez le contenu. Le champ dépend du type.
+6. Ajoutez des **Instructions** et des **Tags** si vous le souhaitez. Séparez les tags par des virgules.
+7. Enregistrez l'élément.
+
+| Type | Champ de contenu |
+| --- | --- |
+| **Text** | **Content** |
+| **File** | **File** |
+| **URL** | **URL** et **Max crawl depth** |
+| **Connection** | **Source identifier** |
+
+Le formulaire a aussi un champ **Status**. Réglez-le sur **Active** ou **Disabled**.
+
+## Consulter un élément {#read-an-item}
+
+Sélectionnez un élément pour ouvrir son panneau de détail. Le panneau contient ces cartes.
+
+| Carte | Ce qu'elle affiche |
+| --- | --- |
+| **Properties** | Le type, le statut, la taille, les dates et la référence. |
+| **Content** | Le contenu de l'élément. |
+| **AI Data Preview** | La façon dont le contexte apparaît aux agents d'IA. |
+| **Attached To** | L'objet propriétaire de l'élément. |
+
+## Contexte d'une mission {#context-of-a-mission}
+
+La page d'une mission a sa propre section **Context**. Elle liste les éléments de cette mission.
+
+Les responsables de mission peuvent utiliser ces commandes.
+
+- **Add** ouvre le formulaire avec la mission déjà choisie.
+- Les boutons de modification et de suppression d'une ligne modifient ou suppriment un élément.
+- Déposez plusieurs fichiers sur la zone de dépôt, ou cliquez dessus, pour les ajouter comme éléments de type fichier actifs.
+
+Sélectionnez le nom d'un élément pour ouvrir un détail en lecture seule, avec un aperçu et un téléchargement. Toutes les personnes qui peuvent voir la mission peuvent le faire.
+
+:::tip[Vérifiez l'aperçu]
+Ouvrez **AI Data Preview** après l'ajout d'un élément. Il montre ce que les agents reçoivent.
+:::

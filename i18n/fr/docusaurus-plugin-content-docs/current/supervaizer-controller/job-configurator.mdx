@@ -1,0 +1,492 @@
+---
+id: job-configurator
+title: Configurateur de job (écran Configure)
+displayed_sidebar: supervaizerControllerSidebar
+slug: job-configurator
+---
+
+# Configurateur de job : construire l'écran Configure {#job-configurator-build-the-configure-screen}
+
+L'onglet **Configure** d'un job dans Studio est dessiné à partir d'un document que votre agent renvoie. Votre agent est responsable du vocabulaire, des champs, de la validation et de l'état. Studio est responsable du rendu, de la navigation, des autorisations et de la piste d'audit.
+
+Un agent de campagne, par exemple, affiche **Campaign setup** avec les onglets _Parameters_, _Participants_, _Scenario_, _Review & launch_ et _Links & exports_. Chaque onglet est une section du document, et chaque section contient un composant du catalogue de Studio.
+
+:::info[Exemple fonctionnel]
+L'[exemple Hello World](https://github.com/supervaize/supervaize_hello_world) implémente tout ce que décrit cette page dans `agent_configurator.py` (environ 230 lignes), avec des tests dans `tests/test_configurator.py`.
+:::
+
+:::tip[Confiez ce travail à un agent de code]
+Le [skill d'intégration Supervaizer](https://github.com/supervaize/supervaizer/tree/main/skills/supervaizer-integration) guide Claude Code, Cursor ou Codex dans ce travail. Il est publié avec le SDK, et il lit ce guide ainsi que l'exemple Hello World : il suit donc le contrat en vigueur.
+:::
+
+## Fonctionnement {#how-it-works}
+
+1. L'agent déclare la surface `job.configurator` dans son enregistrement v2.
+2. Un opérateur démarre un job avec le flux `job.start` habituel. La page du job comporte alors deux onglets : **Configure**, et **Operations** avec les cases et les étapes. Studio ouvre un job sur Configure tant qu'il n'a aucun case, puis sur Operations.
+3. Studio charge la surface avec `supervaizer/surface.load`. L'agent renvoie un document `Configurator`.
+4. Studio valide le document et dessine un onglet par section. Un document qui échoue à la validation est refusé en bloc et Studio affiche _Configurator contract error_.
+5. Un bouton d'une section invoque l'action de l'agent désignée par sa **liaison** (binding). L'agent valide, enregistre, puis Studio recharge le document.
+
+L'agent n'envoie ni HTML, ni CSS, ni JavaScript. Studio n'affiche que des composants de son catalogue fermé.
+
+:::note[Qui le voit]
+Studio montre l'onglet Configure aux utilisateurs qui peuvent gérer la mission (`manage_mission`). Les autres utilisateurs, ainsi que les jobs des agents sans cette surface, obtiennent la page de job générique.
+:::
+
+## Étape 1 : déclarer la surface et les actions {#step-1-declare-the-surface-and-the-actions}
+
+Ajoutez la surface à `surfaces`, et ajoutez à `actions` chaque action que votre document lie. Un identifiant d'action seul a la portée job et est mutant, ce dont une liaison de Configurator a besoin.
+
+```python
+from supervaizer.contracts import build_v2_agent_registration
+
+registration = build_v2_agent_registration(
+    agent_slug="hello-world-ai-agent",
+    display_name="Hello World AI Agent",
+    a2ui_catalog_version="hello-world.0",
+    surfaces=["job.start", "job.configurator"],
+    actions=["job.start", "job.sync", "job.stop", "job.configure", "job.greet"],
+)
+```
+
+Enregistrez ensuite les gestionnaires sur le `Server` :
+
+```python
+server.register_v2_surface("job.configurator", handle_surface, agent_slug=agent.slug)
+for action in ("job.configure", "job.greet"):
+    server.register_v2_action(action, handle_action, agent_slug=agent.slug)
+```
+
+:::warning[Les liaisons doivent pointer vers des actions déclarées, de portée job]
+Studio refuse un document qui lie une action absente de l'enregistrement. Il refuse aussi de transmettre une action de portée espace de travail ou mission par une liaison de job. Si une section doit modifier une ressource de l'espace de travail, déclarez pour cela une action de portée job. Seules les consultations en lecture seule `resource.<id>.list` et `resource.<id>.get` peuvent franchir cette frontière.
+
+Une nouvelle action modifie les portées de l'autorisation (grant) de l'agent : l'espace de travail doit accepter de nouveau l'autorisation de l'agent avant que Studio puisse l'appeler.
+:::
+
+## Étape 2 : renvoyer le document Configurator {#step-2-return-the-configurator-document}
+
+Le gestionnaire de surface reçoit `job_id`, `mission_id` et un objet `input`. Il renvoie un `V2SurfaceResult` dont le `document` est le Configurator.
+
+```python
+def handle_surface(request):
+    data = request if isinstance(request, dict) else request.model_dump()
+    return {
+        "surface": data["surface"],
+        "document": configurator_document(data["job_id"], data.get("input") or {}),
+    }
+```
+
+### Champs racine {#root-fields}
+
+```json
+{
+  "type": "Configurator",
+  "id": "hello_world.configurator",
+  "schema_version": "2",
+  "revision": "3",
+  "title": "Hello World setup",
+  "entity_label": "Hello job",
+  "state": "draft",
+  "sections": [],
+  "readiness": [],
+  "primary_action": null
+}
+```
+
+| Champ | Requis | Signification |
+| --- | --- | --- |
+| `type` | oui | Toujours `Configurator`. |
+| `id` | oui | Identifiant stable du document. |
+| `schema_version` | oui | `"1"` ou `"2"`. Voir [versions de schéma](#schema-versions). |
+| `revision` | oui | Jeton opaque de l'état enregistré courant. Voir [révisions](#step-4-handle-saves-and-revisions). |
+| `title` | oui | Titre de l'écran, par exemple _Campaign setup_. |
+| `entity_label`, `state` | non | Vos mots pour désigner le job et son état. |
+| `sections` | oui | Les onglets, dans l'ordre. |
+| `readiness` | non | La liste de vérification de la configuration. |
+| `primary_action` | non | Le bouton principal (lancer, clôturer), ou `null`. |
+
+### Sections {#sections}
+
+```json
+{
+  "id": "parameters",
+  "label": "Parameters",
+  "policy": "editable",
+  "component": { "type": "Form", "id": "hello_world.greeting", "data": {}, "bindings": {} }
+}
+```
+
+Les identifiants de section et de composant doivent être uniques dans le document. Le `label` est le texte de l'onglet. La `policy` peut changer à chaque chargement : une même section peut donc être modifiable dans un brouillon et verrouillée après le lancement :
+
+| Politique | Effet dans Studio |
+| --- | --- |
+| `editable` | Les champs et les boutons fonctionnent. |
+| `read_only` | La section est visible et verrouillée. |
+| `editable_with_confirmation` | Seules les liaisons qui portent une `confirmation` peuvent être invoquées. |
+| `hidden` | Pas d'onglet. |
+
+Les politiques relèvent de la présentation. L'agent doit vérifier de nouveau chaque action.
+
+Un agent de campagne typique fait évoluer ses politiques au fil de la vie du job :
+
+| Section | Brouillon | En cours | Terminé |
+| --- | --- | --- | --- |
+| Parameters | `editable` | `read_only` | `read_only` |
+| Participants | `editable` | `editable` | `read_only` |
+| Scenario | `editable` | `read_only` | `read_only` |
+| Review & launch | `editable` | `editable` | `read_only` |
+| Interviews, Synthesis | `hidden` | `editable` | `read_only` ou `hidden` |
+| Links & exports | `editable` | `editable` | `read_only` |
+
+Les sections de résultats telles que _Interviews_ restent `hidden` pendant la configuration et apparaissent après le lancement. Un champ peut aussi être verrouillé seul avec `read_only: true` tandis que le reste de son formulaire reste modifiable.
+
+### Liaisons {#bindings}
+
+Une liaison relie un bouton à une action de l'agent. Studio ne devine jamais une action à partir d'un type de composant ou d'un identifiant.
+
+```json
+{
+  "action_id": "job.configure",
+  "target_scope": "job",
+  "payload_source": "component",
+  "confirmation": {
+    "title": "Send greetings?",
+    "message": "This replaces the job's hello cases with new ones.",
+    "confirm_label": "Send greetings"
+  }
+}
+```
+
+`target_scope` vaut toujours `job`. `payload_source` vaut `component` pour un bouton de section et `document` pour l'action principale. `confirmation` est facultatif : avec lui, Studio demande une confirmation avant d'invoquer l'action.
+
+## Étape 3 : choisir un composant pour chaque section {#step-3-choose-a-component-for-each-section}
+
+### `Form` : une liste de champs avec un bouton d'enregistrement {#form-a-list-of-fields-with-a-save-button}
+
+L'onglet _Parameters_. Le composant a besoin d'une liaison `save`.
+
+![La section Parameters de l'écran Configure de Hello World](/img/controller/configure-parameters.png)
+
+```json
+{
+  "type": "Form",
+  "id": "hello_world.greeting",
+  "data": {
+    "fields": [
+      { "id": "greeting", "label": "Greeting", "type": "text", "required": true, "default": "Hello" },
+      { "id": "shout", "label": "Shout", "type": "boolean", "default": false },
+      { "id": "created_at", "label": "Created", "type": "date", "default": "2026-04-18", "read_only": true }
+    ],
+    "save_label": "Save parameters"
+  },
+  "bindings": {
+    "save": { "action_id": "job.configure", "target_scope": "job", "payload_source": "component" }
+  }
+}
+```
+
+Les champs utilisent les [définitions de champs](controller-setup#fields) communes à tous les formulaires. Les clés les plus utiles ici :
+
+| Clé | Usage |
+| --- | --- |
+| `default` | La valeur enregistrée courante. Envoyez-la à chaque chargement. |
+| `required`, `read_only` | Studio bloque un champ obligatoire vide et verrouille un champ en lecture seule. |
+| `description`, `placeholder` | Texte d'aide. |
+| `multiline` | Une zone de texte pour un champ `text`. |
+| `options` | Les choix d'un `select`, sous forme d'objets `{ "value", "label" }`. Un `select` obligatoire n'a pas de choix vide : il affiche son `placeholder` jusqu'à ce que l'opérateur choisisse. |
+| `options_source` | Les choix d'un `resource_ref`, chargés depuis l'une des ressources de l'agent. |
+| `depends_on` | N'affiche le champ que pour certaines valeurs d'un autre champ. |
+
+Studio invoque la liaison `save` avec les valeurs des champs visibles sous `value`.
+
+Un `Form` ne sert pas qu'aux réglages. Trois autres usages :
+
+- **Affichage.** Un formulaire de champs `read_only` affiche des faits tels que la date de création ou le propriétaire.
+- **Déclenchement.** La liaison `save` peut désigner n'importe quelle action de portée job, et `save_label` nomme le bouton. Un onglet _Synthesis_ est un `Form` avec un `select` de prompt et le libellé _Generate synthesis_.
+- **Envoi de fichier.** Un champ `file` envoie un fichier avec le formulaire :
+
+```json
+{
+  "id": "report_file",
+  "label": "Insights report (.md)",
+  "type": "file",
+  "accept": ".md,text/markdown",
+  "max_bytes": 1048576,
+  "storage": "studio",
+  "required": true
+}
+```
+
+Studio stocke le fichier, garde le bouton d'enregistrement désactivé pendant l'envoi, et transmet à l'agent une référence au fichier stocké à la place des octets. Un champ de fichier doit être un champ de premier niveau du formulaire.
+
+### `ResourceList` : des lignes que l'opérateur ajoute et supprime {#resourcelist-rows-the-operator-adds-and-removes}
+
+L'onglet _Participants_. Studio liste les lignes d'une ressource de l'agent et propose les opérations que vous liez.
+
+```json
+{
+  "type": "ResourceList",
+  "id": "campaign.contacts",
+  "data": {
+    "resource_id": "campaign_contacts",
+    "columns": [{ "id": "name", "label": "Name" }, { "id": "email", "label": "Email" }],
+    "labels": { "create": "Enrol contact", "import": "Import contacts", "delete": "Remove", "empty": "No participants yet." },
+    "create_fields": [
+      {
+        "id": "contact_id",
+        "label": "Workspace contact",
+        "type": "resource_ref",
+        "required": true,
+        "options_source": { "type": "resource", "resource": "contacts", "value_field": "id", "label_field": "full_name" }
+      }
+    ],
+    "import_fields": [{ "id": "csv", "label": "New contacts (CSV)", "type": "text", "multiline": true, "required": true }]
+  },
+  "bindings": {
+    "create": { "action_id": "campaign.contacts.create", "target_scope": "job", "payload_source": "component" },
+    "delete": { "action_id": "campaign.contacts.delete", "target_scope": "job", "payload_source": "component" },
+    "import": { "action_id": "campaign.contacts.import", "target_scope": "job", "payload_source": "component" }
+  }
+}
+```
+
+- Les lignes proviennent de `resource.<resource_id>.list`, appelée avec le contexte du job afin que l'agent puisse restreindre la liste au job. Chaque ligne a besoin d'un `id` de type chaîne.
+- Chaque liaison est facultative. Sans liaison `delete`, il n'y a pas de bouton de suppression.
+- `create` et `import` reçoivent les valeurs des champs. `delete` reçoit `{"id": "<row id>"}`.
+- Sans `options_source`, un champ `resource_ref` est une simple zone de texte.
+- Un `create_selector` facultatif (`field_id`, `search_label`, `columns`) transforme le sélecteur en tableau avec recherche.
+
+### `TemplateComposer` : un éditeur de prompt ou de modèle {#templatecomposer-a-prompt-or-template-editor}
+
+L'onglet _Scenario_. Il affiche un sélecteur de version, un bloc de texte par emplacement (slot), des variables insérables, des lignes de validation et un aperçu Markdown rendu.
+
+```json
+{
+  "type": "TemplateComposer",
+  "id": "scenario.composer",
+  "data": {
+    "nodes": [{ "id": "body", "label": "Scenario" }],
+    "slots": [{ "id": "body", "label": "Scenario", "value": "Hello {{first_name}}", "multiline": true }],
+    "tokens": [{ "id": "first_name", "label": "First name", "insertion": "{{first_name}}", "group": "Contact" }],
+    "versions": [{ "id": "3", "label": "Version 3 · latest" }],
+    "selected_node_id": "body",
+    "selected_version_id": "3",
+    "validation": [{ "id": "scenario", "label": "Scenario ready", "status": "ok" }],
+    "preview": "Hello **Ada**"
+  },
+  "bindings": {
+    "save": { "action_id": "campaign.scenario.save", "target_scope": "job", "payload_source": "component" }
+  }
+}
+```
+
+`nodes`, `slots`, `tokens` et `versions` sont des listes obligatoires (elles peuvent être vides). `save` reçoit `{"value": {"selected_node_id", "selected_version_id", "slots"}}`, où `slots` associe l'identifiant de chaque emplacement à son texte.
+
+Pendant que l'opérateur saisit, Studio recharge la surface avec un **événement en lecture seule** afin que l'agent puisse actualiser `validation` et `preview` :
+
+```json
+{
+  "supported_schema_versions": ["1", "2"],
+  "event": { "document_id": "…", "revision": "…", "component_id": "scenario.composer", "type": "validation.requested", "value": {} },
+  "local_state": { "slots": { "body": "Hello {{first_name}}, welcome" } }
+}
+```
+
+Studio envoie les types d'événement `validation.requested` (après une pause dans la saisie) et `selection.changed` (un autre nœud ou une autre version). Ignorez un type que vous ne connaissez pas. `local_state` contient le brouillon non enregistré et est limité à 64 Kio. Construisez la réponse à partir de lui, mais **n'enregistrez rien** lors d'un chargement de surface, et conservez la même `revision`.
+
+### `Review` : la liste de vérification et le bouton principal {#review-the-checklist-and-the-main-button}
+
+L'onglet _Review & launch_. Le composant ne prend ni données ni liaisons :
+
+```json
+{ "type": "Review", "id": "campaign.review", "data": {}, "bindings": {} }
+```
+
+Studio le remplit avec la liste `readiness` du document et place le bouton `primary_action` en dessous.
+
+![Une section Review avec un élément bloqué et une action principale désactivée](/img/controller/configure-review.png)
+
+```json
+"readiness": [
+  { "id": "greeting", "label": "Greeting is set", "status": "ok", "section_id": "parameters" },
+  { "id": "signature", "label": "Signature is set", "status": "blocked", "section_id": "parameters" }
+],
+"primary_action": {
+  "id": "greet",
+  "label": "Send greetings",
+  "status": "enabled",
+  "binding": { "action_id": "job.greet", "target_scope": "job", "payload_source": "document" }
+}
+```
+
+- Le `status` d'un élément de readiness vaut `ok` ou `blocked`. Un `section_id` facultatif transforme la ligne en lien vers cette section, et doit désigner une section du document.
+- Studio n'active l'action principale que lorsque son `status` vaut `enabled` **et** qu'aucun élément de readiness n'est `blocked`.
+- Avec une section `Review`, le bouton n'apparaît que là. Sans elle, il apparaît sous chaque section.
+- La readiness sert uniquement à l'affichage. Elle n'autorise rien : vérifiez-la donc de nouveau dans l'action.
+
+### `Table` : des lignes en lecture seule, des liens et des téléchargements {#table-read-only-rows-links-and-downloads}
+
+L'onglet _Links & exports_. `Table` nécessite la version de schéma `"2"` et ses `bindings` doivent être vides.
+
+![Une section Table avec un lien et un artefact](/img/controller/configure-exports.png)
+
+```json
+{
+  "type": "Table",
+  "id": "hello_world.exports",
+  "bindings": {},
+  "data": {
+    "title": "Links & exports",
+    "empty_label": "Nothing to export yet.",
+    "columns": [{ "id": "item", "label": "Item" }, { "id": "link", "label": "Link" }],
+    "rows": [
+      { "item": "Registration link", "link": { "label": "Open", "href": "https://example.com/register" } },
+      { "item": "Invite links (CSV)", "link": { "label": "Download", "artifact": { "id": "invites:csv", "type": "invite_links_csv" } } }
+    ]
+  }
+}
+```
+
+- Une cellule est une chaîne, un nombre, un booléen, `null`, ou un objet lien avec un `label`.
+- `href` doit être une URL absolue en `http` ou `https`.
+- `artifact` est un objet plat avec un `id` de type chaîne. Studio le renvoie tel quel à l'action `artifact.get` de l'agent, puis affiche ou télécharge le contenu. Déclarez `artifact.get` avec `mutating=False`.
+- Limites : 20 colonnes et 500 lignes. Les clés d'une ligne qui ne correspondent à aucune colonne sont supprimées.
+
+## Concevoir l'écran au fil de la vie du job {#design-the-screen-over-the-life-of-the-job}
+
+Le document est reconstruit à chaque chargement : l'écran peut donc suivre l'état du job :
+
+- **Avant que l'objet métier existe.** Un job peut démarrer vide. Renvoyez une section `editable` qui crée ou sélectionne l'objet (par exemple, une campagne), passez les autres sections à `hidden`, et ajoutez une ligne de readiness `blocked` qui indique quoi faire en premier.
+- **Pendant la configuration.** Toutes les sections de configuration sont `editable`. L'action principale est le lancement, `disabled` jusqu'à ce que chaque élément de readiness soit `ok`.
+- **Pendant l'exécution du job.** Verrouillez les sections de configuration, affichez les sections de résultats et changez l'action principale, par exemple en _Close campaign_ avec une `confirmation`.
+- **Après la fin du job.** Passez `primary_action` à `null` et les sections à `read_only`.
+
+Renvoyez le `job_state` du job depuis les actions qui modifient des cases, comme le lancement, afin que Studio mette à jour la vue **Operations** immédiatement.
+
+## Étape 4 : gérer les enregistrements et les révisions {#step-4-handle-saves-and-revisions}
+
+Studio ajoute la `revision` du document à chaque entrée d'action. Pour l'enregistrement d'un `Form`, l'agent reçoit :
+
+```json
+{ "revision": "3", "value": { "greeting": "Bonjour", "shout": false } }
+```
+
+L'action principale reçoit uniquement `{"revision": "3"}`.
+
+La révision empêche deux opérateurs d'écraser le travail l'un de l'autre. Comparez-la en premier, et répondez à une révision périmée par un effet `configurator.conflict` :
+
+```python
+def configure(job_id, action_input):
+    config = job_config(job_id)
+    if action_input.get("revision") != config["revision"]:
+        return {
+            "status": "error",
+            "effects": [{
+                "type": "configurator.conflict",
+                "message": "Configurator changed; reload required",
+                "current_revision": config["revision"],
+            }],
+        }
+    # valider, enregistrer et faire avancer la révision
+    ...
+    return {"status": "ok", "effects": [{"type": "job.configured", "job_id": job_id}]}
+```
+
+En cas de conflit, Studio recharge le document et conserve la saisie non enregistrée de l'opérateur afin qu'il puisse l'appliquer de nouveau.
+
+Pour tout autre refus, renvoyez `status: "error"` avec un effet qui porte un `message`, par exemple `{"type": "campaign.configure.failed", "message": "End date must be in the future"}`. Vérifiez de nouveau la politique de la section et la readiness avant d'écrire : une section verrouillée dans Studio n'empêche pas un appel direct.
+
+Règles pour la révision :
+
+- Elle est opaque pour Studio, qui se contente d'en comparer l'égalité. Un compteur ou un hachage de l'état enregistré conviennent tous les deux.
+- Elle doit changer quand l'état enregistré change, et seulement à ce moment-là. Les données d'affichage seul et les événements en lecture seule ne doivent pas la modifier.
+- Ne placez pas de clé `revision` dans la charge utile d'un composant : Studio l'ajoute.
+
+Studio envoie aussi une `idempotency_key` avec chaque action de Configurator et n'exécute jamais deux actions identiques en même temps. Si l'issue d'un appel est incertaine, Studio réessaie avec la même clé : renvoyez le résultat d'origine au lieu d'appliquer le changement deux fois.
+
+## Étape 5 : libeller le job dans les listes (facultatif) {#step-5-label-the-job-in-lists-optional}
+
+Le document n'est chargé que sur la page du job. Pour afficher votre vocabulaire dans les listes de jobs et dans la ligne de titre, ajoutez `display` à l'instantané du job de tout `job_state` que vous renvoyez :
+
+```json
+"job": {
+  "id": "…",
+  "status": "active",
+  "display": {
+    "entity_label": "Aidan campaign",
+    "state_label": "Draft — setup incomplete",
+    "primary_action_label": "Continue setup"
+  }
+}
+```
+
+Chaque valeur est une chaîne de 120 caractères au maximum. Studio remplace les libellés à chaque `job_state` qu'il reçoit : renvoyez donc un `job_state` depuis les actions qui les modifient. Studio revient à son propre vocabulaire quand le statut du job a évolué depuis l'instantané.
+
+## Versions de schéma {#schema-versions}
+
+Studio liste les versions qu'il prend en charge dans `input.supported_schema_versions`. Répondez avec la version la plus élevée que vous prenez tous deux en charge.
+
+| Version | Catalogue |
+| --- | --- |
+| `"1"` | `Form`, `ResourceList`, `TemplateComposer`, `Review` |
+| `"2"` | La version 1 plus `Table` |
+
+```python
+SCHEMA_VERSIONS = ("1", "2")
+
+supported = surface_input.get("supported_schema_versions") or ["1"]
+version = next((v for v in reversed(SCHEMA_VERSIONS) if v in supported), None)
+if version is None:
+    return {
+        "type": "ConfiguratorError",
+        "code": "unsupported_schema",
+        "message": "Studio and agent do not share a Configurator schema version.",
+        "supported_schema_versions": list(SCHEMA_VERSIONS),
+    }
+```
+
+N'incluez pas de sections `Table` dans un document de version 1 : Studio refuse un type de composant inconnu.
+
+## Règles qui amènent Studio à refuser un document {#rules-that-make-studio-refuse-a-document}
+
+Studio rejette le document entier quand l'une de ces conditions est vraie :
+
+- Un champ racine obligatoire est absent, ou `schema_version` n'est pas prise en charge.
+- Un identifiant de section ou de composant est utilisé deux fois.
+- Une `policy`, un `type` de composant, un `status` de readiness ou un `status` d'action principale ne figure pas dans les listes ci-dessus.
+- Une liaison désigne une action non déclarée, un `target_scope` autre que `job`, ou un `payload_source` inconnu.
+- Une `Table` a une liaison, plus de 20 colonnes ou plus de 500 lignes.
+- Un `section_id` de readiness ne désigne aucune section.
+- Une clé quelconque du document, comparée sans tenir compte de la casse ni de la ponctuation, est l'une des suivantes : `html`, `script`, `iframe`, `src`, `style`, `css`, `import`, `remoteimport`, `expression`, `expressionlanguage`, `targetid`, `jobid`, `missionid`, `caseid`, `stepid`. Une ligne ou un champ ne doit donc pas porter de clé `job_id`. La liaison et le libellé `import` d'une `ResourceList` sont la seule exception.
+- Une valeur d'URL commence par `javascript:`, `data:` ou `vbscript:`.
+
+Le test Hello World `test_configurator_sections_readiness_and_primary_action` montre une petite vérification des clés interdites que vous pouvez copier dans vos propres tests.
+
+## Liste de vérification {#checklist}
+
+- [ ] `job.configurator` figure dans `surfaces`, et chaque action liée figure dans `actions`, avec la portée job.
+- [ ] Le gestionnaire de surface renvoie le document avec une `schema_version` négociée.
+- [ ] Chaque action compare la `revision` en premier et renvoie `configurator.conflict` quand elle est périmée.
+- [ ] Chaque action valide de nouveau son entrée et la readiness.
+- [ ] Un chargement de surface n'écrit jamais d'état.
+- [ ] L'espace de travail a accepté de nouveau l'autorisation de l'agent après l'ajout d'actions.
+
+## Dépannage {#troubleshooting}
+
+| Symptôme | Cause |
+| --- | --- |
+| Pas d'onglet Configure | La surface ne figure pas dans l'enregistrement, l'agent n'a pas été enregistré de nouveau, ou l'utilisateur ne peut pas gérer la mission. |
+| _Configurator contract error_ | Le document a enfreint une règle ci-dessus. Soumettez votre document aux vérifications dans vos tests. |
+| Le bouton principal reste désactivé | Son `status` vaut `disabled` ou un élément de readiness est `blocked`. |
+| Un sélecteur affiche une zone de texte | Le champ `resource_ref` n'a pas d'`options_source`. |
+| L'écran est verrouillé avec un message hors ligne | Le serveur de l'agent est arrêté ou en pause. Configure fonctionne de nouveau dès qu'il se reconnecte. |
+| Une action échoue avec une erreur de portée | L'action liée n'a pas la portée job. |
+
+## Voir aussi {#related}
+
+- [Analyses des jobs et des missions](job-analytics) : ajoutez un tableau de bord à la page du job avec la surface `job.analytics`.
+
+## Référence {#reference}
+
+- [Guide Supervaizer v2](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md) : enregistrement, surfaces, actions et `job_state`.
+- [Exemple Hello World](https://github.com/supervaize/supervaize_hello_world) : `agent_configurator.py` et `tests/test_configurator.py`.

@@ -1,0 +1,84 @@
+---
+id: rating-analytics
+title: Évaluations et analyses
+description: Configurez les dimensions d'évaluation, évaluez les agents, les missions, les jobs et les cases, et lisez les analyses que Supervaize Studio affiche.
+displayed_sidebar: supervaizeFleetSidebar
+slug: rating-analytics
+---
+
+# Évaluations et analyses {#ratings-and-analytics}
+
+Les utilisateurs évaluent les agents, les missions, les jobs et les cases. Chaque évaluation utilise des **dimensions**. Studio affiche aussi des graphiques d'activité et de coût sur le Dashboard et sur les pages des missions.
+
+## Dimensions d'évaluation {#rating-dimensions}
+
+Une dimension est une question à laquelle un utilisateur répond, par exemple **Clarity** ou **Execution Quality**. Une dimension a un type de saisie et une catégorie.
+
+| Type de saisie | Ce que l'utilisateur donne |
+| --- | --- |
+| **Thumbs** | Un pouce levé ou un pouce baissé |
+| **Stars** | De 1 à 5 étoiles |
+| **Score** | Une note sur 10 |
+| **Comment** | Un commentaire seulement |
+
+La catégorie est **Operational performance** ou **User interaction experience**.
+
+Studio fournit 13 dimensions par défaut. Elles sont en lecture seule et portent un badge **Default**. Vous pouvez ajouter les vôtres.
+
+## Configurer les évaluations {#set-up-ratings}
+
+Un administrateur de l'espace de travail ouvre **Settings**, puis **Ratings Setup**. La page a pour titre **Ratings**.
+
+Le tableau liste chaque dimension avec son **Type** et sa **Category**. Il comporte une colonne pour chaque type d'objet qui peut être évalué : agent, mission, job et case. Une case cochée signifie que la dimension s'applique à ce type d'objet.
+
+| Commande | Ce qu'elle fait |
+| --- | --- |
+| **Add Dimension** | Ouvre un formulaire avec **Name**, **Description**, **Input Type** et **Category**. |
+| **Edit** | Modifie une dimension personnalisée. |
+| **Delete** | Supprime une dimension personnalisée après votre confirmation. |
+
+### Affectations par défaut {#default-assignments}
+
+| Objet | Dimensions par défaut |
+| --- | --- |
+| Agents | Les 13 dimensions par défaut |
+| Missions | Les 13 dimensions par défaut |
+| Jobs | **Success** et **Final Thoughts** |
+| Cases | **Success** et **Final Thoughts** |
+
+## Activer les évaluations pour une mission {#turn-on-ratings-for-a-mission}
+
+L'évaluation est activée ou désactivée pour chaque mission. Ouvrez **Edit** sur la mission. Le groupe **Ratings** a trois interrupteurs.
+
+| Interrupteur | Effet |
+| --- | --- |
+| **Rate this mission** | Les utilisateurs peuvent évaluer la mission dans son ensemble. |
+| **Rate jobs** | Les utilisateurs peuvent évaluer chaque job de la mission. |
+| **Rate cases** | Les utilisateurs peuvent évaluer chaque case de la mission. |
+
+Un interrupteur active les dimensions par défaut de ce type d'objet. Vous ne pouvez pas activer un interrupteur lorsque ce type d'objet n'a aucune dimension par défaut.
+
+## Donner une évaluation {#give-a-rating}
+
+Ouvrez la page de l'objet. Chaque page a une commande d'évaluation.
+
+| Objet | Commande |
+| --- | --- |
+| Mission | Bouton **Mission Rating** dans l'en-tête |
+| Job | Bouton **Job Rating** dans l'en-tête |
+| Case | Bouton **Case Rating** dans l'en-tête |
+| Agent | Carte **Rating** dans l'onglet **Overview** |
+
+L'infobulle du bouton indique **Rate this**. Après votre évaluation, elle indique **You rated this — open to view or change**. L'étoile devient ambre.
+
+## Analyses dans Studio {#analytics-in-studio}
+
+| Où | Ce que vous voyez |
+| --- | --- |
+| Dashboard | Des cartes telles que **Agent Activity** et **User Engagement**, avec les cases des 7 derniers jours |
+| Page d'une mission | Les graphiques en anneau **Jobs** et **Cases** par statut, **Mission Costs** et **Job Runs** |
+| Mission, par agent | Un groupe **Insights** avec les liens que l'agent propose : **Overview**, **Analytics** et ses propres jeux de données |
+
+Les liens de **Insights** n'apparaissent que si l'agent les déclare. Les responsables de mission les voient.
+
+Pour le côté développeur, voir [Analyses des jobs](/docs/supervaizer-controller/job-analytics).

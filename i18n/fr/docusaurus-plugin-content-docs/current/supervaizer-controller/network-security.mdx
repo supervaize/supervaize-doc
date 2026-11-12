@@ -1,0 +1,46 @@
+---
+id: network-security
+title: Sécurité réseau
+displayed_sidebar: supervaizerControllerSidebar
+slug: network-security
+---
+
+## Accès réseau et pare-feu : points d'attention {#network-access-and-firewall-considerations}
+
+:::warning[Évitez un contrôle d'accès réseau strict]
+
+**Ne déployez pas d'agents derrière un contrôle d'accès réseau strict** (par exemple des pare-feu ou des groupes de sécurité qui n'autorisent qu'une liste fixe d'adresses IP), sauf si vous avez explicitement autorisé toutes les adresses IP de l'application Supervaize.
+
+Les agents doivent joindre les services Supervaize pour s'enregistrer, recevoir du travail et remonter leur état. Si le trafic sortant est limité à une liste d'autorisation étroite, les connexions échouent et les agents ne fonctionnent pas correctement.
+
+:::
+
+### Autoriser les adresses IP de l'application Supervaize {#allowing-supervaize-app-ip-addresses}
+
+Si votre environnement utilise une liste d'autorisation d'adresses IP (règles de pare-feu, groupes de sécurité, proxys de sortie ou équivalent), vous devez autoriser le trafic sortant vers l'ensemble des adresses IP utilisées par l'application Supervaize.
+
+**Liste complète des adresses IP de l'application Supervaize :**
+
+**[https://app.supervaize.com/network-access/](https://app.supervaize.com/network-access/)**
+
+Utilisez cette page pour obtenir la liste à jour des adresses IP, et actualisez votre liste d'autorisation quand Supervaize publie des changements.
+
+### Trafic entrant vers le contrôleur {#inbound-traffic-to-the-controller}
+
+Studio doit aussi joindre votre contrôleur. Donnez au contrôleur une adresse publique dans `SUPERVAIZER_PUBLIC_URL`. Voir [Configuration d'un tunnel](tunneling-setup) pour un contrôleur local.
+
+Autorisez le trafic HTTPS entrant depuis les adresses IP de l'application Supervaize vers cette adresse.
+
+### Autorisation de l'espace de travail {#workspace-authorization}
+
+Quand vous définissez `SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL`, le contrôleur lit la clé publique de l'espace de travail à cette URL. Autorisez le trafic HTTPS sortant vers elle.
+
+### Interface d'administration {#admin-interface}
+
+L'interface d'administration se trouve à l'adresse `/manage`. Seul un réseau Tailscale peut l'ouvrir. En mode local, l'interface de bouclage (loopback) fonctionne aussi. N'ouvrez pas ce chemin à l'internet public. Voir la [documentation d'administration](supervaizer-controller/ref/2025_08_ADMIN_README.md).
+
+### Recommandations {#recommendations}
+
+- Quand c'est possible, préférez les environnements qui autorisent le trafic HTTPS sortant vers `*.supervaize.com` (ou vers les noms d'hôte précis que votre agent utilise) plutôt que des listes d'autorisation fondées sur les adresses IP.
+- Si vous devez utiliser des listes d'autorisation d'adresses IP, abonnez-vous à la page network-access ou consultez-la régulièrement, et automatisez les mises à jour quand c'est faisable.
+- Testez la connectivité de l'agent après tout changement de pare-feu ou de politique réseau.

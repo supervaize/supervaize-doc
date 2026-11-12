@@ -1,0 +1,91 @@
+---
+id: parameters
+title: Paramètres et secrets de l'agent
+displayed_sidebar: supervaizerControllerSidebar
+slug: parameters
+---
+
+# Paramètres et secrets de l'agent {#agent-parameters-and-secrets}
+
+Un **paramètre** est un réglage dont votre agent a besoin et que l'espace de travail fournit une seule fois : une clé d'API, un nom de modèle, une adresse d'expéditeur. Un administrateur de l'espace de travail définit les valeurs dans Studio. Votre code ne les contient jamais.
+
+![La carte Parameters de la page de l'agent dans Studio](/img/controller/agent-parameters.png)
+
+## Quel réglage va où {#which-setting-goes-where}
+
+| La valeur | À utiliser | Définie par | Quand |
+| --- | --- | --- | --- |
+| est la même pour tous les jobs de l'espace de travail | **Paramètre** (cette page) | Administrateur de l'espace de travail | Une fois, sur la page de l'agent |
+| change à chaque job, et est connue au lancement | [Champ du formulaire de lancement](controller-setup#fields) | Opérateur | Au lancement du job |
+| change à chaque job, et est modifiée plus tard | [Écran Configure](job-configurator) | Opérateur | À tout moment sur la page du job |
+| appartient à votre déploiement, pas à un espace de travail | Variable d'environnement du contrôleur | Vous | Au déploiement |
+
+## Déclarer les paramètres {#declare-the-parameters}
+
+```python
+from supervaizer import Agent, Parameter, ParametersSetup
+
+parameters = ParametersSetup.from_list([
+    Parameter(
+        name="OPENAI_API_KEY",
+        description="API key the agent uses to call the model",
+        is_environment=True,
+        is_secret=True,
+        is_required=True,
+    ),
+    Parameter(
+        name="MODEL_NAME",
+        description="Model used for the research step",
+        is_environment=True,
+    ),
+])
+
+agent = Agent(
+    name="My Agent",
+    version="0.1.0",
+    description="Describe what your agent does.",
+    parameters_setup=parameters,
+    supervaizer_v2_registration=registration,
+)
+```
+
+| Clé | Signification |
+| --- | --- |
+| `name` | Le nom que votre code utilise. |
+| `description` | Le texte que Studio affiche à côté du champ de saisie. |
+| `is_secret` | Studio masque la valeur une fois qu'elle est enregistrée. |
+| `is_required` | Marque le paramètre comme obligatoire dans Studio. |
+| `is_environment` | Le contrôleur place aussi la valeur dans `os.environ[name]`. |
+
+Tant qu'un administrateur n'a pas enregistré les paramètres, Studio affiche l'agent comme **Pending Setup**.
+
+## Lire les valeurs {#read-the-values}
+
+Le contrôleur obtient les valeurs auprès de Studio à son démarrage, une fois qu'un administrateur a configuré l'agent. Studio les envoie chiffrées. Après qu'un administrateur a modifié une valeur, redémarrez le contrôleur.
+
+```python
+import os
+
+api_key = os.environ["OPENAI_API_KEY"]             # avec is_environment=True
+model = agent.parameters_setup.value("MODEL_NAME")  # fonctionne pour tous les paramètres
+```
+
+Lisez la valeur au moment où vous en avez besoin, à l'intérieur de votre action. Ne la copiez pas dans une constante de module à l'import : le contrôleur charge les valeurs après son démarrage.
+
+## Règles {#rules}
+
+- Ne mettez jamais un secret dans un effet, dans les `metadata` d'un case, dans le titre d'une étape, dans une ligne de journal ou dans un message d'erreur.
+- Ne demandez pas un secret dans un formulaire de lancement ou sur un écran Configure. Ces valeurs sont visibles par les opérateurs et sont stockées avec le job.
+- Gardez la liste courte. Chaque paramètre obligatoire est une chose de plus qu'un administrateur doit faire avant le premier job.
+
+## Liste de contrôle {#checklist}
+
+- [ ] Chaque paramètre a une `description` qui permet à un administrateur d'agir.
+- [ ] Les secrets ont `is_secret=True`.
+- [ ] Le code lit les valeurs au moment de leur utilisation.
+- [ ] Aucun secret n'atteint Studio dans un résultat.
+
+## Référence {#reference}
+
+- Hello World : [`supervaizer_control.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/supervaizer_control.py) déclare un paramètre et un secret.
+- [Référence des modèles](model_reference/model_core) : `Parameter` et `ParametersSetup`.

@@ -1,0 +1,124 @@
+---
+id: install
+title: Connecter Claude ou ChatGPT
+description: Connectez un espace de travail Supervaize Studio à Claude ou ChatGPT avec le connecteur MCP Supervaize. Une URL, pas de clé d'API.
+displayed_sidebar: supervaizeFleetSidebar
+slug: install
+---
+
+import ConnectFlow from "@site/src/components/McpDemo/ConnectFlow";
+import ChatReplay from "@site/src/components/McpDemo/ChatReplay";
+
+# Supervaize MCP : connecter Claude ou ChatGPT {#supervaize-mcp-connect-claude-or-chatgpt}
+
+Demandez à votre assistant de chat ce que font vos agents, débloquez-les et lancez de nouveaux travaux, sans quitter la conversation. Le connecteur MCP Supervaize donne à Claude et à ChatGPT l'accès à un espace de travail Studio, **avec vos propres rôles et rien de plus**.
+
+<ChatReplay only="overview" />
+
+- **Une URL, pas de clé d'API.** Vous collez l'URL d'un espace de travail et vous vous connectez. Il n'y a aucun secret à copier ni à renouveler.
+- **Vos permissions, exactement.** Chaque appel s'exécute en votre nom. Un membre en lecture seule ne peut pas écrire ; vous ne voyez que les missions que vous voyez déjà dans Studio.
+- **Révocable en un clic.** Déconnectez l'application depuis votre profil, et l'appel suivant échoue immédiatement.
+
+## Installer en quatre étapes {#install-in-four-steps}
+
+Essayez d'abord le parcours ici. Les boutons fonctionnent.
+
+<ConnectFlow />
+
+### 1. Copier l'URL de votre espace de travail {#1-copy-your-workspace-url}
+
+Dans Studio, ouvrez le menu **Help** (le **?** en bas de la barre latérale) et choisissez **Use Supervaize in Claude / ChatGPT**. Copiez l'URL affichée. Elle ressemble à ceci :
+
+```text
+https://app.supervaize.com/mcp/<your-workspace>
+```
+
+![Page Studio « Use Supervaize in Claude / ChatGPT » montrant l'URL de l'espace de travail et un bouton Copy](/img/mcp/chat-connectors.jpg)
+
+Une URL correspond à un espace de travail. Les mêmes URL sont aussi listées sous **Profile → Developer → Chat connectors (MCP)**.
+
+### 2. L'ajouter dans votre application de chat {#2-add-it-in-your-chat-app}
+
+Ajoutez un **connecteur personnalisé** et collez l'URL, sans barre oblique finale.
+
+- **Claude** (claude.ai et Claude Desktop) : [Get started with custom connectors](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
+- **ChatGPT** (mode développeur) : [MCP in ChatGPT](https://developers.openai.com/api/docs/mcp)
+
+Dans la boîte de dialogue **Add custom connector** de Claude, utilisez ces réglages :
+
+| Réglage | Valeur |
+| --- | --- |
+| URL | `https://app.supervaize.com/mcp/<your-workspace>` |
+| Authentication | **Sign in now** |
+| OAuth client | **Use Claude's published identity** |
+| Client ID / secret | Laisser vide |
+| Request headers | Aucun |
+
+:::warning[Ne choisissez pas « Register automatically »]
+Supervaize ne propose pas l'enregistrement dynamique des clients, cette option échoue donc. Gardez **Use Claude's published identity**.
+:::
+
+### 3. Approuver la connexion {#3-approve-the-connection}
+
+Supervaize ouvre une page de consentement. Connectez-vous si vous êtes déconnecté, confirmez l'espace de travail, puis choisissez les permissions :
+
+![Page de consentement Supervaize : Connect Claude to Supervaize, avec l'espace de travail et les permissions Read / Write](/img/mcp/consent.jpg)
+
+| Permission | Ce que l'assistant peut faire |
+| --- | --- |
+| **Read** (toujours active) | Parcourir les missions, les jobs, les cases et leurs étapes tels que vous les voyez dans Studio. |
+| **Write** (facultative) | Créer et gérer des missions et des jobs, ajouter des tags, commenter et évaluer, répondre aux questions des agents et invoquer des actions d'agent en votre nom. |
+
+Cliquez sur **Allow**. **Deny** ne crée rien.
+
+:::info[S'exécute avec vos rôles]
+Accorder **Write** ne donne jamais à l'assistant plus que ce que vous avez. Si vous êtes un membre en lecture seule, les appels d'écriture sont refusés, quoi que vous cochiez ici.
+:::
+
+### 4. Déconnecter quand vous le voulez {#4-disconnect-when-you-want}
+
+Après **Allow**, l'application est listée sous **Profile → Developer → Connected apps**, avec l'espace de travail, les permissions accordées et la dernière utilisation. **Disconnect** la révoque immédiatement ; l'appel suivant de Claude ou de ChatGPT échoue jusqu'à ce que vous vous connectiez de nouveau.
+
+## Vérifier que cela fonctionne {#check-that-it-works}
+
+Ouvrez un nouveau chat et demandez :
+
+> Qu'est-ce qui est en cours dans mon espace de travail Supervaize ?
+
+L'assistant devrait appeler `workspace_info` et `mission_list`, puis répondre avec le nom de votre espace de travail, votre rôle et vos missions. Ensuite : [voir ce que vous pouvez en faire](./examples).
+
+## Pour les développeurs : vérification de l'émetteur et mise en cache de la liste d'outils {#for-developers-issuer-check-and-tool-list-caching}
+
+Les utilisateurs de Claude et de ChatGPT n'ont rien à faire ici. Ces deux points comptent si vous écrivez votre propre client MCP. Ils s'appliquent à la révision `2026-07-28` de la spécification MCP. Les tests de Studio ne vérifient que cette forme de requête, et les révisions plus anciennes n'ont pas été vérifiées.
+
+### Le paramètre `iss` sur chaque redirection {#the-iss-parameter-on-every-redirect}
+
+Les métadonnées du serveur d'autorisation, à l'adresse `/.well-known/oauth-authorization-server/mcp`, fixent `authorization_response_iss_parameter_supported` à `true` ([RFC 9207](https://www.rfc-editor.org/rfc/rfc9207)). Chaque redirection vers votre client porte alors un paramètre de requête `iss`. Sa valeur est l'émetteur : l'origine de l'API Studio suivie de `/mcp`, par exemple `https://app.supervaize.com/mcp`.
+
+`iss` est présent sur :
+
+- l'approbation, avec `code`
+- le refus, avec `error=access_denied`
+- les redirections d'erreur de `/mcp/authorize`, par exemple `error=invalid_scope`
+
+Comparez `iss` avec l'`issuer` que vous avez découvert et refusez toute différence. Cela bloque une réponse venue d'un autre serveur d'autorisation (une attaque par confusion, dite « mix-up »).
+
+Dans votre callback, passez `iss` à votre bibliothèque OAuth sans le modifier, avec `code` et `state`. Un client qui lit l'indicateur des métadonnées refuse une redirection sans `iss` : ne retirez donc pas les paramètres de requête de la redirection, par exemple dans un proxy.
+
+### Indications de cache sur la liste d'outils {#cache-hints-on-the-tool-list}
+
+Un résultat `tools/list` porte `ttlMs: 900000` (15 minutes) et `cacheScope: "public"`. C'est vrai sur les deux serveurs : `/mcp/<workspace>` et `/mcp/agent/<workspace>`. Les listes d'outils ne changent que lors d'une nouvelle version de Studio, et elles sont les mêmes pour tous les appelants. Un client peut conserver la liste et n'a pas besoin de la redemander à chaque requête.
+
+Après une version de Studio qui ajoute, retire ou modifie un outil, un client peut montrer la liste précédente pendant 15 minutes au plus.
+
+**La mise en cache n'affaiblit pas les règles d'accès.** Les résultats d'outils (`tools/call`) ne portent aucune indication de cache. Ils dépendent de vous et de vos droits d'accès, ils ne sont donc jamais mis en cache. Seule la liste des noms et des schémas d'outils est conservée, jamais les données qu'un outil renvoie.
+
+## Dépannage {#troubleshooting}
+
+| Symptôme | Cause | Solution |
+| --- | --- | --- |
+| `invalid_target` pendant la connexion | L'URL ne correspond pas exactement à l'URL de l'espace de travail | Collez l'URL telle que copiée depuis Studio, sans barre oblique finale |
+| La page de consentement indique que la demande a expiré | La page est restée ouverte plus de 10 minutes | Relancez la connexion depuis l'application de chat |
+| Les appels échouent alors qu'ils fonctionnaient | L'application a été déconnectée, ou n'a pas été utilisée pendant 30 jours | Reconnectez-vous depuis l'application de chat |
+| « Token was issued for another workspace » | Une connexion correspond à un seul espace de travail | Ajoutez un deuxième connecteur avec l'URL de l'autre espace de travail |
+| Une écriture est refusée | Vous n'avez pas accordé **Write**, ou votre rôle Studio ne le permet pas | Reconnectez-vous avec **Write**, ou adressez-vous à un administrateur de l'espace de travail |
