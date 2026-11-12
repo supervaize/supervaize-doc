@@ -1,0 +1,120 @@
+---
+id: job-management
+title: Créer un job
+description: Lancez un job pour un agent dans une mission Supervaize Studio, et réglez ses paramètres, ses limites et ses conditions d'arrêt.
+displayed_sidebar: supervaizeFleetSidebar
+slug: job-management
+---
+
+import JobCreateDemo from "@site/src/components/StudioDemo/JobCreateDemo";
+
+# Créer un job {#create-a-job}
+
+Un job est une exécution d'un agent à l'intérieur d'une [mission](./mission-management.mdx). Vous donnez à l'agent ses paramètres, vous fixez des limites facultatives, et vous lancez. L'agent crée ensuite des cases au fil de son travail.
+
+- **L'agent définit le formulaire.** Chaque agent demande ses propres paramètres : deux agents affichent donc deux formulaires différents.
+- **Vos réponses sont enregistrées comme brouillon.** Quittez la page et revenez : le formulaire est tel que vous l'avez laissé.
+- **Les limites sont facultatives.** Plafonnez le nombre de cases, la durée ou le coût avant de lancer.
+
+## Lancer un job en trois étapes {#start-a-job-in-three-steps}
+
+Essayez d'abord le parcours ici. Les boutons fonctionnent.
+
+<JobCreateDemo />
+
+### 1. Cliquer sur New Job {#1-click-new-job}
+
+Ouvrez la mission et cliquez sur **New Job** en haut à droite.
+
+- **Un seul agent sur la mission** : Studio ouvre directement le formulaire du job.
+- **Plusieurs agents** : choisissez l'agent, puis cliquez sur **Continue**.
+
+Vous pouvez aussi ouvrir le menu **Manage** de l'agent sur la page de la mission et choisir **Start Job**.
+
+### 2. Renseigner les paramètres {#2-fill-in-the-parameters}
+
+La page a deux côtés.
+
+**À gauche : Job Parameters.** Le formulaire fourni par l'agent. Des champs peuvent apparaître ou disparaître selon vos réponses précédentes, et certaines listes sont chargées en direct depuis l'agent. Studio enregistre vos réponses au fil de la saisie.
+
+**À droite : les réglages du job.**
+
+| Réglage | Ce qu'il fait | Valeur par défaut |
+| --- | --- | --- |
+| **Name** | Le nom du job. **Generate** en écrit un, unique, à partir du nom de l'agent et de l'heure courante. | _Nom de la mission - Nom de l'agent_ |
+| **Description** | Une note libre sur cette exécution | Vide |
+| **Max Cases** | Arrêter après ce nombre de cases | Aucune limite |
+| **Max Duration (seconds)** | Arrêter après cette durée | 36000 (10 heures) |
+| **Max Cost (USD)** | Arrêter une fois ce montant dépensé | Aucune limite |
+| **Stop on Warning** | Arrêter le job au premier avertissement | Désactivé |
+| **Stop on Error** | Arrêter le job à la première erreur | Activé |
+
+Les limites se trouvent sous **Execution Limits** et les deux interrupteurs d'arrêt sous **Conditions**. Les deux blocs restent repliés tant que vous ne cliquez pas dessus.
+
+### 3. Lancer {#3-start}
+
+Cliquez sur le bouton de lancement, en bas à droite. Il indique **Start Job**, sauf si l'agent lui donne un autre libellé. Studio ouvre la page du job ; ensuite, [apprenez à vous y repérer](./job-navigation.mdx).
+
+:::warning[Le bouton de lancement reste désactivé tant que le formulaire n'est pas prêt]
+Il est désactivé pendant le chargement des listes de l'agent, et lorsque le formulaire de l'agent n'a pas pu être chargé. S'il reste désactivé, vérifiez que le serveur de l'agent est en ligne.
+:::
+
+## Autres façons de lancer un job {#other-ways-to-start-a-job}
+
+### Dialog Mode {#dialog-mode}
+
+Lorsque votre espace de travail dispose de la fonctionnalité de dialogue et qu'un modèle de dialogue est défini sur la mission, un interrupteur **Form Mode / Dialog Mode** apparaît au-dessus des paramètres. En **Dialog Mode**, vous répondez à des questions dans une conversation, et les valeurs recueillies remplissent le même formulaire. S'il manque encore un élément obligatoire, Studio vous ramène au formulaire en conservant vos réponses.
+
+### Agents LLM {#llm-agents}
+
+Pour un agent qui fonctionne avec un LLM, **New Job** ouvre une **Job Builder Conversation** à la place d'un formulaire. Vous décrivez ce que vous voulez, le panneau **Job Definition** se remplit au fil de la conversation, et **Confirm & Create Job** devient disponible une fois la définition complète.
+
+:::info[Créé, mais pas lancé]
+Un job construit de cette façon est créé, mais il ne démarre pas tout seul. Ouvrez-le et cliquez sur **Start**.
+:::
+
+### Conversation de configuration guidée {#guided-setup-chat}
+
+Certains agents ont un plan de configuration. Dans la conversation, collez un scénario. L'assistant exécute l'action d'aide de l'agent sur le brouillon. Il montre le texte proposé et les modifications. Studio n'enregistre le texte qu'après votre acceptation.
+
+Dans l'onglet **Configure** du job, l'éditeur de scénario propose ces commandes :
+
+- **Upload file** remplace le texte d'un bloc par un fichier `.txt` ou `.md`. Le fichier peut peser 200 Ko au maximum.
+- Les actions d'aide de l'agent apparaissent sous forme de boutons. Pour Aidan, l'un des boutons est **Recommend improvements**.
+- **Use this** applique une proposition. Rien n'est enregistré tant que vous n'enregistrez pas.
+
+Un agent doté d'un plan de configuration reçoit aussi le nom du job : il peut ainsi nommer ce qu'il crée. Un job qui a un plan de configuration et pas encore de case s'ouvre sur **Configure**. Voir [Naviguer dans un job](./job-navigation.mdx).
+
+### Mode test {#testing-mode}
+
+Lorsque la fonctionnalité est activée pour votre espace de travail, un nouveau job d'un agent Supervaizer v2 démarre en mode test. Ses premiers cases sont des cases de test. Les responsables de mission passent le job en production avec **Go live**. Voir [Test et production](./job-navigation.mdx#testing-and-production).
+
+### Jobs planifiés {#scheduled-jobs}
+
+Lorsque la fonctionnalité est activée pour votre espace de travail, la page de la mission comporte un bloc **Schedules**. Les responsables de mission cliquent sur **Schedule** pour lancer des jobs selon une planification. Le formulaire de planification contient le même bloc **Optional rules** que le formulaire du job.
+
+### Règles {#rules}
+
+Lorsque les règles sont activées pour votre espace de travail, le formulaire du job affiche **Rule controls** et **Optional rules**. Voir [Exécuter et contrôler des jobs avec des règles](../rules/run-and-review.mdx).
+
+### Tags {#tags}
+
+Chaque job a des tags. La liste **Jobs** et la liste des jobs de la mission ont un filtre par tag. Cliquez sur **Tags** pour ouvrir une liste des tags dans laquelle vous pouvez chercher. Sélectionnez un tag pour l'afficher. Sélectionnez **Exclude** sur un tag pour masquer tous les jobs qui le portent. Le filtre affiche vos choix sous forme de pastilles, par exemple « Tag is any of billing, urgent » et « Tag is not review ». Cliquez sur **is any of** pour passer à **is all of**.
+
+### Depuis Claude ou ChatGPT {#from-claude-or-chatgpt}
+
+Avec le [connecteur MCP Supervaize](../mcp-connector/install.mdx) et la permission **Write**, demandez :
+
+> Lance un nouveau job pour Aidan dans la mission Onboarding Check-ins.
+
+L'assistant montre d'abord un aperçu de ce qu'il créerait. Rien ne démarre tant que vous n'avez pas confirmé.
+
+## Dépannage {#troubleshooting}
+
+| Symptôme | Cause | Solution |
+| --- | --- | --- |
+| Pas de bouton **New Job** | Vous n'êtes pas autorisé à lancer des jobs dans cette mission | Demandez au responsable de la mission de vous ajouter |
+| « No authorized agents are available for this mission » | L'accès de l'agent à cet espace de travail n'a pas été accepté | Un administrateur de l'espace de travail ou un responsable d'agents accepte l'autorisation de l'agent pour l'espace de travail |
+| « Agent contract is not available » | L'agent n'a pas enregistré de formulaire de job auprès de Studio | Mettez à jour le contrôleur Supervaizer de l'agent et enregistrez-le de nouveau |
+| « Failed to load ... from the agent » | L'agent n'a pas pu renvoyer l'une de ses listes | Vérifiez que le serveur de l'agent est en ligne, puis rechargez |
+| « Could not save draft changes » | Le brouillon n'a pas pu être enregistré | Continuez : le lancement du job utilise tout de même ce qui est à l'écran |

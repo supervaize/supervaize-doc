@@ -5,6 +5,7 @@
 
 import React, { type ReactNode, useState } from "react";
 import clsx from "clsx";
+import Translate, { translate } from "@docusaurus/Translate";
 import BrowserWindow from "@site/src/components/BrowserWindow";
 
 import styles from "./styles.module.css";
@@ -12,10 +13,10 @@ import styles from "./styles.module.css";
 const MCP_URL = "https://app.supervaize.com/mcp/acme";
 
 const STEPS = [
-  { label: "1. Copy the URL", url: "studio.supervaize.com/w/acme/chat-connectors" },
-  { label: "2. Add it in Claude", url: "claude.ai/settings/connectors" },
-  { label: "3. Approve", url: "studio.supervaize.com/oauth/consent" },
-  { label: "4. Manage", url: "studio.supervaize.com/profile/developer" },
+  { label: translate({ id: "mcpDemo.connect.tab1", message: "1. Copy the URL" }), url: "studio.supervaize.com/w/acme/chat-connectors" },
+  { label: translate({ id: "mcpDemo.connect.tab2", message: "2. Add it in Claude" }), url: "claude.ai/settings/connectors" },
+  { label: translate({ id: "mcpDemo.connect.tab3", message: "3. Approve" }), url: "studio.supervaize.com/oauth/consent" },
+  { label: translate({ id: "mcpDemo.connect.tab4", message: "4. Manage" }), url: "studio.supervaize.com/profile/developer" },
 ];
 
 export default function ConnectFlow(): ReactNode {
@@ -61,7 +62,7 @@ export default function ConnectFlow(): ReactNode {
         <div className={styles.screen}>
           {step === 0 && (
             <div className={styles.card}>
-              <div className={styles.cardTitle}>1. Copy this workspace URL</div>
+              <div className={styles.cardTitle}><Translate id="mcpDemo.connect.copyTitle">{"1. Copy this workspace URL"}</Translate></div>
               <div className={styles.urlRow}>
                 <span className={styles.url}>{MCP_URL}</span>
                 <button type="button" className={styles.btn} onClick={copy}>
@@ -74,7 +75,7 @@ export default function ConnectFlow(): ReactNode {
                   className={clsx(styles.btn, styles.btnPrimary)}
                   onClick={() => setStep(1)}
                 >
-                  Next: add it in Claude
+                  <Translate id="mcpDemo.connect.next">{"Next: add it in Claude"}</Translate>
                 </button>
               </div>
             </div>
@@ -92,7 +93,9 @@ export default function ConnectFlow(): ReactNode {
                 <input className={styles.field} readOnly value={MCP_URL} />
               </label>
               <div className={styles.muted}>
-                No client ID, no secret, no headers. Claude signs you in next.
+                <Translate id="mcpDemo.connect.noSecret">
+                  {"No client ID, no secret, no headers. Claude signs you in next."}
+                </Translate>
               </div>
               <div className={styles.actions}>
                 <button
@@ -116,15 +119,18 @@ export default function ConnectFlow(): ReactNode {
                 </select>
               </label>
               <div className={styles.muted}>
-                The connection is bound to this workspace.
+                <Translate id="mcpDemo.connect.bound">
+                  {"The connection is bound to this workspace."}
+                </Translate>
               </div>
               <label className={styles.check}>
                 <input type="checkbox" checked disabled />
                 <span>
                   <strong>Read</strong>
                   <br />
-                  Browse missions, jobs, cases and their steps as you see them
-                  in Studio.
+                  <Translate id="mcpDemo.connect.readDesc">
+                    {"Browse missions, jobs, cases and their steps as you see them in Studio."}
+                  </Translate>
                 </span>
               </label>
               <label className={styles.check}>
@@ -136,13 +142,16 @@ export default function ConnectFlow(): ReactNode {
                 <span>
                   <strong>Write</strong>
                   <br />
-                  Create missions and jobs, answer agent questions and invoke
-                  agent actions on your behalf.
+                  <Translate id="mcpDemo.connect.writeDesc">
+                    {"Create missions and jobs, answer agent questions and invoke agent actions on your behalf."}
+                  </Translate>
                 </span>
               </label>
               {allowed === false && (
                 <div className={styles.muted}>
-                  Denied. Nothing was created; Claude stays disconnected.
+                  <Translate id="mcpDemo.connect.denied">
+                    {"Denied. Nothing was created; Claude stays disconnected."}
+                  </Translate>
                 </div>
               )}
               <div className={styles.actions}>
@@ -169,7 +178,9 @@ export default function ConnectFlow(): ReactNode {
                     <strong>Claude</strong>
                     <br />
                     <span className={styles.muted}>
-                      Acme · {scopes} · last used today
+                      <Translate id="mcpDemo.connect.lastUsed" values={{ scopes }}>
+                        {"Acme · {scopes} · last used today"}
+                      </Translate>
                     </span>
                   </span>
                   <button
@@ -182,8 +193,9 @@ export default function ConnectFlow(): ReactNode {
                 </div>
               ) : (
                 <div className={styles.muted}>
-                  No connected app. The next call from Claude fails until you
-                  connect again.{" "}
+                  <Translate id="mcpDemo.connect.noApp">
+                    {"No connected app. The next call from Claude fails until you connect again."}
+                  </Translate>{" "}
                   <button
                     type="button"
                     className={styles.btn}
@@ -201,7 +213,9 @@ export default function ConnectFlow(): ReactNode {
         </div>
       </BrowserWindow>
       <p className={styles.caption}>
-        Interactive walkthrough with a fictional workspace. Click the buttons.
+        <Translate id="mcpDemo.connect.caption">
+          {"Interactive walkthrough with a fictional workspace. Click the buttons."}
+        </Translate>
       </p>
     </div>
   );

@@ -1,0 +1,151 @@
+---
+id: core-concepts
+title: Missions, jobs, cases et étapes
+displayed_sidebar: supervaizerControllerSidebar
+slug: core-concepts
+---
+
+# Missions, jobs, cases et étapes {#missions-jobs-cases-and-steps}
+
+Supervaize Studio présente le travail de chaque agent avec les quatre mêmes niveaux. Votre première tâche, avant d'écrire du code, est de décider ce que chaque niveau signifie pour votre agent.
+
+| Niveau | Ce que c'est | Qui en est responsable | Exemple : un agent d'entretien |
+| --- | --- | --- | --- |
+| **Mission** | Un objectif métier. Elle regroupe des agents, des personnes, des règles et des jobs. | Studio | « Étude clients 2026 » |
+| **Job** | Une unité de travail qu'un opérateur lance et suit. | Studio conserve l'enregistrement ; l'agent est responsable de l'état métier | Une campagne d'entretiens |
+| **Case** | Un élément métier à l'intérieur d'un job. | Agent | Un entretien avec un contact |
+| **Étape** | Une activité observable à l'intérieur d'un case. | Agent | Inviter, mener l'entretien, résumer |
+
+Une mission peut contenir de nombreux jobs. Un job contient un ou plusieurs cases. Un case contient une ou plusieurs étapes.
+
+![Une page de mission dans Studio avec son agent et ses jobs](/img/controller/mission-page.png)
+
+## Comment les niveaux apparaissent dans Studio {#how-the-levels-show-in-studio}
+
+La page du job liste les cases du job, avec leur statut et leur coût.
+
+![Les cases d'un job dans Studio, avec leur statut et leur coût](/img/controller/job-cases.png)
+
+La page d'un case liste ses étapes. Chaque étape affiche son statut, son coût et ce qu'elle a produit.
+
+![Un case avec deux étapes et un livrable](/img/controller/case-steps.png)
+
+## Choisir votre correspondance {#choose-your-mapping}
+
+Répondez à ces questions pour votre agent. Le [skill d'intégration](/docs/integrations/skills/supervaizer-integration) les pose une série à la fois et conteste les réponses vagues.
+
+**Mission**
+
+- Quel objectif métier plusieurs exécutions de votre agent servent-elles ensemble ?
+- Que doivent partager tous les jobs d'une mission : des personnes, des règles, des contacts, un contexte ?
+
+**Job**
+
+- Que lance un opérateur en un clic ? Qu'est-ce qui est terminé quand le job est terminé ?
+- Le même job peut-il être relancé, ou chaque exécution demande-t-elle un nouveau job ?
+- Le job a-t-il besoin d'une configuration après sa création et avant de travailler ?
+
+**Case**
+
+- Quel est l'élément qu'un opérateur veut voir sur une ligne, avec un statut ? Un contact, un document, un ticket, un prospect ?
+- Le nombre de cases est-il connu au départ, ou les cases apparaissent-ils pendant l'exécution du job ?
+- Si un case échoue, les autres continuent-ils ?
+
+**Étape**
+
+- Quelles activités d'un case un opérateur a-t-il besoin de voir ?
+- Quelle étape coûte de l'argent ? Quelle étape produit quelque chose à ouvrir ou à exporter ?
+- Quelle étape doit attendre une personne ? Quelle étape a un effet qu'une règle de mission doit pouvoir arrêter ?
+
+:::tip[Règles pratiques]
+
+- Si les opérateurs demandent « combien sont terminés ? », ce qu'ils comptent est le **case**.
+- Une étape mérite d'être affichée quand elle peut échouer, attendre, coûter de l'argent ou produire une sortie. N'affichez pas les appels de fonctions internes.
+- Un case avec cinq étapes claires vaut mieux que cinq cases avec une étape.
+
+:::
+
+## Comment votre agent les déclare {#how-your-agent-reports-them}
+
+Votre agent n'appelle pas Studio à chaque changement. Il renvoie un **état du job** depuis ses actions, et Studio l'affiche. Voici un état du job complet, avec un case et deux étapes :
+
+```json
+{
+  "job": {
+    "id": "01M3KEF6A9M0FS50Q5YP0TPG1Y",
+    "agent_slug": "hello-world-ai-agent",
+    "mission_id": "01KSXM5HRAEPDADSKM625KJS6V",
+    "status": "completed",
+    "source": { "type": "fresh_start" },
+    "information": { "cost": { "total_cost": 0.2 } }
+  },
+  "cases": [
+    {
+      "id": "job-1-case-1",
+      "lane": "work",
+      "title": "Hello Ada (1)",
+      "status": "completed",
+      "metadata": { "name": "Ada", "city": "Paris" },
+      "steps": [
+        { "id": "job-1-case-1-start", "activity": "operation", "status": "completed", "title": "Start", "cost": 0.1 },
+        {
+          "id": "job-1-case-1-say-hello",
+          "activity": "operation",
+          "status": "completed",
+          "title": "Deliver greeting card",
+          "cost": 0.1,
+          "outputs": [{ "id": "job-1-case-1-card", "type": "greeting_card", "title": "Hello, Ada from Paris!" }]
+        }
+      ]
+    }
+  ]
+}
+```
+
+- **Les statuts** sont `pending`, `active`, `awaiting`, `completed`, `failed` et `cancelled`. Un échec est un statut, pas un type d'étape.
+- **`lane`** regroupe les cases sur la page du job. Le couloir (lane) par défaut est `work`. Les agents ajoutent souvent `setup` et `deliverable`.
+- **`activity`** d'une étape vaut `operation` ou `delegation`.
+- **`awaiting`** sur une étape signifie qu'elle attend une personne. Voir [Validation humaine](human-in-the-loop).
+- **`cost`** et **`outputs`** sont expliqués dans [Déclaration des coûts](cost-reporting).
+
+### Déclarer les couloirs et les types de sortie {#declare-lanes-and-output-types}
+
+Déclarez vos couloirs et vos types de sortie dans l'enregistrement :
+
+```python
+build_v2_agent_registration(
+    ...,
+    case_lanes=[{"id": "work", "label": "Work", "default": True}, {"id": "deliverable", "label": "Deliverables"}],
+    artifact_types=[{"type": "greeting_card", "label": "Greeting card"}],
+)
+```
+
+Studio charge le contenu d'une sortie avec l'action `artifact.get`. Déclarez `artifact.get` avec `mutating=False`. Un job peut aussi partir d'un travail externe : donnez à `job.source` la valeur `{"type": "external"}` à la place de `fresh_start`.
+
+### Contexte de la mission {#mission-context}
+
+Studio peut envoyer la mission avec chaque requête. `request.mission` contient les champs `id`, `name` et `metadata` de la mission. Le SDK ne lit pas les clés des métadonnées. Leur signification appartient à votre agent. Ne copiez pas les métadonnées dans le job. Voir le [guide du SDK](supervaizer-controller/ref/2026_05_SUPERVAIZER_v2.md).
+
+## Comment Studio dialogue avec votre agent {#how-studio-talks-to-your-agent}
+
+Studio utilise deux types d'appels :
+
+- Une **surface** est un écran que votre agent décrit et que Studio dessine : un formulaire de lancement, un formulaire de relecture, un écran Configure, un tableau de bord.
+- Une **action** est une commande que Studio invoque : lancer le job, synchroniser le job, soumettre une réponse, enregistrer un réglage.
+
+Votre agent déclare ses surfaces et ses actions une seule fois, dans son enregistrement. [Construire votre contrôleur](controller-setup) montre comment.
+
+## Suite {#next}
+
+| Pour faire ceci | Lisez |
+| --- | --- |
+| Écrire l'enregistrement, le formulaire de lancement et l'état du job | [Construire votre contrôleur](controller-setup) |
+| Demander des réglages et des secrets à l'espace de travail | [Paramètres de l'agent](parameters) |
+| Faire attendre une étape jusqu'à l'intervention d'une personne | [Validation humaine](human-in-the-loop) |
+| Partager des données entre les jobs | [Ressources partagées](resources) |
+| Déclarer ce que coûte le travail | [Déclaration des coûts](cost-reporting) |
+| Laisser les règles de mission autoriser, suspendre ou arrêter une étape | [Garde-fous](rule-checkpoints) |
+| Ajouter un écran de configuration au job | [Configurateur de job](job-configurator) |
+| Ajouter des tableaux de bord | [Analyses des jobs et des missions](job-analytics) |
+
+Pour le contrat complet, voir le [guide Supervaizer v2](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#core-model).

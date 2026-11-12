@@ -1,0 +1,92 @@
+---
+id: slack-notifications
+title: Notifications et Slack
+description: Connectez Slack à un espace de travail, choisissez les événements qui vous notifient pour chaque agent d'une mission, et lisez vos notifications dans Supervaize Studio.
+displayed_sidebar: supervaizeFleetSidebar
+slug: slack-notifications
+---
+
+# Notifications et Slack {#notifications-and-slack}
+
+Studio peut vous informer des événements de vos jobs et de vos cases. Il peut envoyer des messages vers des canaux tels que Slack et l'e-mail, et il conserve une liste dans l'application.
+
+La mise en place se fait en trois étapes.
+
+1. Un administrateur de l'espace de travail connecte Slack.
+2. Un membre qui peut modifier la mission choisit les événements pour chaque agent.
+3. Chaque utilisateur lit les notifications dans l'application.
+
+## Connecter Slack {#connect-slack}
+
+Un administrateur de l'espace de travail ouvre **Settings**, puis **Integrations**. La page affiche une carte pour chaque service.
+
+| Service | État |
+| --- | --- |
+| **Slack** | La carte affiche **Connect Slack** tant que vous n'êtes pas connecté. Ensuite, elle affiche **Settings**. |
+| **Email** | La carte fonctionne de la même façon. |
+| **Google Sheets** | La carte fonctionne de la même façon. |
+| **WhatsApp**, **Teams**, **SMS** et **Zoom** | La carte affiche **Coming soon**. Un lien **Request feature** remplace le statut. |
+
+Un développeur peut aussi voir une carte **n8n** lorsque n8n est activé pour l'espace de travail.
+
+Pour connecter Slack :
+
+1. Sur la carte **Slack**, sélectionnez **Connect Slack**.
+2. Approuvez l'accès dans Slack.
+3. Studio revient à la page **Integrations**.
+
+Ouvrez de nouveau la carte **Slack**, et sélectionnez **Settings**. La page affiche ces cartes.
+
+| Carte | Ce qu'elle affiche |
+| --- | --- |
+| **Slack workspace** | Le nom de l'espace de travail Slack, la date de connexion, la dernière vérification, l'expiration du jeton et le **Default channel**. |
+| **Available channels** | Les canaux que Studio peut atteindre. |
+
+Dans **Available channels**, vous pouvez faire deux choses.
+
+- Choisir un **Default channel** et sélectionner **Save default channel**.
+- Choisir un canal sous **Test sending a message**, puis sélectionner **Send test message**.
+
+**Disconnect Slack** supprime la connexion.
+
+## Choisir les événements pour un agent {#choose-events-for-an-agent}
+
+Les préférences appartiennent à un agent dans une mission. Ouvrez la page de la mission. Chaque carte d'agent a un bouton **Notifications**.
+
+La boîte de dialogue **Notification settings** s'ouvre. Elle a trois onglets.
+
+| Onglet | Ce que vous réglez |
+| --- | --- |
+| **Notification preferences** | Quand chaque événement atteint chaque canal |
+| **Interaction capabilities** | Ce que chaque canal peut faire |
+| **Memory retention** | Les données que l'agent conserve : **Deliverables**, **Steps**, **Context** et **Dialogs** |
+
+Dans **Notification preferences**, chaque ligne est un événement d'un job ou d'un case : `start`, `stop`, `pause`, `human_in_the_loop`, `error` ou `unknown`. Chaque colonne est un canal : `slack`, `teams`, `email` ou `web`.
+
+Pour chaque cellule, choisissez une fréquence.
+
+| Fréquence | Signification |
+| --- | --- |
+| **Off** | Aucun message |
+| **Real Time** | Immédiatement |
+| **Hourly** | Un message par heure |
+| **Daily** | Un message par jour |
+| **Weekly** | Un message par semaine |
+
+Sélectionnez **Save preferences** pour conserver vos choix. Sélectionnez **Reset to agent defaults** pour les supprimer.
+
+Les membres en lecture seule voient les valeurs sans ces boutons.
+
+## Lire vos notifications {#read-your-notifications}
+
+La cloche de l'en-tête liste vos nouvelles notifications. Sélectionnez **My notifications**, en bas, pour les voir toutes.
+
+**My notifications** couvre tous les espaces de travail dont vous êtes membre. Utilisez le filtre **Workspace** pour réduire la liste.
+
+| Colonne | Ce qu'elle affiche |
+| --- | --- |
+| **Workspace** | L'espace de travail de la notification |
+| **Event** | Ce qui s'est passé |
+| **Source** | Qui ou ce qui l'a provoqué, par exemple un agent |
+
+Sélectionnez **Mark notifications as read** pour remettre à zéro le compteur de notifications non lues.

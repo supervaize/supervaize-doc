@@ -1,0 +1,64 @@
+---
+id: developer-account
+title: Configurer votre compte développeur Supervaize
+displayed_sidebar: supervaizeFleetSidebar
+slug: developer-account
+---
+
+## Depuis le terminal {#terminal}
+
+Une fois le SDK Supervaizer installé, une seule commande effectue toutes les étapes de cette page :
+
+```bash
+supervaizer login
+```
+
+La commande ouvre une page d'approbation dans votre navigateur. Vous vous y connectez ou vous y créez un compte (la connexion Google fonctionne), vous vérifiez le code affiché dans votre terminal, vous choisissez l'espace de travail et vous approuvez. La commande écrit ensuite votre clé d'API et vos variables d'environnement dans `.env`.
+
+- Un nouveau compte reçoit son propre espace de travail, et vous en êtes l'administrateur.
+- Si l'espace de travail n'a pas encore l'accès Developer, l'approbation par un administrateur de l'espace de travail l'active.
+- La clé est à votre nom. Vous pouvez la consulter et la supprimer sur la page **Developer**, avec vos autres clés.
+
+Le [démarrage rapide](/docs/supervaizer-controller/quickstart#login) montre chaque étape. Le reste de cette page décrit la méthode manuelle, dans Studio.
+
+## Étapes rapides {#quick-steps}
+
+- Créez votre compte sur supervaize.
+- Abonnez-vous en tant que développeur
+- Créez une clé d'API pour votre espace de travail
+- Récupérez vos identifiants
+
+## Configurer la CLI Supervaize {#set-up-the-supervaize-cli}
+
+Commencez par créer un compte Supervaize ou par vous connecter sur [supervaize.com](https://supervaize.com)
+
+## Premiers pas sur Supervaize {#getting_started}
+
+### S'abonner à l'offre développeur {#subscribe-to-the-developer-plan}
+
+Une fois votre compte Supervaize créé, vous devez vous abonner en tant que développeur pour accéder à l'API Fleet. Ouvrez les paramètres de votre compte et sélectionnez l'offre d'abonnement développeur.
+![S'abonner à l'offre développeur](https://cdn.do.supervaize.com/documentation/supervaize-subscribe-developers.png)
+
+### Paramètres développeur {#developer-settings}
+
+Ouvrez les paramètres de votre espace de travail : cliquez sur le menu de votre profil, en haut à droite, puis sélectionnez « Developer » dans le menu déroulant.
+
+![Menu Developer de Supervaize](https://cdn.do.supervaize.com/documentation/supervaize-developer-menu.png)
+
+Après votre abonnement, vous pouvez créer des identifiants d'API pour votre espace de travail. Ces identifiants vous permettent de vous authentifier auprès de l'API Supervaize Studio.
+
+![Créer des identifiants Supervaize](https://cdn.do.supervaize.com/documentation/supervaize-create-credentials.png)
+
+Cliquez sur « Create API Key » pour générer une nouvelle clé pour votre environnement de développement.
+
+## Récupérer votre clé d'API {#api_key}
+
+Ouvrez les paramètres de votre espace de travail et cliquez sur l'onglet « Developer ». Vous y trouvez les options pour créer et gérer vos clés d'API.
+
+:::danger
+Copiez cette clé et conservez-la en lieu sûr : vous ne pourrez plus l'afficher ensuite.
+:::
+
+![Paramètres développeur de Supervaize](https://cdn.do.supervaize.com/documentation/supervaize-developer-settings.png)
+
+Copiez vos variables d'environnement pour les utiliser dans la [configuration de supervaizer](/docs/supervaizer-controller/quickstart#3)

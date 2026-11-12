@@ -1,0 +1,173 @@
+---
+id: rule-checkpoints
+title: Garde-fous (points de contrôle des règles)
+displayed_sidebar: supervaizerControllerSidebar
+slug: rule-checkpoints
+---
+
+# Garde-fous : laissez les règles de la mission décider {#guardrail-controls-let-mission-rules-decide}
+
+Un responsable de mission écrit les règles d'une mission dans Studio, par exemple « ne pas contacter un concurrent » ou « une personne doit approuver chaque remboursement supérieur à 500 USD ». Un **point de contrôle de règle** est le moment où votre agent demande à Studio : « puis-je exécuter cette étape ? ». Studio évalue l'étape au regard des règles et répond **allow**, **pause** ou **stop**.
+
+## Point de contrôle de règle ou validation humaine ? {#rule-checkpoint-or-human-in-the-loop}
+
+| | [Validation humaine](human-in-the-loop) | Point de contrôle de règle |
+| --- | --- | --- |
+| Qui décide qu'une étape attend | Votre agent, dans son code | Le responsable de mission, avec des règles dans Studio |
+| Identique pour toutes les missions | Oui | Non, chaque mission a ses propres règles |
+| Ce que la personne voit | Le formulaire de votre agent | Le panneau **Rule activity** du job dans Studio |
+
+Utilisez les deux quand vous avez besoin des deux : votre agent demande l'information manquante, et la mission décide de ce qui est autorisé.
+
+## Quand l'ajouter {#when-to-add-it}
+
+Ajoutez un point de contrôle à chaque étape qui a un effet en dehors de votre agent : elle envoie un message, appelle un système du client, dépense de l'argent, publie ou supprime. Une étape qui se contente de lire ou de calculer n'en a pas besoin.
+
+## Fonctionnement {#how-it-works}
+
+1. Votre agent déclare les phases de point de contrôle qu'il prend en charge : `before` (avant l'effet), `after` (après l'effet), ou les deux.
+2. Quand une mission a des règles, Studio ajoute un `rule_snapshot` opaque à l'entrée de `job.start`.
+3. Avant l'effet, votre agent envoie un point de contrôle avec les faits métier de l'étape. Studio répond.
+   - `allow` : exécutez l'effet.
+   - `stop` : ne l'exécutez pas. L'étape échoue. Cette décision est définitive.
+   - `pause` : attendez. Une personne décide dans Studio, puis Studio appelle votre action `rule.checkpoint.resume` avec `allow` ou `stop`.
+4. Après l'effet, votre agent peut envoyer un second point de contrôle avec le résultat.
+
+Une étape en pause attend dans le panneau **Rule activity** de la page du job. La personne lit la règle et le verdict, écrit un motif, puis sélectionne **Approve** ou **Deny**. [Exécuter et contrôler des jobs avec des règles](/docs/supervaize-fleet/rules/run-and-review) explique chaque décision.
+
+![Le panneau Rule activity d'un job dans Studio : la règle en vigueur, le décompte des vérifications et une vérification en pause avec les boutons Approve, Deny et Re-evaluate](/img/controller/rule-checkpoint.png)
+
+Studio ne démarre un job dans une mission avec des règles que si l'agent déclare des points de contrôle de règle.
+
+:::note[Côté Studio]
+L'espace de travail a besoin d'un Rule Controller avant qu'un job d'une mission avec des règles puisse démarrer. [Configurer les règles](/docs/supervaize-fleet/rules/setup) explique comment un administrateur le configure et écrit les règles.
+:::
+
+## 1. Déclarer la capacité {#1-declare-the-capability}
+
+```python
+registration = build_v2_agent_registration(
+    agent_slug="my-agent",
+    display_name="My Agent",
+    a2ui_catalog_version="my-agent-ui.1",
+    surfaces=["job.start", "case.step.awaiting"],
+    actions=["job.start", "job.sync", "job.stop", "step.awaiting.submit"],
+    rule_checkpoints={"phases": ["before", "after"], "secret_refs": ["case.metadata.customer_reference"]},
+)
+```
+
+`secret_refs` est facultatif. Il liste les chemins des secrets métier dans les données de vos étapes. Chaque chemin commence par `job.fields.`, `case.metadata.`, `step.payload.` ou `context.`. Passez la même liste à `RuleCheckpointGate.from_job_start(account, request, secret_refs=...)`.
+
+Le SDK ajoute l'action `rule.checkpoint.resume` à l'enregistrement. Enregistrez un gestionnaire pour cette action (étape 4).
+
+## 2. Ouvrir la barrière au démarrage du job {#2-open-the-gate-at-job-start}
+
+```python
+from supervaizer import RuleCheckpointGate
+
+GATES: dict[str, RuleCheckpointGate] = {}
+
+def start_job(request: V2ActionRequest) -> dict:
+    job_state = build_job_state(request)
+    if "rule_snapshot" in request.input:  # la mission a des règles
+        GATES[request.job_id] = RuleCheckpointGate.from_job_start(account, request)
+        hold_guarded_steps(job_state)     # les passer à "pending" : rien n'a encore été exécuté
+    JOBS[request.job_id] = job_state
+    return started(job_state)
+```
+
+:::warning[Exécutez les points de contrôle après la réponse du démarrage]
+Studio ne connaît un case qu'après l'avoir reçu dans un état de job. Un point de contrôle pour un case que Studio ne connaît pas est refusé. Renvoyez donc les étapes protégées à l'état `pending` depuis `job.start`, demandez une synchronisation à Studio, puis exécutez les points de contrôle dans `job.sync`.
+:::
+
+Le `rule_snapshot` est opaque. Ne le lisez pas, ne le modifiez pas, ne le journalisez pas et ne le copiez pas dans les données d'un case.
+
+## 3. Demander avant et après l'effet {#3-ask-before-and-after-the-effect}
+
+```python
+PAUSED = {"reason": "rule_checkpoint", "surface": "case.step.awaiting", "action": "rule.checkpoint.resume"}
+
+async def run_guarded_step(gate: RuleCheckpointGate, job_id: str, case: dict, step: dict) -> None:
+    ids = {"job_id": job_id, "case_id": case["id"], "step_id": step["id"]}
+
+    decision = await gate.checkpoint(
+        occurrence_id=step["id"], phase="before", **ids,
+        context={"operation": "send_email", "recipient_domain": case["metadata"]["domain"]},
+    )
+    if decision.status == "pause":
+        step["status"] = case["status"] = "awaiting"
+        step["awaiting"] = dict(PAUSED)
+        decision = await gate.wait_for_resume(decision, step["id"], "before", job_id=job_id, case_id=case["id"])
+        step.pop("awaiting", None)
+    if decision.status == "stop":
+        step["status"] = case["status"] = "failed"
+        return
+
+    result = send_the_email(case)  # l'effet ne s'exécute qu'après un allow
+
+    decision = await gate.checkpoint(
+        occurrence_id=step["id"], phase="after", **ids,
+        context={"operation": "send_email", "outcome": result.status},
+    )
+    step["status"] = case["status"] = "completed" if decision.status == "allow" else "failed"
+```
+
+- **`context`** contient les faits métier que les règles évaluent : l'opération, le montant, le destinataire, le résultat. Utilisez des valeurs simples. N'envoyez pas de secrets.
+- **`occurrence_id`** identifie cette exécution de l'étape. Utilisez une valeur stable, afin qu'une nouvelle tentative porte sur la même occurrence.
+- Une étape en pause apparaît à l'état `awaiting` avec le motif `rule_checkpoint`. La personne décide dans le panneau **Rule activity** de la page du job, et non dans un formulaire de votre agent.
+
+`wait_for_resume` attend à l'intérieur de votre processus. Un agent réel ne bloque pas une requête dessus : il renvoie l'état du job avec l'étape en pause et reprend quand la décision arrive. Le fichier Hello World [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) montre ce flux complet.
+
+## 4. Recevoir la décision {#4-receive-the-decision}
+
+```python
+from supervaizer import RuleCheckpointRecoveryRequired
+from supervaizer.contracts import RuleCheckpointResume
+from supervaizer.rule_controls import resume_rule_checkpoint
+
+@sv_server.v2_action("rule.checkpoint.resume", agent_slug=agent.slug)
+async def resume(request: V2ActionRequest) -> dict:
+    decision = RuleCheckpointResume.model_validate(
+        request.input | {"job_id": request.job_id, "case_id": request.case_id, "agent_slug": request.agent_slug}
+    )
+    try:
+        resume_rule_checkpoint(decision)
+    except (ValueError, RuleCheckpointRecoveryRequired) as error:  # aucun point de contrôle correspondant
+        return {"status": "error", "effects": [{"type": "rule.checkpoint.rejected", "job_id": request.job_id,
+                                                "message": str(error)}]}
+    job_state = JOBS[request.job_id]
+    return {"status": "ok",
+            "effects": [{"type": "rule.checkpoint.resumed", "job_id": request.job_id}],
+            "job_state": job_state}
+```
+
+`resume_rule_checkpoint` associe la décision à la barrière en attente et réveille `wait_for_resume`. La fonction renvoie `None` quand la décision arrive avant que l'étape n'attende. Le SDK conserve la décision pour cette étape. Elle lève `ValueError` quand la décision ne correspond à aucun point de contrôle. Elle lève `RuleCheckpointRecoveryRequired` quand aucune attente en cours dans ce processus ne détient la barrière. Renvoyez une erreur dans les deux cas : n'appliquez jamais une décision au hasard.
+
+:::warning[Renvoyez l'état du job avec la décision]
+Studio applique le `job_state` que le gestionnaire renvoie, comme pour toute autre action. Renvoyez l'état du job après la décision. Sans cet état, le job reste **Awaiting** dans Studio jusqu'au prochain `job.sync`.
+
+Studio n'applique pas un état qu'il refuse, ni un état qui arrive après la mise en pause de l'agent. Le job garde alors son état enregistré jusqu'au prochain `job.sync`.
+
+Quand l'étape reprend après la réponse, demandez une synchronisation à Studio : Studio appelle alors `job.sync` et affiche le nouvel état. La fonction `schedule_refresh` du fichier Hello World [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) montre cette demande.
+:::
+
+## Conserver la barrière après un redémarrage {#keep-the-gate-across-restarts}
+
+Dans ces exemples, la barrière vit en mémoire. Après un redémarrage, l'agent ne peut plus associer une décision, et il doit la rejeter. En production, stockez le `rule_snapshot` avec votre job et reconstruisez la barrière à partir de lui.
+
+Le SDK propose aussi une fonction utilitaire, `Case.run_guarded_step()`, qui exécute toute la séquence et stocke le résultat de chaque phase pour un redémarrage sûr. Voir « Rule checkpoints » dans le [guide du SDK](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#rule-checkpoints).
+
+## Liste de vérification {#checklist}
+
+- [ ] `rule_checkpoints` liste les phases, et `rule.checkpoint.resume` a un gestionnaire.
+- [ ] Chaque étape avec un effet extérieur demande `before`.
+- [ ] L'effet ne s'exécute qu'après `allow`.
+- [ ] `stop` fait échouer l'étape et est définitif. `pause` affiche l'étape à l'état `awaiting`.
+- [ ] Le gestionnaire de décision renvoie l'état du job. L'agent demande une synchronisation à Studio quand l'étape reprend plus tard.
+- [ ] Le `context` contient les faits dont une règle a besoin, et aucun secret.
+- [ ] Les jobs d'une mission sans règles s'exécutent comme avant.
+
+## Référence {#reference}
+
+- Hello World : [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) et [`tests/test_rule_checkpoints.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/tests/test_rule_checkpoints.py).
+- Guide du SDK : [Rule checkpoints](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md#rule-checkpoints).

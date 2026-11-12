@@ -1,0 +1,207 @@
+---
+id: monitor
+title: Suivre une campagne
+description: Suivez une campagne d'entretiens Aidan en cours dans Supervaize Studio - graphiques, cases, transcriptions, confidentialité, synthèse, exports et clôture.
+displayed_sidebar: supervaizeFleetSidebar
+slug: monitor
+---
+
+# Suivre une campagne Aidan {#monitor-an-aidan-campaign}
+
+Une fois la campagne lancée, vous la suivez depuis la page de son job : **Job Analytics** montre les tendances, les **Cases** montrent chaque entretien, et l'onglet **Configure** contient les transcriptions, la synthèse et les exports.
+
+- **Chaque entretien est un case.** Les missions contiennent des jobs, les jobs contiennent des cases, les cases contiennent des étapes.
+- **Les graphiques sont en direct.** Ils sont fournis par Aidan et reflètent les entretiens au fur et à mesure.
+- **Gardez les tests hors du vrai job.** Faites les entretiens de test dans un job séparé, sinon ils comptent dans vos résultats.
+- **La clôture est définitive.** Une campagne clôturée ne peut pas être rouverte depuis Studio.
+
+## Où regarder {#where-to-look}
+
+| Vous voulez savoir | Allez à |
+| --- | --- |
+| Comment la campagne avance globalement | Le job, onglet **Operations** : **Job Analytics** |
+| Qui a passé l'entretien, qui ne l'a pas passé | Le job, onglet **Operations** : les cases |
+| Ce qui a été dit dans un entretien | Le job, onglet **Configure**, **Interviews** |
+| Ce que dit la campagne dans son ensemble | **Synthesis**, puis **Links & exports** |
+| Les résumés d'une campagne anonymisée | Le case du couloir **Deliverable** |
+
+Pour atteindre un entretien depuis le tableau de bord : **Missions**, la mission de la campagne, son job, puis le case.
+
+## Lire les graphiques {#read-the-charts}
+
+La page du job montre les analyses d'Aidan sous **Job Analytics**, au-dessus des cases. Les mêmes analyses s'ouvrent depuis la carte d'Aidan sur la page de la mission.
+
+**Job Metadata**, juste au-dessus, rappelle le nom de la campagne, son statut, son responsable, si elle est anonymisée, et son lien d'inscription.
+
+Quand vous pouvez voir les coûts, la carte **Information** du job montre la consommation de tokens déclarée. Voir [Naviguer dans un job](../features/job-navigation#the-job-page-at-a-glance).
+
+| Graphique ou compteur | Ce qu'il vous dit |
+| --- | --- |
+| **Campaign Progress** | Les contacts inscrits et le **% completion**. |
+| **Session Metrics** | Le nombre de sessions et l'**Avg duration**. |
+| **Call duration over time** | Un point par entretien, en secondes. Survolez un point pour voir le contact, le statut et la raison de fin. |
+| **Sessions per campaign per day** | Le rythme quotidien de la campagne. |
+| **Sessions by day and hour** | Le moment où les participants passent leur entretien. |
+
+Deux filtres s'appliquent aux graphiques :
+
+- **Window** : **24h**, **7d**, **14d** ou **All**, ou une date **From** et une date **To**.
+- **Session start time** : **UTC**, ou **Contact local** pour lire les heures dans le fuseau horaire de chaque participant. Utilisez-le pour voir quand les personnes, partout dans le monde, passent réellement l'appel.
+
+:::tip[Lisez d'abord le graphique des durées]
+Un entretien complet et un entretien abandonné sont très différents. Sur un scénario de 15 à 20 minutes, les entretiens complets se situent autour de 1 000 secondes. Un point à 14 secondes correspond à quelqu'un qui a ouvert le lien puis est parti, ou à un test.
+:::
+
+## Suivre les cases {#follow-the-cases}
+
+Ouvrez l'onglet **Operations** du job. L'entretien de chaque participant est un case, et vous choisissez la vue : **Board**, **List** ou **Calendar**. [Naviguer dans un job](../features/job-navigation) les décrit en détail.
+
+| Colonne du tableau | Ce qu'elle signifie pour un entretien |
+| --- | --- |
+| **Todo** | Le participant est inscrit et n'a pas commencé. |
+| **In Progress** | L'entretien est en cours. |
+| **Success** | L'entretien est terminé. |
+| **Anomaly** | L'entretien a échoué ou a été annulé. |
+
+- **Ouvrez un case** pour voir ses étapes et son statut. **Contact Data** montre l'e-mail du participant et son lien d'entretien personnel.
+- **Les compteurs** à côté du titre **Cases** donnent les totaux : Total, Completed, Waiting, Failed.
+- **Passez en List** pour trier et filtrer. Filtrez sur **Status** pour isoler les participants qui n'ont pas commencé.
+- **Exportez** depuis **View all** : **Export CSV** vous laisse choisir les colonnes, **Full export** prend tous les champs.
+
+Quand le mode test est activé pour votre espace de travail, les cases de test apparaissent dans un couloir **Testing**. Le couloir par défaut s'appelle **Production**. Voir [Test et production](../features/job-navigation#testing-and-production).
+
+### Campagnes anonymisées : le case Deliverable {#anonymised-campaigns-the-deliverable-case}
+
+Sur une campagne anonymisée, les cases des participants dans le couloir **Work** ne portent aucun résultat. Un case du couloir **Deliverable** les rassemble à la place :
+
+- **Un résumé anonymisé par entretien**, nommé d'après l'identifiant de session, et non d'après le participant.
+- **La synthèse de la campagne**, une fois qu'elle a été générée.
+
+Il n'y a aucune transcription, nulle part, sur une campagne anonymisée.
+
+## Lire les entretiens {#read-the-interviews}
+
+Ouvrez l'onglet **Configure** du job, puis **Interviews**. Chaque ligne est une conversation, la plus récente en premier.
+
+| Colonne | Ce qu'elle montre |
+| --- | --- |
+| **Participant** | Le nom du participant, ou « Participant 1 », « Participant 2 » sur une campagne anonymisée. |
+| **Status** | Où en est l'entretien. |
+| **Started** | Quand la conversation a commencé. |
+| **Duration** | Combien de temps elle a duré. |
+| **Transcript** | La conversation complète. |
+| **Prompt used** | Les instructions personnalisées exactes qu'Aidan a reçues pour cet entretien. Utilisez-les pour vérifier ce qui a été demandé. |
+| **Synthesis** | Le résumé de cet entretien, une fois qu'il a été produit. |
+
+Le tableau montre les 200 entretiens les plus récents.
+
+## Confidentialité {#confidentiality}
+
+| Situation | Ce que Studio montre | Qui est responsable |
+| --- | --- | --- |
+| **Campagne anonymisée** | Les participants sont numérotés. Pas de colonne **Transcript** ni **Prompt used**, et pas d'export des données de campagne. Les résumés anonymisés, identifiés par l'identifiant de session, sont dans le [case Deliverable](#anonymised-campaigns-the-deliverable-case). | Studio l'impose. |
+| **Un participant a demandé la confidentialité** | L'entretien entier est couvert, pas un passage. Son contenu est remplacé par une mention « confidentialité demandée », dans Studio et dans les exports. | Studio l'impose. |
+| **Campagne identifiée, sans demande** | Les transcriptions sont attribuées aux participants. | Votre équipe. Décidez qui peut lire les transcriptions et comment les citations sont utilisées. |
+
+Une demande est détectée à partir de ce que dit le participant. Le fait qu'Aidan mentionne l'option de confidentialité dans son introduction ne compte pas comme une demande.
+
+## Garder les tests hors des résultats {#keep-tests-out-of-the-results}
+
+Les entretiens de test créent des cases, des sessions et des points sur les graphiques, comme les vrais.
+
+- **Avant le lancement**, testez sur un job séparé. Voir [Tester avant la mise en ligne](./setup#test-before-you-go-live).
+- **Avec le mode test** activé pour votre espace de travail, un job démarre en mode test. Un responsable de mission sélectionne **Go live** quand la campagne est prête. Voir [Test et production](../features/job-navigation#testing-and-production).
+- **Pendant la campagne**, gardez un job pilote parallèle pour les essais, par exemple une nouvelle version du scénario. Ses résultats restent hors du job principal.
+- **La suppression a une limite.** Un participant qui a déjà un entretien ne peut pas être retiré dans **Participants**. Si des entretiens de test ont atterri dans la vraie campagne, listez les utilisateurs de test et demandez à Runwaize de les nettoyer.
+
+## Entretenir la participation {#keep-participation-moving}
+
+Les participants restent modifiables tant que la campagne est en ligne.
+
+- **Ajoutez les retardataires** avec **Enrol contact** ou **Import contacts** dans **Participants**.
+- **Trouvez qui n'a pas répondu.** Téléchargez **Invite links (CSV)** depuis **Links & exports**. La colonne `status` montre où en est chaque participant, et `interview_url` est le lien à renvoyer.
+
+Studio n'envoie aucune relance. Envoyez-les depuis votre propre outil de messagerie.
+
+## Générer la synthèse {#generate-the-synthesis}
+
+Ouvrez **Synthesis**.
+
+| Champ | Ce qu'il faut choisir |
+| --- | --- |
+| **Synthesis prompt** | Les instructions utilisées pour transformer les entretiens en un seul résumé de campagne. |
+| **Perimeter** | **All completed interviews**, ou un échantillon des 1 ou 5 premiers ou derniers entretiens pour essayer d'abord la synthèse. |
+
+Cliquez sur **Generate synthesis**. Le résultat apparaît dans **Links & exports** sous le nom **Campaign synthesis**.
+
+La section **Synthesis** est masquée une fois la campagne clôturée. Générez la synthèse finale avant de clôturer.
+
+## Ouvrir et télécharger les résultats {#open-and-download-results}
+
+Ouvrez **Links & exports**.
+
+| Élément | Ce que vous obtenez | Disponible |
+| --- | --- | --- |
+| **Registration link** | La page d'inscription partagée. | Quand **Allow contact registration** est activé |
+| **Invite links (CSV)** | Chaque participant avec son statut et son lien d'entretien personnel. | Toujours |
+| **Campaign synthesis** | Le résumé de la campagne, affiché dans Studio. | Après la génération d'une synthèse |
+| **Interview summaries (ZIP)** | Le résumé de chaque entretien. | Après le lancement, dès qu'une synthèse existe |
+| **Campaign data export (ZIP)** | Les données complètes de la campagne, avec la version du scénario utilisée. Les entretiens confidentiels sont expurgés. | Pas sur les campagnes anonymisées |
+
+## Clôturer la campagne {#close-the-campaign}
+
+Une campagne se clôture de l'une de ces deux façons :
+
+- **Automatiquement**, quand la date **End date** est atteinte (minuit UTC).
+- **À la main** : ouvrez **Review & launch**, cliquez sur **Close campaign** et confirmez.
+
+:::warning[La clôture est définitive]
+Les participants ne peuvent plus commencer d'entretien. La campagne ne peut pas être rouverte depuis Studio. Pour la relancer, démarrez un nouveau job.
+:::
+
+## Ce qui change au lancement {#what-changes-at-launch}
+
+| Section | Avant le lancement | En ligne | Après la clôture |
+| --- | --- | --- | --- |
+| **Parameters** | Modifiable | Lecture seule | Lecture seule |
+| **Participants** | Modifiable | Modifiable | Lecture seule |
+| **Scenario** | Modifiable | Lecture seule | Lecture seule |
+| **Review & launch** | Launch campaign | Close campaign | Lecture seule |
+| **Interviews** | Masquée | Disponible | Lecture seule |
+| **Synthesis** | Masquée | Disponible | Masquée |
+| **Links & exports** | Disponible | Disponible | Lecture seule |
+
+## Exemple : un point à mi-campagne {#example-a-mid-campaign-review}
+
+Une séance de revue typique, d'une demi-heure, quelques jours après le début de la première vague d'une campagne en deux vagues. L'organisation et les personnes sont fictives.
+
+**Le contexte.** Une équipe recueille le savoir-faire de ses experts seniors. La première vague est une campagne identifiée avec un lien d'inscription partagé, et elle doit être terminée le mardi suivant. Le responsable de la campagne fait visiter Studio à deux collègues.
+
+| Étape | Ce qu'ils font | Ce qu'ils apprennent |
+| --- | --- | --- |
+| **1. Job Analytics** | Ils ouvrent la mission, puis son job, et lisent les graphiques. | La plupart des entretiens durent près de 1 000 secondes. Quelques points se situent à quelques secondes. |
+| **2. Graphique des durées** | Ils survolent les points courts. | Ce sont les tests de l'équipe elle-même, dont un de 14 secondes. Ils faussent les moyennes. |
+| **3. Cases** | Ils ouvrent l'onglet **Operations** du job, puis un case. | Le chemin vers n'importe quel entretien : mission, job, case. Le case montre le lien et le statut du participant. |
+| **4. Colonne Todo** | Ils regardent les cases qui n'ont pas bougé. | Ces participants sont inscrits et n'ont pas commencé. Ce sont eux qu'il faut relancer. |
+| **5. Vue List** | Ils passent en **List**, filtrent sur **Status**, exportent le CSV. | Une liste de relance, prête pour l'outil de messagerie. |
+| **6. Confidentialité** | Ils demandent ce qu'il advient des réponses sensibles. | La campagne est identifiée, donc l'équipe décide de la façon dont les transcriptions sont partagées. Un participant qui demande la confidentialité voit son entretien entier retiré de la consultation. |
+| **7. Données de test** | Ils essaient de retirer les utilisateurs de test dans **Participants**. | Le retrait est refusé pour les participants qui ont déjà un entretien. |
+| **8. Horaires des sessions** | Ils basculent **Session start time** sur **Contact local**. | Les participants de toutes les régions passent le plus souvent l'appel pendant leurs heures de travail. |
+
+**Ce qu'ils décident.**
+
+- **Lister les utilisateurs de test** et les faire nettoyer de la campagne.
+- **Créer un job pilote parallèle** pour tous les essais à venir, afin que les tests ne se mélangent plus aux vrais entretiens. Un collègue veut d'abord lire son propre entretien de test, donc le job pilote le conserve.
+- **Préparer la deuxième vague dans le job pilote.** Le deuxième scénario y est testé avant la clôture de la première vague.
+
+## Préparer une deuxième vague {#plan-a-second-round}
+
+Une vague de suivi peut s'appuyer sur ce que chaque participant a dit la première fois. Le scénario de la deuxième vague est alors personnalisé pour chaque participant, à partir des transcriptions ou des résumés de la première vague.
+
+Cela se prépare avec Runwaize : un modèle de scénario maître, plus une étape de construction qui condense le premier entretien de chaque participant dans son propre scénario. Prévoyez-le avant la clôture de la première vague, et testez-le dans un job séparé.
+
+## Suivre depuis Claude ou ChatGPT {#monitor-from-claude-or-chatgpt}
+
+Avec le [connecteur MCP Supervaize](../mcp-connector/install), vous pouvez interroger un assistant sur la mission, le job et les cases de la campagne au lieu d'ouvrir Studio.
+
+Retour à : [configurer une campagne Aidan](./setup).

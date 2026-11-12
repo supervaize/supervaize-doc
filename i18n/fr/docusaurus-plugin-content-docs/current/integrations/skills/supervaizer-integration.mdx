@@ -1,0 +1,125 @@
+---
+id: supervaizer-integration
+title: Supervaizer Integration
+displayed_sidebar: integrationsSidebar
+---
+
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Le skill Supervaizer Integration {#supervaizer-integration-skill}
+
+**Source** : [<i className="bi bi-github"></i> supervaizer/skills/supervaizer-integration](https://github.com/supervaize/supervaizer/tree/main/skills/supervaizer-integration)
+
+Ce skill permet à un agent de code (Claude Code, Cursor, Codex, Gemini CLI) de connecter votre agent Python à Supervaize Studio. Il fait deux choses :
+
+1. Il **vous interroge**, pour que vous décidiez ce que sont une mission, un job, un case et une étape pour votre agent.
+2. Il **construit l'intégration** à partir des guides de ce site, un sujet à la fois, avec des tests.
+
+Le skill est publié avec le SDK Supervaizer, il suit donc la version en cours.
+
+:::tip[Principe clé]
+La décision d'intégration la plus importante est la **correspondance sémantique**, pas la syntaxe. Si la correspondance job/case/étape est fausse, le code du contrôleur peut fonctionner, mais l'interface de Supervaize et la télémétrie seront trompeuses.
+:::
+
+## Avant de commencer {#before-you-start}
+
+- Un projet d'agent Python (Python 3.12 ou ultérieur) qui fonctionne déjà.
+- Un agent de code capable de charger des skills.
+- 30 minutes pour l'entretien. Vos réponses décident de ce que les opérateurs voient dans Studio.
+- Aucun compte Studio n'est nécessaire au départ. Le skill lance `supervaizer login` quand l'agent est prêt, et vous vous connectez ou vous vous inscrivez dans votre navigateur.
+
+## Installation {#install}
+
+Dans Claude Code :
+
+```
+/plugin marketplace add supervaize/supervaizer
+/plugin install supervaizer-integration@supervaizer
+```
+
+Avec un autre agent de code, clonez le [dépôt du SDK](https://github.com/supervaize/supervaizer) et indiquez à l'agent le fichier `skills/supervaizer-integration/SKILL.md`.
+
+## Utilisation {#use-it}
+
+Ouvrez le projet de votre agent et demandez :
+
+```
+Integrate this agent with Supervaize.
+```
+
+Pour ajouter une capacité à un agent déjà connecté, nommez-la :
+
+```
+Add a human approval before the agent sends an e-mail.
+```
+
+## Ce qui se passe {#what-happens}
+
+| Phase | Ce que fait le skill | Ce que vous faites |
+| --- | --- | --- |
+| **1. Lire** | Il lit votre code : le point d'entrée, les entrées, les boucles, les sorties, les secrets, les appels qui ont des effets extérieurs | Rien |
+| **2. Interroger** | Il pose ses questions par séries. Chaque question vient avec une réponse recommandée et la raison tirée de votre code | Décider |
+| **3. Consigner** | Il écrit vos décisions dans `integration_spec.json` et vous montre le résumé | Confirmer |
+| **4. Construire** | Il lance `supervaizer scaffold`, puis construit un sujet à la fois à partir de son guide, chacun avec un test | Relire |
+| **5. Tester et connecter** | Il lance le contrôleur sans Studio. Puis il lance `supervaizer login`, démarre le contrôleur et vous donne le lien vers votre agent dans Studio | Approuver la connexion dans votre navigateur, puis accepter l'autorisation d'espace de travail de l'agent sur sa page Studio |
+
+### L'entretien {#the-interview}
+
+Le skill n'accepte pas « ça dépend ». Il vous interroge sur votre dernière exécution réelle, reformule votre réponse sous forme d'exemple, et repose la question quand le résultat serait inutile à un opérateur. Une série ressemble à ceci :
+
+```
+Round 2: the cases
+
+Q1. What does the operator count when they ask "how many are done"?
+    Recommended: one case per lead. run_batch() loops over `leads`
+    and each lead ends with its own status.
+
+Q2. Is the list of leads known when the job starts?
+    Recommended: yes. The CSV is read before the loop.
+
+Q3. When one lead fails, do the others continue?
+    Recommended: yes. The loop catches the error and goes on.
+```
+
+Les questions suivent cet ordre, et chaque réponse ouvre les suivantes :
+
+1. **Le job** : ce qu'un clic démarre, qui le démarre, combien de temps il dure.
+2. **Les cases** : ce que l'opérateur compte.
+3. **Les étapes** : ce qui peut échouer, coûter de l'argent, produire une sortie, avoir un effet extérieur ou nécessiter une personne.
+4. **Les sujets** que vos réponses ont ouverts (tableau ci-dessous).
+
+L'entretien continue pendant la construction. Quand le code révèle un point que personne n'a décidé, le skill s'arrête et pose la question.
+
+## Ce qu'il construit {#what-it-builds}
+
+| Sujet | Le skill l'aborde | Guide |
+| --- | --- | --- |
+| Enregistrement, formulaire de lancement, état du job | Toujours | [Construire votre contrôleur](/docs/supervaizer-controller/controller-setup) |
+| Définitions des champs des formulaires | Toujours | [Définitions des champs](/docs/supervaizer-controller/controller-setup#fields) |
+| Paramètres et secrets | Quand votre code lit des clés d'API ou des réglages | [Paramètres de l'agent](/docs/supervaizer-controller/parameters) |
+| Déclaration des coûts | Toujours | [Déclaration des coûts](/docs/supervaizer-controller/cost-reporting) |
+| Validation humaine | Quand une étape est irréversible, peut être incertaine ou nécessite une personne | [Validation humaine](/docs/supervaizer-controller/human-in-the-loop) |
+| Garde-fous | Pour chaque étape qui a un effet en dehors de l'agent | [Garde-fous](/docs/supervaizer-controller/rule-checkpoints) |
+| Ressources partagées | Quand des jobs partagent des données ou que des opérateurs doivent les modifier | [Ressources partagées](/docs/supervaizer-controller/resources) |
+| Écran de configuration | Quand un job a besoin d'une configuration sur sa page | [Configurateur de job](/docs/supervaizer-controller/job-configurator) |
+| Tableaux de bord d'analyse | Quand l'agent a des chiffres à suivre | [Analyses des jobs et des missions](/docs/supervaizer-controller/job-analytics) |
+
+Vous pouvez refuser un sujet. Le skill indique alors dans son rapport final quels sujets il a ignorés.
+
+## Ce que vous obtenez {#what-you-get}
+
+- `supervaizer_control.py` : le contrôleur, créé par `supervaizer scaffold` puis complété.
+- Des handlers dans un module de votre projet, et des tests qui les appellent comme le fait Studio.
+- `integration_spec.json` : la trace de vos décisions.
+- Un rapport final : la correspondance, les surfaces et les actions, les tests, et ce qui reste à écrire.
+
+## Conseils {#tips}
+
+- Répondez avec des exemples réels : « lundi dernier, le job avait 40 contacts et 3 ont échoué ».
+- Pensez comme l'opérateur. Il ne connaît pas votre code. Il veut voir ce qui est fait, ce qui attend et ce qui a échoué.
+- Commencez petit. Une bonne correspondance job, case et étape avec les coûts vaut mieux que toutes les options.
+
+## Apprenez d'abord le modèle {#learn-the-model-first}
+
+- [Missions, jobs, cases et étapes](/docs/supervaizer-controller/core-concepts)
+- [Hello World](https://github.com/supervaize/supervaize_hello_world) : un agent fonctionnel avec tous les sujets ci-dessus.

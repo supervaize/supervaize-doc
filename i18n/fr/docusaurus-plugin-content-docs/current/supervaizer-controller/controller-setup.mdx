@@ -1,0 +1,347 @@
+---
+id: controller-setup
+title: Construire votre contrôleur
+displayed_sidebar: supervaizerControllerSidebar
+slug: controller-setup
+---
+
+# Construire votre contrôleur {#build-your-controller}
+
+Le contrôleur est un seul fichier Python, `supervaizer_control.py`. Il indique à Studio ce que votre agent peut afficher et faire, et il relie les appels de Studio au code de votre agent.
+
+Cette page construit un contrôleur complet en six étapes. Définissez d'abord vos [missions, jobs, cases et étapes](core-concepts).
+
+:::tip[Laissez un agent de code s'en charger]
+Le [skill d'intégration Supervaizer](/docs/integrations/skills/supervaizer-integration) vous pose les questions de conception, puis suit ce guide dans votre projet.
+:::
+
+## 1. Créer le fichier {#1-create-the-file}
+
+```bash
+pip install supervaizer
+supervaizer scaffold
+```
+
+`supervaizer scaffold` écrit un fichier `supervaizer_control.py` fonctionnel : un agent, un formulaire de lancement, une action de lancement. Les étapes suivantes expliquent chaque partie et l'enrichissent.
+
+## 2. Enregistrer l'agent {#2-register-the-agent}
+
+L'enregistrement déclare les **surfaces** (les écrans) et les **actions** (les commandes) de votre agent.
+
+```python
+import os
+from typing import Any
+
+from supervaizer import (
+    Account,
+    Agent,
+    Server,
+    V2ActionRequest,
+    V2SurfaceRequest,
+    build_v2_agent_registration,
+)
+
+AGENT_NAME = "My Agent"
+
+agent = Agent(
+    name=AGENT_NAME,
+    version="0.1.0",
+    description="Describe what your agent does.",
+    supervaizer_v2_registration=build_v2_agent_registration(
+        agent_slug="my-agent",  # doit être égal au nom de l'agent transformé en slug
+        display_name=AGENT_NAME,
+        a2ui_catalog_version="my-agent-ui.1",  # changez-le quand vos surfaces changent
+        surfaces=["job.start"],
+        actions=["job.start", "job.sync", "job.stop"],
+    ),
+)
+
+account = Account(
+    workspace_id=os.getenv("SUPERVAIZE_WORKSPACE_ID") or "dummy_workspace_id",
+    api_key=os.getenv("SUPERVAIZE_API_KEY") or "dummy_api_key",
+    api_url=os.getenv("SUPERVAIZE_API_URL") or "https://app.supervaize.com",
+)
+
+sv_server = Server(agents=[agent], supervisor_account=account)
+```
+
+Une action porte sur un job et modifie l'état, sauf indication contraire de votre part. Déclarez une action en lecture seule avec `V2ActionDefinition(id="...", mutating=False)`. Studio s'en sert pour décider qui peut l'appeler.
+
+Ajoutez un `label` et une `description` à une action ou à une surface quand Studio l'affiche sous forme de bouton. Les deux sont du texte brut, de 300 caractères au plus. Pour décrire une surface, passez `{"id": "job.analytics", "label": "Analytics", "description": "Charts of the job."}` dans `surfaces`.
+
+### Décrire l'agent {#describe-the-agent}
+
+Passez `introduction` et `full_description` à `Agent`, à côté de `description` :
+
+```python
+agent = Agent(
+    name=AGENT_NAME,
+    version="0.1.0",
+    description="Describe what your agent does.",
+    introduction={
+        "tagline": "Turns a question into a sourced brief",
+        "summary": "Collects sources, drafts a synthesis and asks for review.",
+        "example_goals": ["Brief me on a market"],
+    },
+    full_description={"format": "markdown", "content": "# My Agent\n\nWhat it does and its limits."},
+    supervaizer_v2_registration=registration,
+)
+```
+
+Studio affiche `introduction` avant qu'un job existe. Studio affiche `full_description` sur la page de l'agent, en `markdown` ou en `html`, et le nettoie avant l'affichage.
+
+### Autoriser les lancements planifiés {#allow-scheduled-starts}
+
+Ajoutez `scheduled_start=True` à `build_v2_agent_registration` pour que Studio puisse lancer le job selon une planification. L'enregistrement doit déclarer `job.start`. Studio appelle `job.start` avec les mêmes données d'entrée qu'un lancement manuel, et une `idempotency_key` stable pour chaque occurrence. Voir [Scheduled start](supervaizer-controller/ref/2026_10_SCHEDULED_START.md).
+
+## 3. Décrire le formulaire de lancement {#fields}
+
+Quand un opérateur lance un job, Studio charge la surface `job.start` et dessine le formulaire que votre agent renvoie.
+
+![Le formulaire de lancement de l'agent Hello World](/img/controller/job-start-form.png)
+
+```python
+@sv_server.v2_surface("job.start", agent_slug=agent.slug)
+def job_start_form(request: V2SurfaceRequest) -> dict[str, Any]:
+    return {
+        "surface": request.surface,
+        "document": {
+            "type": "Form",
+            "id": "my_agent.job.start",
+            "title": "Start job",
+            "fields": [
+                {"id": "goal", "label": "Goal", "type": "text", "multiline": True, "required": True},
+                {
+                    "id": "mode",
+                    "label": "Mode",
+                    "type": "select",
+                    "default": "fast",
+                    "options": [{"value": "fast", "label": "Fast"}, {"value": "deep", "label": "Deep"}],
+                },
+                {
+                    "id": "max_sources",
+                    "label": "Maximum sources",
+                    "type": "integer",
+                    "default": 10,
+                    "depends_on": {"field": "mode", "in": ["deep"]},
+                    "validation": {"min": 1, "max": 50, "message": "Choose 1 to 50 sources"},
+                },
+                {"id": "review", "label": "Review before sending", "type": "boolean", "default": False},
+            ],
+            "submit": {"action": "job.start", "label": "Start"},
+        },
+    }
+```
+
+### Définitions de champs {#field-definitions}
+
+La même définition de champ sert dans tous les formulaires : le formulaire de lancement, un formulaire de [validation humaine](human-in-the-loop), un formulaire [Configure](job-configurator) et un formulaire de [ressource](resources).
+
+| Type | Saisie |
+| --- | --- |
+| `string`, `text` | Une ligne de texte. Avec `multiline: true`, une zone de texte. |
+| `integer`, `number` | Un nombre. |
+| `boolean` | Une case à cocher. |
+| `date`, `email` | Un sélecteur de date, un champ d'adresse e-mail. |
+| `select`, `multi_select` | Un ou plusieurs choix parmi `options`. |
+| `resource_ref` | Un choix parmi les éléments d'une des [ressources](resources) de l'agent, avec `options_source`. |
+| `file` | Un envoi de fichier. Voir [Validation humaine](human-in-the-loop#files). |
+| `list` | Un groupe répétable de `item_fields`. |
+
+| Clé | Usage |
+| --- | --- |
+| `id`, `label` | Obligatoires. L'`id` est la clé de la valeur que votre action reçoit. |
+| `required` | Studio bloque l'envoi tant que le champ est vide. |
+| `default`, `placeholder` | La valeur de départ, et l'indication affichée dans un champ vide. |
+| `description` | Texte d'aide, de 300 caractères au plus. |
+| `multiline`, `min_rows` | Une zone de texte et sa hauteur. |
+| `read_only` | Affiche la valeur et la verrouille. |
+| `options` | Les choix, sous forme d'objets `{"value", "label"}`. Un `select` obligatoire n'a pas de choix vide. |
+| `options_source` | Des choix chargés depuis une ressource : `{"type": "resource", "resource": "contacts", "value_field": "id", "label_field": "email"}`. |
+| `depends_on` | N'affiche le champ que lorsqu'un autre champ a l'une des valeurs listées : `{"field": "mode", "in": ["deep"]}`. |
+| `validation` | `min_length`, `max_length`, `pattern` pour le texte ; `min`, `max` pour les nombres ; `min_items`, `max_items` pour les listes ; `message` pour le texte de l'erreur. |
+
+Le SDK rejette une mauvaise définition de champ dans les plans de configuration, les étapes en attente et les ressources :
+
+- Une règle `validation` doit correspondre au type : `min`, `max` pour `integer`, `number` ; `min_length`, `max_length`, `pattern` pour `string`, `text` ; `min_items`, `max_items` pour `multi_select`, `list`.
+- `min_rows` exige `multiline: true`.
+- Une `list` exige `item_fields`. Un champ d'élément ne peut pas être une `list`.
+- Les `options` sont des objets `{"value", "label"}`. Une simple chaîne est refusée.
+- Les valeurs de `depends_on` sont des chaînes. Les champs parents peuvent s'enchaîner.
+
+Studio vérifie les champs pour le confort de l'opérateur. Votre action doit vérifier les valeurs à nouveau.
+
+## 4. Lancer le job et renvoyer l'état du job {#4-start-the-job-and-return-the-job-state}
+
+L'action `job.start` reçoit les valeurs du formulaire dans `request.input`. Elle exécute votre agent et renvoie l'**état du job** : le job, ses cases et leurs étapes.
+
+```python
+@sv_server.v2_action("job.start", agent_slug=agent.slug)
+def start_job(request: V2ActionRequest) -> dict[str, Any]:
+    job_id = request.job_id or "local-job"
+    if job_id in JOBS:  # Studio peut renvoyer le même lancement : ne l'exécutez jamais deux fois
+        return started(JOBS[job_id])
+
+    result = run_my_agent(goal=request.input["goal"], mode=request.input.get("mode", "fast"))
+
+    JOBS[job_id] = {
+        "job": {
+            "id": job_id,
+            "agent_slug": request.agent_slug,
+            "mission_id": request.mission_id,
+            "status": "completed",
+            "source": {"type": "fresh_start"},
+            "information": {"cost": {"total_cost": result.cost}},
+        },
+        "cases": [
+            {
+                "id": f"{job_id}-case-1",
+                "lane": "work",
+                "title": request.input["goal"],
+                "status": "completed",
+                "steps": [
+                    {
+                        "id": f"{job_id}-case-1-research",
+                        "activity": "operation",
+                        "status": "completed",
+                        "title": "Research",
+                        "cost": result.cost,
+                    }
+                ],
+            }
+        ],
+    }
+    return started(JOBS[job_id])
+
+
+def started(job_state: dict[str, Any]) -> dict[str, Any]:
+    job = job_state["job"]
+    return {
+        "status": "ok",
+        "effects": [{"type": "job.started", "job_id": job["id"], "status": job["status"]}],
+        "job_state": job_state,  # Studio ne lit les cases et les étapes qu'à partir d'ici
+    }
+```
+
+`JOBS` est un stockage qui vous appartient. Utilisez un dictionnaire pour commencer, et votre base de données en production.
+
+Les règles :
+
+- **Renvoyez l'état du job au niveau supérieur du résultat.** Studio ne lit pas les cases depuis un effet.
+- **Rendez le lancement répétable sans risque.** Studio renvoie le même `job_id` et la même `idempotency_key` après une réponse incertaine. Une exécution planifiée a une nouvelle clé pour chaque occurrence. Renvoyez le premier résultat pour une clé répétée.
+- **Refusez une clé réutilisée avec d'autres données d'entrée.** Renvoyez `status: "error"` avec `errors[0].code` valant `idempotency_conflict`.
+- **Un travail long ne bloque pas la réponse.** Renvoyez les cases en `pending` ou `active`, exécutez le travail en arrière-plan, et laissez `job.sync` rendre compte de l'avancement.
+
+## 5. Synchroniser et arrêter {#5-sync-and-stop}
+
+Studio appelle `job.sync` pour obtenir l'état courant, et `job.stop` quand un opérateur arrête ou termine le job.
+
+```python
+@sv_server.v2_action("job.sync", agent_slug=agent.slug)
+def sync_job(request: V2ActionRequest) -> dict[str, Any]:
+    job_state = JOBS.get(request.job_id)
+    result: dict[str, Any] = {"status": "ok", "effects": [{"type": "job.synced", "job_id": request.job_id}]}
+    if job_state:
+        result["job_state"] = job_state
+    return result
+
+
+@sv_server.v2_action("job.stop", agent_slug=agent.slug)
+def stop_job(request: V2ActionRequest) -> dict[str, Any]:
+    cancel_my_agent(request.job_id)
+    JOBS.pop(request.job_id, None)
+    return {"status": "ok", "effects": [{"type": "job.stopped", "job_id": request.job_id}]}
+```
+
+Studio n'interroge pas votre agent de lui-même. Quand le travail avance, renvoyez le nouvel état du job depuis la prochaine action, ou demandez une synchronisation à Studio. Le fichier Hello World [`agent_rules.py`](https://github.com/supervaize/supervaize_hello_world/blob/main/agent_rules.py) montre la demande de synchronisation.
+
+## 6. Exécuter et tester {#6-run-and-test}
+
+Exécutez le contrôleur sans Studio :
+
+```bash
+supervaizer start --local
+```
+
+Chargez ensuite le formulaire de lancement :
+
+```bash
+curl -s http://127.0.0.1:8000/a2a \
+  -H "X-API-Key: local-dev" -H "Content-Type: application/json" \
+  -d '{"jsonrpc": "2.0", "id": "1", "method": "supervaizer/surface.load",
+       "params": {"request_id": "r1", "actor": {"user_id": "me"}, "workspace": {"id": "local"},
+                  "mission_id": "local-mission", "agent_slug": "my-agent",
+                  "surface": "job.start", "input": {}}}'
+```
+
+Pour lancer un job, remplacez la méthode par `supervaizer/action.invoke` et ajoutez `"action": "job.start"`, un `"job_id"` et les valeurs de votre formulaire dans `"input"`.
+
+Pour les tests automatiques, définissez `SUPERVAIZER_LOCAL_MODE=true` avant d'importer le fichier de contrôle. Envoyez ensuite les mêmes requêtes à `sv_server.app` avec le `TestClient` de FastAPI. Le mode local ignore le jeton d'espace de travail. Sans lui, la requête exige un en-tête d'autorisation d'espace de travail signé. Le dossier [`tests/`](https://github.com/supervaize/supervaize_hello_world/tree/main/tests) de Hello World contient les fonctions utilitaires.
+
+Testez que le lancement est répétable sans risque. La fonction utilitaire appelle votre gestionnaire deux fois et échoue si le second appel change quoi que ce soit :
+
+```python
+from supervaizer import assert_confirm_idempotent
+
+def test_job_start_is_idempotent(start_request):  # une V2ActionRequest avec une idempotency_key
+    assert_confirm_idempotent(start_job, start_request)
+```
+
+Pour connecter le contrôleur à votre espace de travail, définissez les identifiants comme le montre le [démarrage rapide](quickstart#3). À la première utilisation dans un espace de travail, un administrateur ouvre la page de l'agent dans Studio, donne un **identifiant d'espace de travail de l'agent** (le nom de cet espace de travail côté agent) et accepte l'autorisation de l'agent.
+
+## Configuration guidée {#guided-setup}
+
+Studio peut configurer un job dans un panneau de discussion. Votre agent décrit la configuration sous forme de plan. L'opérateur remplit les étapes, lit l'estimation de coût et confirme. Studio appelle alors `job.start`.
+
+```python
+from supervaizer import V2CostEstimate, V2SetupFieldDefinition, V2SetupPlan, V2SetupStep
+
+plan = V2SetupPlan(
+    steps=[
+        V2SetupStep(
+            id="scope",
+            title="Scope",
+            fields=[V2SetupFieldDefinition(id="goal", label="Goal", type="text", multiline=True, required=True)],
+            help_actions=["goal.suggest"],
+        )
+    ],
+    cost_estimate=V2CostEstimate(status="estimated", unit="USD", min=1, max=3, basis="for 10 sources"),
+)
+
+registration = build_v2_agent_registration(
+    agent_slug="my-agent",
+    display_name="My Agent",
+    a2ui_catalog_version="my-agent-ui.1",
+    surfaces=["job.start"],
+    actions=[
+        "job.start",
+        {"id": "goal.suggest", "kind": "help", "mutating": False, "target_field": "goal"},
+        {"id": "job.test", "dry_run": True, "label": "Test run"},
+    ],
+    job_policy={"setup": {"plan": plan}},
+)
+```
+
+- `job_policy.setup` ajoute l'action en lecture seule `job.start.preview`. Elle renvoie le plan dans `setup_plan`.
+- Une **action d'aide** a `kind="help"` et `mutating=False`. Elle propose une valeur pour le champ désigné par `target_field`. Elle reçoit `{"field": ..., "values": {...}}` et renvoie `draft`.
+- Une **action d'essai à blanc** a `dry_run=True`. Elle peut créer des données temporaires et faire des appels au modèle. Elle n'envoie jamais de messages externes.
+- Une estimation de coût est une fourchette ou `status="unknown"`. Voir [Déclaration des coûts](cost-reporting#say-the-cost-before-the-job-starts).
+
+Le contrat complet se trouve dans [Guided setup contract](supervaizer-controller/ref/2026_10_GUIDED_SETUP_CONTRACT.md).
+
+## Ajouter ce dont votre agent a besoin {#add-what-your-agent-needs}
+
+| Votre agent | Ajoutez |
+| --- | --- |
+| a besoin de réglages ou de secrets fournis par l'espace de travail | [Paramètres de l'agent](parameters) |
+| doit attendre une personne | [Validation humaine](human-in-the-loop) |
+| a des données que les jobs partagent ou que les opérateurs modifient | [Ressources partagées](resources) |
+| coûte de l'argent à exécuter | [Déclaration des coûts](cost-reporting) |
+| a des effets que les règles de mission doivent contrôler | [Garde-fous](rule-checkpoints) |
+| a besoin d'une configuration sur la page du job | [Configurateur de job](job-configurator) |
+| a des données qui méritent des graphiques | [Analyses des jobs et des missions](job-analytics) |
+
+## Référence {#reference}
+
+- [Guide Supervaizer v2](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md) : le contrat complet.
+- [Hello World](https://github.com/supervaize/supervaize_hello_world) : un agent fonctionnel avec toutes les fonctionnalités de ces guides, et ses tests.

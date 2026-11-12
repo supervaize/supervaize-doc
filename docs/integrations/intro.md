@@ -19,4 +19,4 @@ This section covers how to connect Supervaize with external tools and agents.
 
 - **You have an n8n workflow** and want it to run as a Supervaize Agent (e.g. from Missions or Jobs) → [n8n Integration](/docs/integrations/n8n-integration).
 - **You have agent code** and want to instrument it with the Supervaizer Controller → [Supervaizer Integration](/docs/integrations/skills/supervaizer-integration).
-- **Your workspace is live** and you want to manage agents, missions, and HITL from a chatbot or IDE → [Supervaize Access](/docs/integrations/skills/supervaize-access).
+- **Your workspace is live** and you want to manage agents, missions, and human-in-the-loop steps from a chatbot or IDE → [Supervaize Access](/docs/integrations/skills/supervaize-access).

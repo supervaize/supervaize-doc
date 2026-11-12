@@ -1,0 +1,123 @@
+---
+id: troubleshooting
+title: Dépannage
+displayed_sidebar: supervaizerControllerSidebar
+slug: troubleshooting
+---
+
+# Dépannage {#troubleshooting}
+
+Problèmes courants et solutions lors de la mise en place et de l'exécution du contrôleur Supervaizer.
+
+## Problèmes de démarrage du serveur {#server-launch-issues}
+### L'A2A enregistré dans Studio exige une autorisation de l'espace de travail {#studio-registered-a2a-requires-workspace-authorization}
+Si le démarrage signale `Studio-registered Supervaizer v2 A2A requires workspace authorization`, la clé d'API Studio seule ne suffit pas. Dans Studio, ouvrez **Developer → Environment variables** et copiez `SUPERVAIZER_WORKSPACE_AUTH_REQUIRED`, `SUPERVAIZER_WORKSPACE_AUTH_ISSUER` et `SUPERVAIZER_WORKSPACE_AUTH_JWKS_URL` dans l'environnement du serveur de l'agent. L'émetteur et le point de terminaison JWKS sont des paramètres de vérification publics, et non des secrets d'API. Voir le [démarrage rapide](quickstart#workspace-authorization-for-studio-managed-v2-agents).
+
+Si la récupération de l'URL JWKS renvoie `404`, utilisez l'origine de l'API Django et la route `/w/<workspace-slug>/api/v1/workspace-agent-grants/jwks/`. L'émetteur de production est `https://studio.supervaize.com` ; l'origine de l'API de production est `https://app.supervaize.com`. La route JWKS et la route des événements du contrôleur partagent le préfixe de l'espace de travail, mais ont des points de terminaison distincts.
+
+### `/a2a` répond par l'erreur JSON-RPC `-32030` {#a2a-answers-the-json-rpc-error--32030}
+
+Le contrôleur a refusé l'autorisation de l'espace de travail de l'appel. Lisez `error.data.code` dans la réponse.
+
+| Code | Cause | Que faire |
+| --- | --- | --- |
+| `workspace_authorization_not_configured` | Le contrôleur n'a aucun paramètre `SUPERVAIZER_WORKSPACE_AUTH_*` | Définissez les trois variables de la section ci-dessus, puis redémarrez le contrôleur |
+| `workspace_authorization_missing` | L'appel n'a pas d'en-tête d'autorisation de l'espace de travail | Laissez Studio effectuer l'appel. Pour un test sur votre ordinateur, utilisez `supervaizer start --local` |
+
+### **Commande inconnue : supervaizer** {#unknown-command-supervaizer-}
+
+Vérifiez que votre environnement virtuel est actif.
+
+### **Error sending event SERVER_REGISTER** {#error-sending-event-server_register}
+
+```
+ERROR | ❌ Error sending event SERVER_REGISTER : Client error '403 Forbidden' for url 'https://stage.supervaize.com/w/team_1/api/v1/ctrl-events/'
+```
+
+L'en-tête de requête `workspace` et le chemin d'URL `/w/<slug>/` proviennent de `SUPERVAIZE_WORKSPACE_ID`. Vérifiez qu'il s'agit du slug exact d'un espace de travail Studio actif, et que l'utilisateur propriétaire de `SUPERVAIZE_API_KEY` appartient à cet espace de travail et dispose toujours de l'accès Developer. Vérifiez aussi que l'abonnement de l'espace de travail est actif et que `SUPERVAIZE_API_URL` correspond à l'environnement dans lequel la clé a été créée. Si le corps de la réponse de Studio indique `Subscription required`, demandez à un administrateur de l'espace de travail de vérifier l'abonnement. N'envoyez jamais la clé d'API dans un message au support.
+
+`supervaizer login` écrit ensemble le slug de l'espace de travail, l'adresse de l'API et la clé, à partir du même Studio. Relancez la commande quand vous n'êtes pas sûr que ces trois valeurs concordent. Voir le [démarrage rapide](quickstart#login).
+
+### **`supervaizer login` n'aboutit pas** {#supervaizer-login-does-not-complete}
+
+| Message | Cause | Que faire |
+| --- | --- | --- |
+| `This Studio does not support supervaizer login` | Le Studio à l'adresse `--api-url` ne propose pas cette connexion | Vérifiez l'adresse. Si elle est correcte, créez la clé sur la page **Developer** de Studio |
+| `The code expired before the approval` | L'approbation est arrivée plus de 15 minutes après le début | Relancez `supervaizer login` |
+| `The request was denied in Studio` | Quelqu'un a sélectionné **Deny** sur la page d'approbation | Relancez `supervaizer login` et approuvez la demande vous-même |
+| `Too many login requests` | Trop de connexions ont été lancées depuis votre adresse réseau | Attendez quelques minutes, puis réessayez |
+| La page indique `This code is not valid` | Le code est inconnu, expiré ou déjà utilisé | Relancez `supervaizer login` et ouvrez la nouvelle adresse |
+| La page n'affiche pas de bouton **Approve** | Votre compte n'a aucun espace de travail avec l'accès Developer | Demandez à un administrateur de l'espace de travail d'approuver, ou de vous donner l'accès Developer |
+
+### **HTTP 400 : invalid server.register details** {#http-400-invalid-serverregister-details}
+
+Si la réponse désigne `details.agents[n].parameters_setup`, ce champ doit être un tableau JSON de définitions de paramètres. Omettez-le ou envoyez `[]` quand l'agent n'a pas de paramètres ; un `null` explicite n'est pas valide.
+
+Exemple : `Invalid server.register details: details.agents[0].parameters_setup: must be a list of parameter definitions; omit it or send [] when none exist`.
+
+### **HTTP 500 lors de l'envoi de SERVER_REGISTER** {#http-500-while-sending-server_register}
+
+HTTP 500 signifie que Studio a échoué pendant le traitement de l'enregistrement. Le journal du contrôleur ne permet pas à lui seul d'identifier la cause côté serveur. Dans un rapport au support, indiquez l'horodatage UTC, le slug de l'espace de travail, l'environnement et l'en-tête `X-Request-ID` de la réponse de Studio. Ne partagez ni l'en-tête d'autorisation, ni la charge utile de l'événement, ni les clés d'API.
+
+Studio renvoie `X-Request-ID` dans les réponses de l'API de production et inclut cet identifiant dans ses journaux. Supervaizer journalise le statut HTTP distant et l'identifiant de requête pour les erreurs HTTP. Si l'en-tête de réponse n'a pas été capturé, fournissez l'horodatage et l'espace de travail pour que le support puisse rechercher les journaux Studio correspondants.
+
+Si une clé d'API est apparue dans des journaux ou dans un message au support, renouvelez à la fois la clé d'API de l'espace de travail Studio et la clé d'API du contrôleur, mettez à jour la configuration des secrets de l'agent, puis redéployez. Supprimez les copies des journaux exposés, ou restreignez-en l'accès, quand c'est possible.
+
+### **Port déjà utilisé** {#port-already-in-use}
+
+Démarrez le serveur sur un autre port : `supervaizer start --port 8010`, ou définissez `SUPERVAIZER_PORT=8010`.
+
+## Configuration de l'environnement {#environment-configuration}
+
+### Variables d'environnement manquantes {#missing-environment-variables}
+
+Vérifiez que toutes les variables d'environnement requises sont définies :
+
+```bash
+export SUPERVAIZE_API_KEY=your_api_key_here
+export SUPERVAIZE_WORKSPACE_ID=your_workspace_id
+export SUPERVAIZE_API_URL=https://app.supervaize.com
+```
+
+### Problèmes d'authentification par clé d'API {#api-key-authentication-issues}
+
+- Vérifiez que votre clé d'API est active dans le tableau de bord Supervaize
+- Vérifiez que l'identifiant de l'espace de travail correspond à votre compte
+- Vérifiez que l'URL de l'API est correcte pour votre environnement (staging ou production)
+
+## Configuration de l'agent {#agent-configuration}
+
+### Agent introuvable {#agent-not-discoverable}
+
+- Vérifiez que l'identifiant de l'agent dans votre contrôleur respecte le format attendu
+- Vérifiez que tous les paramètres requis sont correctement définis
+- Vérifiez que les méthodes de l'agent sont correctement implémentées
+
+### Erreurs de validation des paramètres {#parameter-validation-errors}
+
+- Relisez les définitions des paramètres dans votre contrôleur
+- Vérifiez que les champs obligatoires sont correctement marqués
+- Vérifiez que les types des paramètres correspondent aux valeurs attendues
+
+## Réseau et connectivité {#network-and-connectivity}
+
+### Délais de connexion dépassés {#connection-timeouts}
+
+- Vérifiez votre connectivité réseau
+- Vérifiez que les réglages du pare-feu autorisent les connexions HTTPS sortantes
+- Vérifiez que les points de terminaison de l'API Supervaize sont accessibles depuis votre réseau
+
+### Problèmes SSL/TLS {#ssltls-issues}
+
+- Vérifiez que votre système dispose de certificats SSL à jour
+- Vérifiez qu'un proxy ou un pare-feu d'entreprise n'interfère pas
+- Vérifiez que votre environnement Python dispose des bibliothèques SSL requises
+
+## Encore besoin d'aide ? {#still-need-help}
+
+Si vous rencontrez toujours des problèmes :
+
+1. Consultez le [dépôt GitHub du contrôleur Supervaizer](https://github.com/supervaize/supervaizer) pour connaître les problèmes connus
+2. Consultez la [référence de l'API REST](supervaizer-controller/ref/2025_08_REST_API.md) pour des informations détaillées sur les points de terminaison
+3. Consultez la [documentation de la CLI](supervaizer-controller/ref/2025_08_CLI.md) pour les options de dépannage en ligne de commande
+4. Vérifiez que vous utilisez la dernière version du paquet Supervaizer

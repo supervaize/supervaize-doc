@@ -1,0 +1,120 @@
+---
+id: Tunneling-setup
+title: Configurer une solution de tunnel (pour le développement local)
+displayed_sidebar: supervaizerControllerSidebar
+slug: tunneling-setup
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Link from "@docusaurus/Link";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+Ce guide vous accompagne dans la mise en place d'une solution de tunnel pour le développement local.
+
+Pour tester en local, vous devez installer une solution de tunnel afin d'obtenir une **URL externe**.
+
+## Option 1 : utiliser [**localtunnel** <i className="bi bi-box-arrow-up-right"></i>](https://loca.lt) {#option-1-using-localtunnel-}
+
+### Installer {#install}
+
+```bash
+npm install -g localtunnel
+```
+
+### Démarrer {#start}
+
+En supposant que le serveur supervaizer s'exécute sur le port 8000 (ce qui est le cas par défaut)
+
+```bash
+lt --port 8000
+# votre URL est : https://silly-peaches-chapter.loca.lt
+
+# ou, en option, définissez votre propre sous-domaine (s'il est disponible)
+
+lt --port 8000 --subdomain my_supervaizer_agent
+# votre URL est : https://my_supervaizer_agent.loca.lt
+```
+
+:::info[Conservez votre URL]
+Notez l'URL complète, par exemple `https://my_supervaizer_agent.loca.lt`. Stockez-la dans la variable d'environnement `SUPERVAIZER_PUBLIC_URL`.
+:::
+
+## Option 2 : utiliser [**ngrok** <i className="bi bi-box-arrow-up-right"></i>](https://ngrok.com/) {#option-2-using-ngrok-}
+
+### Installation {#installation}
+
+<Tabs groupId="os" queryString>
+  <TabItem value="mac" label="macOS">
+
+```bash
+brew install ngrok
+```
+
+  </TabItem>
+  <TabItem value="win" label="Windows">
+
+Installez-le depuis le [Windows App Store <i className="bi bi-box-arrow-up-right"></i>](ms-windows-store://pdp/?ProductId=9mvs1j51gmk6)
+
+  </TabItem>
+  <TabItem value="linux" label="Linux (apt)">
+  ```bash
+  curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc \
+  | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null \
+  && echo "deb https://ngrok-agent.s3.amazonaws.com bookworm main" \
+  | sudo tee /etc/apt/sources.list.d/ngrok.list \
+  && sudo apt update \
+  && sudo apt install ngrok
+  ```
+
+  </TabItem>
+</Tabs>
+
+### Configurer et déployer {#setup--deploy}
+
+[Inscrivez-vous sur ngrok (gratuit avec des limitations) <i className="bi bi-box-arrow-up-right"></i>](https://dashboard.ngrok.com/signup) pour obtenir un jeton
+
+```bash title="Configurer"
+ngrok config add-authtoken <token>
+```
+
+```bash title="Exécuter"
+ngrok http 8000
+
+# Ou, en option, essayez de définir l'URL (offres payantes)
+ngrok http 8000 --url my_supervaizer_agent.ngrok.dev
+```
+
+```bash title="Ngrok en cours d'exécution" {5}
+Update                        update available (version 3.26.0, Ctrl-U to update)
+Version                       3.22.1
+Region                        United States (us)
+Web Interface                 http://127.0.0.1:4040
+Forwarding                    https://e83bc6b8acec.ngrok-free.app -> http://localhost:8000
+```
+
+:::info[Conservez votre URL]
+Notez l'URL complète, par exemple `https://my_supervaizer_agent.ngrok.dev`. Stockez-la dans la variable d'environnement `SUPERVAIZER_PUBLIC_URL`.
+:::
+
+## Définir l'URL publique {#set-the-public-url}
+
+Donnez l'URL au contrôleur avec une variable d'environnement ou avec une option de `supervaizer start`.
+
+```bash
+export SUPERVAIZER_PUBLIC_URL=https://my_supervaizer_agent.loca.lt
+supervaizer start
+
+# ou utilisez l'option
+supervaizer start --public-url https://my_supervaizer_agent.loca.lt
+```
+
+L'option `--public-url` est prioritaire sur la variable d'environnement.
+
+:::note[SUPERVAIZER_HOST]
+`SUPERVAIZER_HOST` est l'adresse sur laquelle le serveur écoute. N'y mettez pas le nom d'hôte du tunnel.
+:::
+
+## Et ensuite ? {#whats-next}
+
+[Exportez votre variable d'environnement et démarrez le serveur](quickstart#localdev)

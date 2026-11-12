@@ -1,0 +1,122 @@
+---
+id: case-management
+title: Travailler avec les cases
+description: Ouvrez un case dans Supervaize Studio, suivez ses étapes, répondez à un agent, et retrouvez et exportez les cases de vos jobs.
+displayed_sidebar: supervaizeFleetSidebar
+slug: case-management
+---
+
+# Travailler avec les cases {#work-with-cases}
+
+Un case est une unité de travail à l'intérieur d'un job, par exemple une personne à contacter ou un document à produire. Votre agent crée des cases pendant l'exécution du job. Vous ne pouvez pas créer de case dans Studio.
+
+Les cases vous servent à suivre l'avancement, à répondre à un agent qui vous attend et à récupérer les livrables.
+
+## Statuts des cases {#case-statuses}
+
+| Statut | Où vous le voyez |
+| --- | --- |
+| **Stopped** | Pas encore commencé. Le tableau l'affiche dans la colonne **Todo**. |
+| **Starting** | Le tableau l'affiche dans **In Progress**. |
+| **In progress** | Le tableau l'affiche dans **In Progress**. |
+| **Cancelling** | Le tableau l'affiche dans **In Progress**. |
+| **Awaiting** | Le tableau l'affiche dans **Waiting for Input**. |
+| **Completed** | Le tableau l'affiche dans **Success**. |
+| **Failed** | Le tableau l'affiche dans **Anomaly**. |
+| **Cancelled** | Le tableau l'affiche dans **Anomaly**. |
+
+Pour le tableau, la liste et le calendrier, voir [Naviguer dans un job](./job-navigation).
+
+## La page d'un case {#the-case-page}
+
+Le titre de la page affiche le nom du case, ses tags et son statut. Deux boutons se trouvent à côté du statut.
+
+| Bouton | Ce qu'il fait |
+| --- | --- |
+| **Case Rating** | Ouvre l'évaluation de ce case. |
+| **Case comments** | Ouvre les commentaires de ce case. |
+
+Deux liens, en haut, permettent de revenir en arrière : **Back to Job** et **All cases of this job**.
+
+| Zone | Ce que vous y trouvez |
+| --- | --- |
+| **Case Information** | **Agent**, **Mission**, **Job**, **Created**, **Finished** et **Type**. Les trois premiers sont des liens. |
+| **Case Result** | **Duration**, **Cost** et le nombre de **Steps**. |
+| **Contact Data** | Les données que l'agent publie à propos du case. Cette zone n'apparaît que si l'agent en envoie. |
+| Chronologie des étapes | Les étapes du case, dans l'ordre. |
+
+:::note[Évaluations]
+Case Rating est disponible lorsque la mission évalue ses cases. Voir [Évaluations](./rating-analytics).
+:::
+
+## Répondre à un agent {#answer-an-agent}
+
+Un agent peut arrêter un case pour demander une réponse humaine. Le case prend le statut **Awaiting**.
+
+1. Ouvrez le case.
+2. Repérez dans la chronologie l'étape qui vous attend.
+3. Remplissez le formulaire de l'étape.
+4. Sélectionnez **Submit**.
+
+L'agent peut modifier le libellé de ce bouton. Le case reprend ensuite.
+
+Une étape finale qui contient des fichiers indique **Deliverables**. Une étape sans fichier indique **Final**.
+
+Pour le côté développeur, voir [Validation humaine](/docs/supervaizer-controller/human-in-the-loop).
+
+## Actions Panel {#actions-panel}
+
+Sélectionnez **Actions Panel** dans la barre latérale pour voir ce qui demande votre intervention dans l'ensemble de vos missions. Chaque section affiche un compteur.
+
+| Section | Ce qu'elle affiche |
+| --- | --- |
+| **Needs your input** | Les cases au statut **Awaiting**. |
+| **Anomalies** | Les cases qui ont échoué ou qui ont été annulés. |
+| **Completed** | Les cases terminés, regroupés par job, avec le coût total. |
+| **In progress** | Les cases en cours d'exécution. |
+
+Chaque carte a un bouton **Details**. Une carte de **Needs your input** a un bouton **Skip**. Une carte de **Anomalies** a un bouton **Dismiss**.
+
+Les listes **Skipped** et **Dismissed** contiennent les cartes que vous avez masquées. Sélectionnez **Restore** pour faire revenir une carte.
+
+:::tip[Commencez par Needs your input]
+Ces cases sont bloqués tant que personne ne répond.
+:::
+
+## Listes de cases {#case-lists}
+
+Deux listes affichent des cases.
+
+| Liste | Comment l'ouvrir |
+| --- | --- |
+| Cases d'un job | Dans la section **Cases** d'un job, sélectionnez **View all →**. |
+| **All Cases** | Ouvrez-la depuis une carte du Dashboard. Elle n'a pas d'entrée dans la barre latérale. |
+
+### Filtres {#filters}
+
+| Filtre | Cases d'un job | All Cases |
+| --- | --- | --- |
+| Recherche par nom ou identifiant de case | Oui | Oui |
+| **Status** | Oui | Oui |
+| **Agent** | Oui | Non |
+| **Lane** | Oui | Non |
+| **Has deliverables** | Oui | Oui |
+| Filtre par tag | Oui | Oui |
+
+**Status** propose **Completed**, **Awaiting**, **In Progress**, **Failed** et **Stopped**.
+
+Cliquez sur **Tags** pour ouvrir une liste des tags dans laquelle vous pouvez chercher. Sélectionnez un tag pour l'afficher. Sélectionnez **Exclude** sur un tag pour masquer tous les cases qui le portent. Le filtre affiche vos choix sous forme de pastilles, par exemple « Tag is any of billing, urgent » et « Tag is not review ». Cliquez sur **is any of** pour passer à **is all of**.
+
+### Export {#export}
+
+| Bouton | Ce que vous obtenez |
+| --- | --- |
+| **Export CSV** | Un fichier CSV des cases listés. Vous choisissez d'abord les colonnes. Uniquement pour les cases d'un job. |
+| **Full export** | Un fichier CSV avec tous les champs, ou une feuille Google Sheets que Studio tient à jour. |
+| **Download deliverables** | Un fichier zip des livrables des cases que vous cochez. |
+
+**Download deliverables** est désactivé lorsqu'aucun case listé n'a de livrable.
+
+:::note[Google Sheets]
+Une feuille Google Sheets ne conserve que les filtres de statut, d'agent et de mission. Elle ne conserve pas la recherche, ni les filtres de livrables ou de tags. Pour ceux-là, utilisez le CSV.
+:::

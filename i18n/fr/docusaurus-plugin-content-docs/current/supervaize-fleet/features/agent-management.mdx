@@ -1,0 +1,96 @@
+---
+id: agent-management
+title: Gérer les agents
+description: Retrouvez vos agents dans Supervaize Studio, consultez leurs détails, réglez leurs paramètres, et mettez-les en pause, partagez-les ou retirez-les.
+displayed_sidebar: supervaizeFleetSidebar
+slug: agent-management
+---
+
+# Gérer les agents {#manage-agents}
+
+Un agent s'enregistre lui-même auprès de Studio. Vous ne l'ajoutez pas à la main. L'agent apparaît dans votre liste **Agents**.
+
+Les administrateurs de l'espace de travail peuvent voir les serveurs par lesquels les agents s'enregistrent. Ouvrez **Advanced**, puis **Servers**. Cette entrée n'apparaît que si les serveurs sont activés pour l'espace de travail.
+
+## La liste Agents {#the-agents-list}
+
+Chaque agent a une carte avec son statut et un badge d'intégration.
+
+Le badge d'intégration indique **New**, **Updated**, **Pending Setup**, **Operational** ou **Decommissioned**.
+
+Pour réduire la liste, utilisez **Search agents...** ou le filtre **Status**. Les valeurs de statut sont **Active**, **Inactive**, **Suspended**, **Error**, **Inaccessible** et **Paused**.
+
+## La page d'un agent {#the-agent-page}
+
+L'en-tête affiche le nom, le statut et la description.
+
+Les responsables d'agents voient deux onglets.
+
+| Onglet | Ce qu'il affiche |
+| --- | --- |
+| **Overview** | Les détails de l'agent, décrits ci-dessous |
+| **Activity** | Les jobs et les cases de l'agent par statut, avec les graphiques **Jobs per day** et **Cases per day** |
+
+Les autres membres ne voient que la vue d'ensemble.
+
+| Carte | Ce qu'elle affiche |
+| --- | --- |
+| **About** | La description complète que l'agent envoie lorsqu'il s'enregistre. |
+| **Agent Info** | **Slug**, **Name**, **Runtime**, **Version**, **Supervaizer SDK**, **Author**, **Developer**, **Maintainer**, **Editor**, **Environment**, **Server**, **Onboarding**, **Tags**, **Created** et **Updated**. Une ligne n'apparaît que si l'agent fournit une valeur. |
+| **Parameters** | Les réglages de l'agent. |
+| **Rating** | Les évaluations de l'agent. Voir [Évaluations](./rating-analytics). |
+
+### Définir les paramètres {#set-parameters}
+
+L'agent déclare ses propres paramètres. Chaque paramètre affiche son nom et un badge **Set** ou **Not Set**. Une icône de clé signale un secret.
+
+1. Saisissez une valeur dans le champ. Un champ secret masque la valeur.
+2. Recommencez pour chaque paramètre à modifier.
+3. Sélectionnez **Save Parameters**.
+
+Studio n'enregistre que les valeurs que vous avez modifiées.
+
+Le contrôleur lit les valeurs à son démarrage. Après la modification d'une valeur, le développeur redémarre le contrôleur. Voir [Paramètres](/docs/supervaizer-controller/parameters).
+
+## Actions de l'en-tête {#header-actions}
+
+| Bouton | Ce qu'il fait |
+| --- | --- |
+| **New Mission** | Crée une mission pour cet agent. Voir [Créer une mission](./mission-management). |
+| **Pause** ou **Resume** | Met l'agent en pause ou met fin à la pause. |
+| **Edit** | Modifie l'agent. |
+| **LLM settings** | Ouvre les réglages d'un agent LLM. |
+| **Delete** | Supprime l'agent. |
+| **Request Publication** ou **Unpublish** | Demande la publication de l'agent, ou la retire. |
+| **Remove from workspace** | Retire un agent partagé de votre espace de travail. |
+
+Les actions de modification, de suppression et de publication appartiennent à l'espace de travail propriétaire de l'agent.
+
+## Mettre un agent en pause {#pause-an-agent}
+
+Le propriétaire d'un agent peut le mettre en pause.
+
+1. Sélectionnez **Pause**.
+2. Dans la boîte de dialogue **Pause agent**, lisez l'avertissement.
+3. Confirmez.
+
+Si des jobs sont en cours, la boîte de dialogue les liste. Sélectionnez **Pause anyway and stop N jobs** pour continuer, ou **Cancel**.
+
+Un agent en pause se comporte comme suit.
+
+- Studio arrête ses contrôles d'état.
+- Studio bloque toutes les opérations de l'agent. Le bouton **Start** du job est désactivé, et son infobulle indique **Agent paused**.
+- Le statut est **Paused**.
+- Un bandeau affiche la date et le motif.
+
+Seul le propriétaire peut mettre fin à la pause. Sélectionnez **Resume**.
+
+Un serveur qui reste longtemps hors service est mis en pause avec ses agents. Le délai par défaut est de 24 heures.
+
+La pause n'existe que dans Studio. Elle n'envoie rien au serveur de l'agent.
+
+## Partager un agent {#share-an-agent}
+
+Vous pouvez partager un agent avec un autre espace de travail. La carte **Workspace Access** de l'agent partagé montre l'état de l'autorisation.
+
+L'espace de travail destinataire doit accepter l'agent avant qu'un job puisse démarrer. Un administrateur de l'espace de travail ou un responsable d'agents de cet espace de travail l'accepte et définit la référence de l'agent dans l'espace de travail.

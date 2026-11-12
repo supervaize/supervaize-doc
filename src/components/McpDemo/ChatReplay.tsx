@@ -5,6 +5,7 @@
 
 import React, { type ReactNode, useEffect, useState } from "react";
 import clsx from "clsx";
+import Translate from "@docusaurus/Translate";
 import BrowserWindow from "@site/src/components/BrowserWindow";
 
 import { SCENARIOS } from "./scenarios";
@@ -56,7 +57,7 @@ export default function ChatReplay({ only }: { only?: string | string[] }): Reac
             </button>
           ))}
         <button type="button" className={styles.tab} onClick={() => play(active)}>
-          ↻ Replay
+          <Translate id="mcpDemo.ui.replay">{"↻ Replay"}</Translate>
         </button>
       </div>
 
@@ -81,7 +82,12 @@ export default function ChatReplay({ only }: { only?: string | string[] }): Reac
               return (
                 <div key={i} className={styles.confirm}>
                   <span>
-                    Claude asks to run <code>{step.tool}</code> on Supervaize
+                    <Translate
+                      id="mcpDemo.ui.confirmAsk"
+                      values={{ tool: <code>{step.tool}</code> }}
+                    >
+                      {"Claude asks to run {tool} on Supervaize"}
+                    </Translate>
                   </span>
                   <span className={styles.confirmButtons}>
                     <span className={styles.confirmDeny}>Deny</span>
@@ -95,12 +101,15 @@ export default function ChatReplay({ only }: { only?: string | string[] }): Reac
               </div>
             );
           })}
-          {shown < steps.length && <div className={styles.typing}>Claude is working…</div>}
+          {shown < steps.length && <div className={styles.typing}>
+              <Translate id="mcpDemo.ui.working">{"Claude is working…"}</Translate>
+            </div>}
         </div>
       </BrowserWindow>
       <p className={styles.caption}>
-        Illustrative replay with fictional data. Wording varies between chats;
-        the tools are the real ones.
+        <Translate id="mcpDemo.ui.replayCaption">
+          {"Illustrative replay with fictional data. Wording varies between chats; the tools are the real ones."}
+        </Translate>
       </p>
     </div>
   );

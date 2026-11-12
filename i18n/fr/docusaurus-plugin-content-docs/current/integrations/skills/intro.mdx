@@ -1,0 +1,37 @@
+---
+id: skills-intro
+title: Skills
+displayed_sidebar: integrationsSidebar
+slug: /integrations/skills
+---
+
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+# Skills {#skills}
+
+Des skills d'agent pour l'écosystème [Runwaize](https://runwaize.com). Chaque skill est un jeu d'instructions autonome qu'un agent de code (Claude Code, Cursor, Codex, Gemini CLI, etc.) peut charger et suivre pour interagir avec la plateforme Supervaize.
+
+Le skill Supervaizer Integration est publié avec le [<i className="bi bi-github"></i> SDK Supervaizer](https://github.com/supervaize/supervaizer/tree/main/skills/supervaizer-integration). Les autres skills sont dans le dépôt [<i className="bi bi-github"></i> runwaize_skills](https://github.com/runwaize/runwaize_skills).
+
+## Installation {#install}
+
+Les skills sont disponibles dans la **marketplace de plugins de Claude Code** :
+
+```
+/plugin marketplace add supervaize/supervaizer
+/plugin install supervaizer-integration@supervaizer
+```
+
+```
+/plugin marketplace add runwaize/runwaize_skills
+/plugin install supervaize-access@runwaize-skills
+```
+
+Avec un autre agent de code, clonez le dépôt du skill et indiquez à l'agent son fichier `SKILL.md`.
+
+## Skills disponibles {#available-skills}
+
+| Skill                                                                            | Objectif                                                                                              | Quand l'utiliser                                                                                                                              |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| [**Supervaizer Integration**](/docs/integrations/skills/supervaizer-integration) | Intégrer un agent Python existant avec le Supervaizer Controller                                      | Vous voulez que votre outil de code IA intègre Supervaizer dans le projet de votre agent.                                                     |
+| [**Supervaize Access**](/docs/integrations/skills/supervaize-access)             | Piloter un espace de travail Supervaize depuis un chatbot ou un IDE (REST + MCP, clé d'API)           | Votre espace de travail est en service ; vous voulez gérer les agents, les missions, les cases, les étapes et la validation humaine depuis votre assistant IA ou votre CLI |

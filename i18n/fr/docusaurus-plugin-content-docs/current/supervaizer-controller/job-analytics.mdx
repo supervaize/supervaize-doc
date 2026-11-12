@@ -1,0 +1,248 @@
+---
+id: job-analytics
+title: Analyses des jobs et des missions
+displayed_sidebar: supervaizerControllerSidebar
+slug: job-analytics
+---
+
+# Analyses des jobs et des missions : construire les tableaux de bord {#job-and-mission-analytics-build-the-dashboards}
+
+Studio peut afficher un tableau de bord des données de votre agent à deux endroits. Votre agent renvoie un document `Dashboard` pour chacun, et Studio dessine les cartes KPI, les filtres et les graphiques.
+
+| Surface | Où Studio l'affiche | Périmètre des données |
+| --- | --- | --- |
+| `job.analytics` | Une section **Job Analytics** sur chaque page de job. Pour un job avec un [écran Configure](job-configurator), elle se trouve dans la vue **Operations**. | Un job |
+| `mission.analytics` | Le lien **Analytics** de la page de la mission | Tous les jobs de la mission |
+
+Les deux surfaces utilisent le même document et les mêmes jeux de données : un seul constructeur peut donc servir les deux.
+
+![La section Job Analytics d'une page de job : un filtre, un graphique et des cartes KPI](/img/controller/job-analytics.png)
+
+La page de la mission présente le même tableau de bord pour tous les jobs de la mission, avec un tableau par jeu de données :
+
+![Le tableau de bord de mission de l'agent Hello World : un filtre, un graphique, des cartes KPI et un tableau](/img/controller/mission-analytics.png)
+
+:::info[Exemple fonctionnel]
+L'[exemple Hello World](https://github.com/supervaize/supervaize_hello_world) implémente les deux surfaces dans `agent_dashboard.py`.
+:::
+
+:::tip[Confiez ce travail à un agent de code]
+Le [skill d'intégration Supervaizer](https://github.com/supervaize/supervaizer/tree/main/skills/supervaizer-integration) guide Claude Code, Cursor ou Codex dans ce travail. Il est publié avec le SDK, et il lit ce guide ainsi que l'exemple Hello World : il suit donc le contrat en vigueur.
+:::
+
+## Fonctionnement {#how-it-works}
+
+1. L'agent déclare ses **jeux de données** (datasets) et la surface dans l'enregistrement v2.
+2. Studio charge la surface. Pour `job.analytics`, la requête porte le `job_id`, et `input` contient les champs de lancement du job.
+3. L'agent renvoie un document `Dashboard` : jeux de données, contrôles et widgets.
+4. Pour chaque jeu de données, Studio invoque l'action `dataset.<id>.query` et lit les lignes.
+5. Studio calcule les métriques et dessine les graphiques à partir des lignes. La modification d'un contrôle relance les requêtes.
+
+L'agent n'envoie que des données et des spécifications déclaratives de graphiques. Il n'envoie ni HTML ni JavaScript.
+
+## Étape 1 : déclarer les jeux de données et la surface {#step-1-declare-the-datasets-and-the-surface}
+
+```python
+registration = build_v2_agent_registration(
+    agent_slug="hello-world-ai-agent",
+    display_name="Hello World AI Agent",
+    a2ui_catalog_version="hello-world.0",
+    surfaces=["job.start", "mission.analytics", "job.analytics"],
+    actions=["job.start", "job.sync", "job.stop"],
+    datasets=[
+        {
+            "id": "hello_cases",
+            "label": "Hello cases",
+            "display": {"columns": ["title", "city", "status"]},
+        }
+    ],
+)
+```
+
+Gardez le jeu de données à la portée par défaut, `workspace`. Depuis une page de job, Studio n'exécute une requête que sur un jeu de données de portée espace de travail. Votre gestionnaire de requête limite les lignes au job ou à la mission.
+
+Le SDK en déduit l'action `dataset.hello_cases.query` avec `mutating=False`. Enregistrez un gestionnaire pour cette action, et un pour chaque surface :
+
+```python
+for surface in ("mission.analytics", "job.analytics"):
+    server.register_v2_surface(surface, handle_surface, agent_slug=agent.slug)
+server.register_v2_action("dataset.hello_cases.query", handle_action, agent_slug=agent.slug)
+```
+
+Un jeu de données accepte aussi `auto_surface=True` pour une surface de tableau générée, et un `scope` égal à `workspace`, `mission` ou `job`.
+
+Vous pouvez aussi déclarer un tableau de bord dans l'enregistrement. Ses widgets pointent vers un jeu de données :
+
+```python
+dashboards=[
+    {
+        "id": "overview",
+        "label": "Overview",
+        "surface": "mission.analytics",  # la valeur par défaut
+        "widgets": [
+            {
+                "id": "by_city",
+                "title": "Cases by city",
+                "data": {"mode": "ref", "datasetId": "hello_cases"},
+                "visualization": {"type": "vega-lite", "spec": {"mark": "bar", "encoding": {"x": {"field": "city", "type": "nominal"}}}},
+            }
+        ],
+    }
+]
+```
+
+Studio n'affiche la section Job Analytics que si `job.analytics` figure dans l'enregistrement. Une nouvelle surface ou une nouvelle action modifie les portées de l'autorisation (grant) : l'espace de travail doit donc accepter de nouveau l'autorisation de l'agent.
+
+## Étape 2 : renvoyer le document Dashboard {#step-2-return-the-dashboard-document}
+
+```json
+{
+  "type": "Dashboard",
+  "id": "hello_world.job.analytics",
+  "title": "Job analytics",
+  "datasets": [],
+  "controls": [],
+  "widgets": [],
+  "state": {}
+}
+```
+
+### Jeux de données et métriques KPI {#datasets-and-kpi-metrics}
+
+```json
+{
+  "id": "hello_cases",
+  "label": "Hello cases",
+  "input": { "job_ref": "01M3KEF6…", "status": "all" },
+  "display": { "columns": ["title", "city", "status"] },
+  "metrics": [
+    { "id": "cases", "label": "Cases", "reducer": "row_count" },
+    { "id": "cities", "label": "Cities", "reducer": "distinct_count", "field": "city" },
+    { "id": "avg_duration", "label": "Avg duration", "reducer": "avg", "field": "duration_secs", "suffix": "s" },
+    { "id": "completed", "label": "Completed", "reducer": "ratio", "numerator_field": "completed", "denominator_field": "total" }
+  ]
+}
+```
+
+- `id` doit désigner un jeu de données de l'enregistrement.
+- `input` est envoyé avec chaque requête de ce jeu de données. Utilisez-le pour restreindre les lignes, par exemple au job.
+- Chaque métrique devient une carte KPI. Studio la calcule à partir des lignes renvoyées.
+
+| Réducteur | Résultat | Nécessite |
+| --- | --- | --- |
+| `row_count` | Nombre de lignes | rien |
+| `sum`, `avg`, `max` | Somme, moyenne ou maximum d'un champ numérique | `field` |
+| `distinct_count` | Nombre de valeurs différentes | `field` |
+| `ratio` | `sum(numerator) / sum(denominator)`, affiché sous la forme `12 / 40` | `numerator_field`, `denominator_field` |
+
+`suffix` ajoute une unité telle que `%` ou `s`.
+
+### Contrôles {#controls}
+
+Les contrôles sont les filtres placés au-dessus du tableau de bord.
+
+```json
+"controls": [
+  {
+    "id": "range",
+    "label": "Window",
+    "type": "segmented",
+    "default": "14d",
+    "options": [
+      { "label": "7d", "value": "7d" },
+      { "label": "14d", "value": "14d" },
+      { "label": "All", "value": "365d" }
+    ]
+  },
+  { "id": "date_from", "label": "From", "type": "date" }
+]
+```
+
+Les types de contrôle sont `segmented` (une rangée de boutons, avec des `options` et un `default`) et `date`. Studio ajoute la valeur de chaque contrôle à l'entrée de chaque requête de jeu de données, sous l'`id` du contrôle.
+
+### Widgets {#widgets}
+
+Un widget est un graphique. Studio affiche les widgets dont le `visualization.type` est `vega-lite` et qui portent un `spec`. Il ignore les autres types.
+
+```json
+{
+  "id": "cases_by_city",
+  "title": "Cases by city",
+  "layout": { "w": 6, "h": 4 },
+  "data": { "mode": "ref", "datasetId": "hello_cases", "input": { "status": "all" } },
+  "visualization": {
+    "type": "vega-lite",
+    "spec": {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "mark": "bar",
+      "encoding": {
+        "x": { "field": "city", "type": "nominal" },
+        "y": { "aggregate": "count", "type": "quantitative" }
+      }
+    }
+  }
+}
+```
+
+- `data.datasetId` désigne le jeu de données dont les lignes alimentent le graphique. Studio injecte les lignes dans le `data.values` de Vega-Lite.
+- À la place d'une référence à un jeu de données, un widget peut contenir des lignes en ligne : `"data": {"mode": "inline", "values": [...]}`.
+- `layout.w` et `layout.h` dimensionnent le widget sur une grille de 12 colonnes. `x` et `y` sont facultatifs.
+- Toute marque Vega-Lite fonctionne : barres, lignes, points, cartes de chaleur (`rect`), graphiques superposés.
+
+:::tip[Graphiques vides]
+Une carte de chaleur sans données associe chaque cellule à la couleur médiane. Donnez à l'échelle de couleurs un domaine qui inclut zéro, et ajoutez une couche de texte qui indique _No available data_.
+:::
+
+## Étape 3 : répondre à la requête du jeu de données {#step-3-answer-the-dataset-query}
+
+L'entrée de l'action est la fusion des champs de lancement du job, de l'`input` du jeu de données et des valeurs des contrôles. Les dernières valeurs l'emportent.
+
+```python
+def query_dataset(action_input):
+    rows = load_rows(job_ref=action_input.get("job_ref"), status=action_input.get("status"))
+    return {
+        "status": "ok",
+        "effects": [{"type": "dataset.queried", "dataset": "hello_cases", "count": len(rows), "rows": rows}],
+    }
+```
+
+Studio lit les lignes dans l'effet `dataset.queried` dont le `dataset` est égal à l'identifiant du jeu de données. Chaque ligne est un objet plat. Ajoutez les champs numériques auxiliaires dont vos métriques ont besoin, par exemple `completed: 1` et `total: 1` pour un `ratio`.
+
+## Ce qui diffère entre job et mission {#what-differs-between-job-and-mission}
+
+| | `job.analytics` | `mission.analytics` |
+| --- | --- | --- |
+| Requête | `job_id` est renseigné ; `input` contient les champs de lancement du job | pas de `job_id` |
+| Cartes KPI | oui | oui |
+| Graphiques | oui | oui |
+| Tableaux des jeux de données | non | oui, un tableau par jeu de données, avec `display.columns` |
+| Valeur par défaut habituelle | toute la durée de vie du job | une fenêtre récente |
+
+Pour un job, retrouvez votre propre objet métier à partir du `job_id`, puis placez sa référence dans l'`input` de chaque jeu de données. Vérifiez qu'il appartient à l'espace de travail du contexte `workspace_authorization` vérifié. Une valeur de filtre n'est pas une frontière d'accès.
+
+Un tableau de bord de job doit couvrir tout le job par défaut. Si votre tableau de bord de mission utilise par défaut une fenêtre courte, définissez-en une longue quand aucune plage n'est fournie.
+
+## Liste de vérification {#checklist}
+
+- [ ] Chaque jeu de données du document est déclaré dans `datasets` de l'enregistrement, avec la portée `workspace`.
+- [ ] `job.analytics` et `mission.analytics` figurent dans `surfaces`, chacune avec un gestionnaire.
+- [ ] L'action de requête renvoie un effet `dataset.queried` avec `dataset` et `rows`.
+- [ ] Les graphiques utilisent `visualization.type: "vega-lite"` avec un `spec`.
+- [ ] Le tableau de bord du job restreint chaque jeu de données au job et vérifie l'espace de travail.
+
+## Dépannage {#troubleshooting}
+
+| Symptôme | Cause |
+| --- | --- |
+| La section affiche _Failed to load chart data_ | Le jeu de données n'a pas la portée espace de travail, ou l'espace de travail n'a pas accepté de nouveau l'autorisation de l'agent. |
+| Pas de section Job Analytics | `job.analytics` ne figure pas dans l'enregistrement, ou l'agent n'a pas été enregistré de nouveau. |
+| _No analytics datasets declared_ | Le document n'a pas de `datasets`, ou leurs identifiants ne correspondent à aucun jeu de données déclaré. |
+| Un widget ne s'affiche pas | Sa visualisation n'est pas `vega-lite`, ou il n'a pas de `spec`. |
+| Les cartes KPI affichent 0 | Il manque aux lignes le `field` de la métrique, ou les valeurs ne sont pas des nombres. |
+| Un filtre ne change rien | Le gestionnaire de requête ne lit pas l'`id` du contrôle dans son entrée. |
+
+## Référence {#reference}
+
+- [Configurateur de job (écran Configure)](job-configurator)
+- [Guide Supervaizer v2](https://github.com/supervaize/supervaizer/blob/main/docs/2026_05_SUPERVAIZER_v2.md) : jeux de données, tableaux de bord et surfaces.
+- [Documentation de Vega-Lite](https://vega.github.io/vega-lite/docs/)
