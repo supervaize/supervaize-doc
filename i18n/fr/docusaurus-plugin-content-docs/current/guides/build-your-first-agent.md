@@ -83,7 +83,7 @@ Ouvrez ensuite une **nouvelle** fenêtre de Terminal et vérifiez avec `claude -
 
 Le [modèle de départ](./starter-template) est un agent qui respecte déjà toutes les exigences de Supervaize : Claude Code n'aura qu'à y mettre la logique de votre agent.
 
-1. Téléchargez [le modèle](/files/supervaize-agent-template.zip) et décompressez-le où vous voulez.
+1. Récupérez le modèle depuis [son dépôt GitHub](https://github.com/supervaize/supervaize-agent-template) : lancez `git clone https://github.com/supervaize/supervaize-agent-template.git`, ou choisissez **Code**, puis **Download ZIP**, et décompressez-le où vous voulez (le dossier s'appelle alors `supervaize-agent-template-main`).
 2. Dans le Terminal, placez-vous dans son dossier et préparez Python :
 
 <Tabs groupId="os">

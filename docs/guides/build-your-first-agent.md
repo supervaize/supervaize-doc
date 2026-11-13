@@ -83,7 +83,7 @@ Then open a **new** terminal window and check with `claude --version`. Other way
 
 The [starter template](./starter-template) is an agent that already meets every Supervaize requirement: Claude Code only has to add your agent's logic.
 
-1. Download [the template](/files/supervaize-agent-template.zip) and unzip it wherever you like.
+1. Get the template from [its GitHub repository](https://github.com/supervaize/supervaize-agent-template): run `git clone https://github.com/supervaize/supervaize-agent-template.git`, or select **Code**, then **Download ZIP**, and unzip it wherever you like (the folder is then named `supervaize-agent-template-main`).
 2. In the terminal, go to its folder and set up Python:
 
 <Tabs groupId="os">
